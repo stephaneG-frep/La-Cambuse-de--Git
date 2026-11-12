@@ -2,7 +2,7 @@
 
 Application Flutter **Android** et **Linux** : académie Git / GitHub / GitLab / Docker / DevOps de zéro à expert, atelier d'opérations réelles sur projets et capitaine automatique supervisé.
 
-> État actuel : **fin de phase 1** (fondations et design). Voir [docs/ACCEPTANCE_MATRIX.md](docs/ACCEPTANCE_MATRIX.md) pour l'état réel de chaque fonctionnalité. L'Académie, l'Atelier et le Capitaine affichent honnêtement la phase où ils seront livrés : rien n'est simulé.
+> État actuel : **fin de phase 2** (Académie Git complète, hors ligne). Voir [docs/ACCEPTANCE_MATRIX.md](docs/ACCEPTANCE_MATRIX.md) pour l'état réel de chaque fonctionnalité. L'Atelier et le Capitaine affichent honnêtement la phase où ils seront livrés. Le bac à sable de l'Académie est un **simulateur pédagogique** clairement signalé : il n'exécute aucune commande réelle.
 
 ## Documents de référence
 
@@ -11,6 +11,7 @@ Application Flutter **Android** et **Linux** : académie Git / GitHub / GitLab /
 - [ROADMAP.md](ROADMAP.md) — phases
 - [docs/PHASE0_DIAGNOSTIC.md](docs/PHASE0_DIAGNOSTIC.md) — environnement, décisions, menaces, contrat API
 - [docs/PHASE1_BILAN.md](docs/PHASE1_BILAN.md) — bilan de la phase 1
+- [docs/PHASE2_BILAN.md](docs/PHASE2_BILAN.md) — bilan de la phase 2
 - [CHANGELOG.md](CHANGELOG.md)
 
 ## Prérequis développeur
@@ -23,6 +24,7 @@ Application Flutter **Android** et **Linux** : académie Git / GitHub / GitLab /
 
 ```bash
 flutter pub get
+python3 tool/content/git_module.py                          # régénère assets/courses/git.json
 dart run build_runner build --delete-conflicting-outputs   # code Drift
 flutter analyze --fatal-infos
 flutter test

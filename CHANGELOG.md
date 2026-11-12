@@ -2,7 +2,21 @@
 
 Format inspiré de « Keep a Changelog ». Versions non publiées.
 
-## [Non publié] — Phase 1 : fondations et design (2026-11-12)
+## [Non publié] — Phase 2 : Académie Git (2026-11-12)
+
+### Ajouté
+- Module Git : 14 leçons, 60 questions avec corrections expliquées, 12 exercices guidés, projet final et grille d'évaluation, glossaire (25 termes). Source : `tool/content/git_module.py`.
+- Bac à sable Git simulé en mémoire (aucune exécution réelle, chemins confinés, enchaînements refusés).
+- Validation des leçons (quiz ≥ 70 % + exercice), meilleur score, tentatives.
+- Répétition espacée (Leitner 1-2-4-8-16 jours) et écran Révisions.
+- Carte des îles (10 modules, 9 annoncés « en brume » avec leur phase), recherche, glossaire.
+- Reprise de la dernière leçon et progression sur le Pont ; renommage du profil.
+- Schéma de base v2 et migration v1 → v2 testée.
+
+### Corrigé
+- Écran de leçon trop chargé sur téléphone : bouton d'action du quiz fixe, onglets compacts, lien « Leçon suivante » déplacé.
+
+## Phase 1 : fondations et design (2026-11-12)
 
 ### Ajouté
 - Projet Flutter Android + Linux (`fr.lacambuse.la_cambuse`).

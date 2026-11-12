@@ -32,6 +32,8 @@ dev_dependencies:
 
 flutter:
   generate: true
+  assets:
+    - assets/courses/
 
   uses-material-design: true
 

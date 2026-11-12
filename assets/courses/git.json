@@ -1,0 +1,2475 @@
+{
+ "id": "git",
+ "version": 1,
+ "title": "Git, de zéro à autonome",
+ "summary": "Versionner son travail, créer des branches, fusionner, résoudre des conflits et publier des versions propres.",
+ "objectives": [
+  "Comprendre le modèle de Git : copie de travail, index, dépôt",
+  "Créer un historique propre de commits atomiques",
+  "Travailler avec des branches, fusionner et résoudre des conflits",
+  "Protéger son dépôt : .gitignore, secrets, bonnes pratiques",
+  "Marquer des versions avec des étiquettes et SemVer"
+ ],
+ "prerequisites": [
+  "Aucun prérequis Git",
+  "Savoir ce qu'est un fichier et un dossier",
+  "Recommandé : module Terminal Linux (livré en phase 9)"
+ ],
+ "lessons": [
+  {
+   "id": "pourquoi-git",
+   "title": "Pourquoi Git ?",
+   "minutes": 15,
+   "objectives": [
+    "Expliquer ce qu'est un système de gestion de versions",
+    "Distinguer Git (l'outil) de GitHub et GitLab (les services)",
+    "Créer son premier dépôt"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Sans gestion de versions, on finit avec des fichiers « rapport_final_v3_VRAIMENT_final.docx ». Un système de gestion de versions (VCS) enregistre l'historique d'un projet : chaque étape importante est un instantané que l'on peut consulter, comparer ou restaurer."
+    },
+    {
+     "type": "text",
+     "body": "Git est un VCS distribué : chaque copie d'un dépôt contient tout l'historique. On peut donc travailler hors ligne, et aucun serveur unique n'est indispensable. GitHub et GitLab sont des services qui hébergent des dépôts Git et ajoutent la collaboration (revues de code, tickets, CI)."
+    },
+    {
+     "type": "text",
+     "body": "Trois notions de base : le dépôt (le dossier caché .git qui contient l'historique), le commit (un instantané daté, signé par un auteur, avec un message) et la branche (une ligne de travail)."
+    },
+    {
+     "type": "code",
+     "body": "git init\ngit status",
+     "caption": "Créer un dépôt dans le dossier courant puis demander son état"
+    },
+    {
+     "type": "tip",
+     "body": "git status est votre boussole : lancez-le avant et après chaque action pour comprendre ce qui se passe."
+    }
+   ],
+   "exercise": {
+    "intro": "Bienvenue dans la Salle des machines ! Ce terminal est un simulateur : il n'agit sur aucun vrai fichier.",
+    "setup": [],
+    "steps": [
+     {
+      "instruction": "Créez un dépôt Git vide.",
+      "hint": "La commande commence par git et se termine par init.",
+      "solution": [
+       "git init"
+      ],
+      "goals": [
+       {
+        "type": "initialized"
+       }
+      ]
+     },
+     {
+      "instruction": "Demandez à Git l'état du dépôt.",
+      "hint": "C'est la commande « boussole » vue dans le cours.",
+      "solution": [
+       "git status"
+      ],
+      "goals": [
+       {
+        "type": "commandUsed",
+        "prefix": "git status"
+       }
+      ]
+     }
+    ]
+   },
+   "quiz": [
+    {
+     "id": "git-l1-q1",
+     "type": "single",
+     "prompt": "Qu'est-ce qu'un commit ?",
+     "choices": [
+      "Un instantané enregistré de l'état du projet, avec auteur et message",
+      "Une copie du dépôt envoyée sur un serveur",
+      "Un fichier de configuration de Git",
+      "Une branche distante"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Un commit est un instantané : Git enregistre l'état complet des fichiers suivis à ce moment, avec l'auteur, la date, le message et le lien vers le commit précédent."
+    },
+    {
+     "id": "git-l1-q2",
+     "type": "single",
+     "prompt": "Que signifie « Git est distribué » ?",
+     "choices": [
+      "Chaque clone contient tout l'historique du projet",
+      "Git ne fonctionne qu'avec un serveur central",
+      "Les fichiers sont répartis sur plusieurs disques",
+      "Git est distribué gratuitement"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Distribué signifie que chaque copie est un dépôt complet : on peut consulter l'historique, créer des commits et des branches sans réseau."
+    },
+    {
+     "id": "git-l1-q3",
+     "type": "command",
+     "prompt": "Quelle commande crée un nouveau dépôt Git dans le dossier courant ?",
+     "accepted": [
+      "git init"
+     ],
+     "explanation": "git init crée le dossier caché .git qui contiendra tout l'historique. Le dossier de travail, lui, n'est pas modifié."
+    },
+    {
+     "id": "git-l1-q4",
+     "type": "multiple",
+     "prompt": "Quels bénéfices apporte un système de gestion de versions ? (plusieurs réponses)",
+     "choices": [
+      "Revenir à une version antérieure",
+      "Travailler à plusieurs en parallèle",
+      "Savoir qui a changé quoi, et pourquoi",
+      "Rendre le programme plus rapide à l'exécution"
+     ],
+     "answer": [
+      0,
+      1,
+      2
+     ],
+     "explanation": "Un VCS sert l'historique, la collaboration et la traçabilité. Il n'a aucun effet sur les performances du programme."
+    },
+    {
+     "id": "git-l1-q5",
+     "type": "single",
+     "prompt": "Quelle phrase décrit correctement Git et GitHub ?",
+     "choices": [
+      "Git est l'outil de versionnement ; GitHub est un service qui héberge des dépôts Git",
+      "Ce sont deux noms du même logiciel",
+      "GitHub est la nouvelle version de Git",
+      "Git ne fonctionne qu'avec GitHub"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Git fonctionne seul, en local. GitHub, GitLab ou un serveur personnel hébergent des copies de dépôts et ajoutent des outils de collaboration."
+    }
+   ]
+  },
+  {
+   "id": "configurer",
+   "title": "Configurer son identité",
+   "minutes": 12,
+   "objectives": [
+    "Déclarer son nom et son e-mail d'auteur",
+    "Comprendre les niveaux de configuration système, global et local",
+    "Lire une valeur de configuration"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Chaque commit enregistre un auteur. Avant le premier commit, Git doit donc connaître votre nom et votre e-mail ; sinon il refuse de valider avec « Author identity unknown »."
+    },
+    {
+     "type": "code",
+     "body": "git config --global user.name \"Anne Bonny\"\ngit config --global user.email anne@exemple.fr",
+     "caption": "Identité pour tous vos dépôts"
+    },
+    {
+     "type": "text",
+     "body": "Trois niveaux existent : --system (toute la machine), --global (votre compte utilisateur, fichier ~/.gitconfig) et --local (un seul dépôt, fichier .git/config). Le niveau le plus précis l'emporte : une valeur locale remplace la valeur globale."
+    },
+    {
+     "type": "code",
+     "body": "git config user.name\ngit config --list",
+     "caption": "Lire une valeur, ou tout afficher"
+    },
+    {
+     "type": "tip",
+     "body": "Sur GitHub, utilisez l'adresse « noreply » fournie dans vos paramètres si vous ne voulez pas exposer votre e-mail personnel dans l'historique public."
+    },
+    {
+     "type": "text",
+     "body": "D'autres réglages utiles : core.editor (l'éditeur ouvert pour les messages) et init.defaultBranch (le nom de la branche créée par git init, souvent main)."
+    }
+   ],
+   "exercise": {
+    "intro": "Un dépôt vient d'être créé. Présentez-vous à Git.",
+    "setup": [
+     "git init"
+    ],
+    "steps": [
+     {
+      "instruction": "Déclarez votre nom d'auteur (user.name).",
+      "hint": "git config user.name \"Votre Nom\"",
+      "solution": [
+       "git config user.name \"Anne Bonny\""
+      ],
+      "goals": [
+       {
+        "type": "configSet",
+        "key": "user.name"
+       }
+      ]
+     },
+     {
+      "instruction": "Déclarez votre e-mail (user.email).",
+      "hint": "Même principe avec la clé user.email.",
+      "solution": [
+       "git config user.email anne@cambuse.example"
+      ],
+      "goals": [
+       {
+        "type": "configSet",
+        "key": "user.email"
+       }
+      ]
+     },
+     {
+      "instruction": "Choisissez nano comme éditeur (core.editor).",
+      "hint": "git config core.editor nano",
+      "solution": [
+       "git config --global core.editor nano"
+      ],
+      "goals": [
+       {
+        "type": "configSet",
+        "key": "core.editor"
+       }
+      ]
+     }
+    ]
+   },
+   "quiz": [
+    {
+     "id": "git-l2-q1",
+     "type": "single",
+     "prompt": "Que se passe-t-il si vous committez sans avoir configuré votre identité ?",
+     "choices": [
+      "Git refuse avec « Author identity unknown »",
+      "Le commit est anonyme",
+      "Git utilise automatiquement votre compte GitHub",
+      "Le commit est créé mais pas sauvegardé"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Git exige un auteur pour chaque commit. Il affiche les deux commandes git config à lancer."
+    },
+    {
+     "id": "git-l2-q2",
+     "type": "command",
+     "prompt": "Écrivez la commande qui définit, pour tous vos dépôts, l'e-mail moi@exemple.fr.",
+     "accepted": [
+      "git config --global user.email moi@exemple.fr",
+      "git config --global user.email \"moi@exemple.fr\""
+     ],
+     "explanation": "--global écrit dans ~/.gitconfig, donc pour tous les dépôts de votre compte. Sans --global, la valeur ne vaudrait que pour le dépôt courant."
+    },
+    {
+     "id": "git-l2-q3",
+     "type": "single",
+     "prompt": "Une valeur est définie en --global ET en --local. Laquelle s'applique dans le dépôt ?",
+     "choices": [
+      "La valeur locale",
+      "La valeur globale",
+      "La première définie",
+      "Git affiche une erreur"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Le niveau le plus précis gagne : local > global > système. C'est pratique pour utiliser un e-mail professionnel dans un seul dépôt."
+    },
+    {
+     "id": "git-l2-q4",
+     "type": "single",
+     "prompt": "Quel réglage choisit le nom de la branche créée par git init ?",
+     "choices": [
+      "init.defaultBranch",
+      "core.editor",
+      "user.branch",
+      "branch.default"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "git config --global init.defaultBranch main fait de main la branche initiale de tous vos nouveaux dépôts."
+    }
+   ]
+  },
+  {
+   "id": "etats-fichiers",
+   "title": "Les états d'un fichier",
+   "minutes": 18,
+   "objectives": [
+    "Nommer les états non suivi, modifié, indexé et validé",
+    "Lire la sortie de git status, en version longue et courte",
+    "Situer la copie de travail, l'index et le dépôt"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Git gère trois zones : la copie de travail (vos fichiers), l'index (la « zone de préparation » du prochain commit) et le dépôt (l'historique des commits)."
+    },
+    {
+     "type": "text",
+     "body": "Un fichier est donc : non suivi (untracked, Git ne le connaît pas encore), modifié (différent du dernier commit, pas encore préparé), indexé (staged, prêt pour le prochain commit) ou validé (identique au dernier commit)."
+    },
+    {
+     "type": "code",
+     "body": "git status\ngit status -s",
+     "caption": "Version détaillée et version courte"
+    },
+    {
+     "type": "text",
+     "body": "Dans la version courte, deux colonnes : la première pour l'index, la seconde pour la copie de travail. « ?? » = non suivi, « A  » = nouveau fichier indexé, « M  » = modification indexée, «  M » = modification non indexée."
+    },
+    {
+     "type": "tip",
+     "body": "L'index permet de construire des commits cohérents : vous choisissez précisément ce qui part dans chaque commit, même si vous avez modifié beaucoup de fichiers."
+    }
+   ],
+   "exercise": {
+    "intro": "Observez un fichier passer d'un état à l'autre.",
+    "setup": [
+     "git init",
+     "git config user.name \"Anne Bonny\"",
+     "git config user.email anne@cambuse.example"
+    ],
+    "steps": [
+     {
+      "instruction": "Créez un fichier README.md contenant « La Cambuse ».",
+      "hint": "echo \"La Cambuse\" > README.md",
+      "solution": [
+       "echo \"La Cambuse\" > README.md"
+      ],
+      "goals": [
+       {
+        "type": "untracked",
+        "path": "README.md"
+       }
+      ]
+     },
+     {
+      "instruction": "Regardez l'état du dépôt : le fichier doit apparaître comme non suivi.",
+      "hint": "git status",
+      "solution": [
+       "git status"
+      ],
+      "goals": [
+       {
+        "type": "commandUsed",
+        "prefix": "git status"
+       }
+      ]
+     },
+     {
+      "instruction": "Indexez README.md.",
+      "hint": "git add suivi du nom du fichier.",
+      "solution": [
+       "git add README.md"
+      ],
+      "goals": [
+       {
+        "type": "staged",
+        "path": "README.md"
+       }
+      ]
+     },
+     {
+      "instruction": "Affichez l'état en version courte.",
+      "hint": "Ajoutez -s à git status.",
+      "solution": [
+       "git status -s"
+      ],
+      "goals": [
+       {
+        "type": "commandUsed",
+        "prefix": "git status -s"
+       }
+      ]
+     }
+    ]
+   },
+   "quiz": [
+    {
+     "id": "git-l3-q1",
+     "type": "single",
+     "prompt": "Dans git status -s, que signifie « ?? » devant un fichier ?",
+     "choices": [
+      "Fichier non suivi",
+      "Fichier en conflit",
+      "Fichier supprimé",
+      "Fichier ignoré"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "« ?? » signale un fichier que Git ne suit pas encore. Il faut un git add pour qu'il entre dans l'index."
+    },
+    {
+     "id": "git-l3-q2",
+     "type": "single",
+     "prompt": "À quoi sert l'index (staging area) ?",
+     "choices": [
+      "Préparer précisément le contenu du prochain commit",
+      "Stocker une sauvegarde sur le serveur",
+      "Lister les branches",
+      "Accélérer Git"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "L'index est une zone intermédiaire : seul ce qui y est placé entrera dans le prochain commit."
+    },
+    {
+     "id": "git-l3-q3",
+     "type": "multiple",
+     "prompt": "Quels sont des états possibles d'un fichier dans Git ? (plusieurs réponses)",
+     "choices": [
+      "Non suivi",
+      "Modifié",
+      "Indexé",
+      "Compilé"
+     ],
+     "answer": [
+      0,
+      1,
+      2
+     ],
+     "explanation": "Non suivi, modifié, indexé et validé sont les états du cycle de vie. « Compilé » n'a rien à voir avec Git."
+    },
+    {
+     "id": "git-l3-q4",
+     "type": "single",
+     "prompt": "Que signifie «  M » (espace puis M) dans git status -s ?",
+     "choices": [
+      "Modifié dans la copie de travail mais pas indexé",
+      "Modifié et indexé",
+      "Nouveau fichier",
+      "Fichier fusionné"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "La colonne de gauche concerne l'index, celle de droite la copie de travail. Un M à droite seulement = modification pas encore indexée."
+    },
+    {
+     "id": "git-l3-q5",
+     "type": "command",
+     "prompt": "Quelle commande affiche l'état du dépôt en version courte ?",
+     "accepted": [
+      "git status -s",
+      "git status --short"
+     ],
+     "explanation": "-s (ou --short) affiche une ligne par fichier avec deux colonnes de statut."
+    }
+   ]
+  },
+  {
+   "id": "add-commit",
+   "title": "Indexer et valider",
+   "minutes": 20,
+   "objectives": [
+    "Indexer des fichiers choisis avec git add",
+    "Créer des commits avec un message clair",
+    "Utiliser git commit -a à bon escient"
+   ],
+   "sections": [
+    {
+     "type": "code",
+     "body": "git add fichier.txt\ngit add .\ngit commit -m \"Ajoute la page d'accueil\"",
+     "caption": "Indexer un fichier, tout indexer, valider"
+    },
+    {
+     "type": "text",
+     "body": "Un bon message de commit décrit l'intention à l'impératif présent, en une ligne courte (≈ 50 caractères) : « Ajoute la validation du formulaire », « Corrige le calcul du total ». Évitez « modifs » ou « wip » : dans six mois, personne ne saura ce qu'ils contiennent."
+    },
+    {
+     "type": "text",
+     "body": "Un commit = une idée. Si vous corrigez un bug et renommez une variable ailleurs, faites deux commits : l'historique sera lisible et chaque changement pourra être annulé séparément."
+    },
+    {
+     "type": "code",
+     "body": "git commit -am \"Corrige la faute de frappe\"",
+     "caption": "Indexer les fichiers déjà suivis et valider"
+    },
+    {
+     "type": "warning",
+     "body": "git commit -a n'ajoute PAS les nouveaux fichiers (non suivis) : il ne prend que les fichiers déjà connus de Git. Et git add . ajoute tout : vérifiez git status avant pour ne pas embarquer un fichier secret."
+    }
+   ],
+   "exercise": {
+    "intro": "Deux fichiers attendent. Construisez des commits propres, une idée à la fois.",
+    "setup": [
+     "git init",
+     "git config user.name \"Anne Bonny\"",
+     "git config user.email anne@cambuse.example",
+     "echo \"<h1>Cambuse</h1>\" > index.html",
+     "echo \"body { color: navy; }\" > style.css"
+    ],
+    "steps": [
+     {
+      "instruction": "Indexez uniquement index.html (pas style.css).",
+      "hint": "git add index.html",
+      "solution": [
+       "git add index.html"
+      ],
+      "goals": [
+       {
+        "type": "staged",
+        "path": "index.html"
+       },
+       {
+        "type": "untracked",
+        "path": "style.css"
+       }
+      ]
+     },
+     {
+      "instruction": "Validez avec le message « Ajoute la page d'accueil ».",
+      "hint": "git commit -m \"...\"",
+      "solution": [
+       "git commit -m \"Ajoute la page d'accueil\""
+      ],
+      "goals": [
+       {
+        "type": "commitCount",
+        "min": 1
+       },
+       {
+        "type": "fileCommitted",
+        "path": "index.html"
+       }
+      ]
+     },
+     {
+      "instruction": "Ajoutez et validez style.css dans un second commit.",
+      "hint": "git add puis git commit -m.",
+      "solution": [
+       "git add style.css",
+       "git commit -m \"Ajoute la feuille de style\""
+      ],
+      "goals": [
+       {
+        "type": "commitCount",
+        "min": 2
+       },
+       {
+        "type": "fileCommitted",
+        "path": "style.css"
+       }
+      ]
+     },
+     {
+      "instruction": "Ajoutez « <p>Bienvenue</p> » à la fin d'index.html, puis validez en une seule commande avec -a.",
+      "hint": "echo \"...\" >> index.html puis git commit -am \"message\".",
+      "solution": [
+       "echo \"<p>Bienvenue</p>\" >> index.html",
+       "git commit -am \"Ajoute un message de bienvenue\""
+      ],
+      "goals": [
+       {
+        "type": "commitCount",
+        "min": 3
+       },
+       {
+        "type": "fileContains",
+        "path": "index.html",
+        "text": "Bienvenue"
+       },
+       {
+        "type": "clean"
+       }
+      ]
+     }
+    ]
+   },
+   "quiz": [
+    {
+     "id": "git-l4-q1",
+     "type": "single",
+     "prompt": "Quel est le meilleur message de commit ?",
+     "choices": [
+      "Ajoute la validation de l'e-mail du formulaire",
+      "modifs",
+      "wip",
+      "commit du 12/11"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Un message utile décrit l'intention, à l'impératif. « modifs » ou une date n'apprennent rien."
+    },
+    {
+     "id": "git-l4-q2",
+     "type": "single",
+     "prompt": "git commit -a ajoute-t-il les fichiers non suivis ?",
+     "choices": [
+      "Non, seulement les fichiers déjà suivis",
+      "Oui, tous les fichiers",
+      "Oui, sauf les fichiers ignorés",
+      "Seulement s'ils sont dans un sous-dossier"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "-a indexe les modifications et suppressions des fichiers déjà suivis. Un nouveau fichier doit d'abord passer par git add."
+    },
+    {
+     "id": "git-l4-q3",
+     "type": "command",
+     "prompt": "Écrivez la commande qui valide l'index avec le message « Corrige le total ».",
+     "accepted": [
+      "git commit -m \"Corrige le total\""
+     ],
+     "explanation": "-m fournit le message directement ; sans -m, Git ouvre l'éditeur configuré."
+    },
+    {
+     "id": "git-l4-q4",
+     "type": "single",
+     "prompt": "Vous avez corrigé un bug ET reformaté un autre fichier. Que faire ?",
+     "choices": [
+      "Deux commits séparés, un par idée",
+      "Un seul commit « divers »",
+      "Ne rien committer",
+      "Supprimer le reformatage"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Un commit par idée rend l'historique lisible et permet d'annuler un changement sans l'autre."
+    },
+    {
+     "id": "git-l4-q5",
+     "type": "single",
+     "prompt": "Pourquoi relire git status avant git add . ?",
+     "choices": [
+      "Pour ne pas indexer par erreur un fichier sensible ou inutile",
+      "Parce que git add . échoue sinon",
+      "Pour accélérer le commit",
+      "Ce n'est jamais utile"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "git add . prend tout ce qui n'est pas ignoré : un .env ou un gros binaire peut partir dans l'historique, où il sera difficile à effacer."
+    }
+   ]
+  },
+  {
+   "id": "historique",
+   "title": "Explorer l'historique",
+   "minutes": 15,
+   "objectives": [
+    "Lire l'historique avec git log",
+    "Utiliser les formats compacts",
+    "Inspecter un commit avec git show"
+   ],
+   "sections": [
+    {
+     "type": "code",
+     "body": "git log\ngit log --oneline\ngit log -n 3",
+     "caption": "Historique complet, compact, limité"
+    },
+    {
+     "type": "text",
+     "body": "Chaque commit est identifié par une empreinte (hash) de 40 caractères hexadécimaux, dont les 7 premiers suffisent généralement. Les décorations entre parenthèses indiquent où pointent HEAD, les branches et les étiquettes."
+    },
+    {
+     "type": "text",
+     "body": "HEAD désigne « l'endroit où vous êtes » : la plupart du temps, le dernier commit de la branche courante. « HEAD -> main » se lit : HEAD pointe sur la branche main."
+    },
+    {
+     "type": "code",
+     "body": "git show\ngit show a1b2c3d",
+     "caption": "Détail du dernier commit, ou d'un commit précis"
+    },
+    {
+     "type": "tip",
+     "body": "Sur un vrai dépôt, essayez git log --oneline --graph --all pour visualiser les branches."
+    }
+   ],
+   "exercise": {
+    "intro": "Un dépôt avec quelques commits existe déjà. Menez l'enquête.",
+    "setup": [
+     "git init",
+     "git config user.name \"Anne Bonny\"",
+     "git config user.email anne@cambuse.example",
+     "echo \"Jour 1 : départ\" > journal.txt",
+     "git add journal.txt",
+     "git commit -m \"Commence le journal\"",
+     "echo \"Jour 2 : tempête\" >> journal.txt",
+     "git commit -am \"Raconte la tempête\"",
+     "echo \"Jour 3 : île en vue\" >> journal.txt",
+     "git commit -am \"Signale une île\""
+    ],
+    "steps": [
+     {
+      "instruction": "Affichez l'historique complet.",
+      "hint": "git log",
+      "solution": [
+       "git log"
+      ],
+      "goals": [
+       {
+        "type": "commandUsed",
+        "prefix": "git log"
+       }
+      ]
+     },
+     {
+      "instruction": "Affichez l'historique en une ligne par commit.",
+      "hint": "Option --oneline.",
+      "solution": [
+       "git log --oneline"
+      ],
+      "goals": [
+       {
+        "type": "commandUsed",
+        "prefix": "git log --oneline"
+       }
+      ]
+     },
+     {
+      "instruction": "Affichez le détail du dernier commit.",
+      "hint": "git show",
+      "solution": [
+       "git show"
+      ],
+      "goals": [
+       {
+        "type": "commandUsed",
+        "prefix": "git show"
+       }
+      ]
+     },
+     {
+      "instruction": "Ajoutez « Jour 4 : trésor » au journal et validez-le.",
+      "hint": "echo ... >> journal.txt puis commit -am.",
+      "solution": [
+       "echo \"Jour 4 : trésor\" >> journal.txt",
+       "git commit -am \"Note la découverte du trésor\""
+      ],
+      "goals": [
+       {
+        "type": "commitCount",
+        "min": 4
+       },
+       {
+        "type": "clean"
+       }
+      ]
+     }
+    ]
+   },
+   "quiz": [
+    {
+     "id": "git-l5-q1",
+     "type": "single",
+     "prompt": "Que désigne HEAD ?",
+     "choices": [
+      "La position courante, en général le dernier commit de la branche active",
+      "Le premier commit du dépôt",
+      "Le serveur distant",
+      "Le fichier le plus récent"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "HEAD est un pointeur vers ce que vous avez « en main » : la branche courante et donc son dernier commit."
+    },
+    {
+     "id": "git-l5-q2",
+     "type": "command",
+     "prompt": "Quelle commande affiche l'historique avec une ligne par commit ?",
+     "accepted": [
+      "git log --oneline"
+     ],
+     "explanation": "--oneline montre le hash abrégé, les décorations et la première ligne du message."
+    },
+    {
+     "id": "git-l5-q3",
+     "type": "single",
+     "prompt": "Que montre git show sans argument ?",
+     "choices": [
+      "Le dernier commit et les modifications qu'il apporte",
+      "La liste des branches",
+      "L'état de l'index",
+      "La configuration"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "git show affiche les métadonnées de HEAD (auteur, message) suivies du diff qu'il introduit."
+    },
+    {
+     "id": "git-l5-q4",
+     "type": "single",
+     "prompt": "Combien de caractères du hash suffisent généralement à désigner un commit ?",
+     "choices": [
+      "Environ 7",
+      "Exactement 40, toujours",
+      "2",
+      "Aucun : on utilise le message"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Git accepte un préfixe tant qu'il est unique dans le dépôt ; 7 caractères suffisent presque toujours."
+    }
+   ]
+  },
+  {
+   "id": "differences",
+   "title": "Voir les différences",
+   "minutes": 15,
+   "objectives": [
+    "Comparer la copie de travail et l'index avec git diff",
+    "Comparer l'index et le dernier commit avec git diff --staged",
+    "Lire un diff unifié"
+   ],
+   "sections": [
+    {
+     "type": "code",
+     "body": "git diff\ngit diff --staged",
+     "caption": "Non indexé vs indexé"
+    },
+    {
+     "type": "text",
+     "body": "git diff montre ce qui a changé mais n'est pas encore indexé. git diff --staged (synonyme --cached) montre ce qui partira dans le prochain commit. Une fois tout indexé, git diff est vide !"
+    },
+    {
+     "type": "text",
+     "body": "Dans un diff, les lignes commençant par « - » sont retirées, celles commençant par « + » sont ajoutées. L'en-tête « @@ -1,3 +1,4 @@ » indique les lignes concernées dans l'ancienne et la nouvelle version."
+    },
+    {
+     "type": "tip",
+     "body": "Relire git diff --staged avant chaque commit est la meilleure habitude pour éviter les surprises (fichiers de débogage, secrets, code commenté)."
+    }
+   ],
+   "exercise": {
+    "intro": "Une recette est versionnée. Modifiez-la et observez les deux sortes de diff.",
+    "setup": [
+     "git init",
+     "git config user.name \"Anne Bonny\"",
+     "git config user.email anne@cambuse.example",
+     "echo \"Rhum\" > recette.txt",
+     "echo \"Citron vert\" >> recette.txt",
+     "git add recette.txt",
+     "git commit -m \"Ajoute la recette du grog\""
+    ],
+    "steps": [
+     {
+      "instruction": "Ajoutez « Cannelle » à la fin de recette.txt.",
+      "hint": "echo \"Cannelle\" >> recette.txt",
+      "solution": [
+       "echo \"Cannelle\" >> recette.txt"
+      ],
+      "goals": [
+       {
+        "type": "fileContains",
+        "path": "recette.txt",
+        "text": "Cannelle"
+       }
+      ]
+     },
+     {
+      "instruction": "Affichez les modifications non indexées.",
+      "hint": "git diff",
+      "solution": [
+       "git diff"
+      ],
+      "goals": [
+       {
+        "type": "commandUsed",
+        "prefix": "git diff"
+       }
+      ]
+     },
+     {
+      "instruction": "Indexez recette.txt.",
+      "hint": "git add recette.txt",
+      "solution": [
+       "git add recette.txt"
+      ],
+      "goals": [
+       {
+        "type": "staged",
+        "path": "recette.txt"
+       }
+      ]
+     },
+     {
+      "instruction": "Affichez ce qui partira dans le prochain commit.",
+      "hint": "git diff --staged",
+      "solution": [
+       "git diff --staged"
+      ],
+      "goals": [
+       {
+        "type": "commandUsed",
+        "prefix": "git diff --staged"
+       }
+      ]
+     },
+     {
+      "instruction": "Validez la modification.",
+      "hint": "git commit -m \"Ajoute la cannelle\"",
+      "solution": [
+       "git commit -m \"Ajoute la cannelle\""
+      ],
+      "goals": [
+       {
+        "type": "clean"
+       },
+       {
+        "type": "commitCount",
+        "min": 2
+       }
+      ]
+     }
+    ]
+   },
+   "quiz": [
+    {
+     "id": "git-l6-q1",
+     "type": "single",
+     "prompt": "Vous avez tout indexé. Que renvoie git diff (sans option) ?",
+     "choices": [
+      "Rien : il compare la copie de travail à l'index, qui sont identiques",
+      "Toutes les modifications indexées",
+      "L'historique",
+      "Une erreur"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "git diff compare la copie de travail à l'index. Pour voir ce qui est indexé : git diff --staged."
+    },
+    {
+     "id": "git-l6-q2",
+     "type": "command",
+     "prompt": "Quelle commande montre les modifications indexées, prêtes à être validées ?",
+     "accepted": [
+      "git diff --staged",
+      "git diff --cached"
+     ],
+     "explanation": "--staged et --cached sont synonymes : comparaison entre l'index et le dernier commit."
+    },
+    {
+     "id": "git-l6-q3",
+     "type": "single",
+     "prompt": "Dans un diff, que signifie une ligne qui commence par « + » ?",
+     "choices": [
+      "Une ligne ajoutée",
+      "Une ligne supprimée",
+      "Une ligne inchangée",
+      "Un conflit"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "« + » = ajout dans la nouvelle version ; « - » = retrait ; un espace = contexte inchangé."
+    },
+    {
+     "id": "git-l6-q4",
+     "type": "single",
+     "prompt": "Pourquoi relire git diff --staged avant de valider ?",
+     "choices": [
+      "Pour vérifier exactement ce qui entrera dans le commit",
+      "C'est obligatoire pour que git commit fonctionne",
+      "Pour envoyer le diff au serveur",
+      "Pour créer une branche"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "C'est la dernière occasion de repérer un oubli, un fichier de débogage ou un secret avant qu'il n'entre dans l'historique."
+    }
+   ]
+  },
+  {
+   "id": "annuler",
+   "title": "Annuler proprement",
+   "minutes": 20,
+   "objectives": [
+    "Abandonner une modification locale avec git restore",
+    "Désindexer un fichier avec git restore --staged",
+    "Connaître revert et reset et leurs risques"
+   ],
+   "sections": [
+    {
+     "type": "code",
+     "body": "git restore fichier.txt",
+     "caption": "Revenir à la version de l'index (perd la modification locale)"
+    },
+    {
+     "type": "code",
+     "body": "git restore --staged fichier.txt",
+     "caption": "Retirer de l'index en gardant la modification"
+    },
+    {
+     "type": "warning",
+     "body": "git restore sans --staged écrase vos modifications locales non indexées : elles sont perdues définitivement, car Git ne les a jamais enregistrées."
+    },
+    {
+     "type": "text",
+     "body": "Pour annuler un commit déjà partagé, on utilise git revert <commit> : il crée un NOUVEAU commit qui inverse le premier. L'historique reste intact et vos collègues ne sont pas perturbés."
+    },
+    {
+     "type": "text",
+     "body": "git reset déplace la branche vers un commit antérieur. Avec --hard, il écrase aussi la copie de travail. Utile en local, dangereux sur une branche déjà poussée : il réécrit l'histoire."
+    },
+    {
+     "type": "tip",
+     "body": "Le simulateur pratique restore ; revert et reset se pratiqueront sur de vrais dépôts jetables dans l'Atelier, avec sauvegarde préalable."
+    }
+   ],
+   "exercise": {
+    "intro": "Une modification ratée et un fichier indexé trop vite : réparez sans rien perdre d'utile.",
+    "setup": [
+     "git init",
+     "git config user.name \"Anne Bonny\"",
+     "git config user.email anne@cambuse.example",
+     "echo \"Cap au nord\" > notes.txt",
+     "echo \"Acheter du rhum\" > todo.txt",
+     "git add .",
+     "git commit -m \"Initialise les notes\"",
+     "echo \"brouillon raté\" > notes.txt",
+     "echo \"Réparer la voile\" >> todo.txt",
+     "git add todo.txt"
+    ],
+    "steps": [
+     {
+      "instruction": "Annulez la modification de notes.txt (revenez à la version validée).",
+      "hint": "git restore notes.txt",
+      "solution": [
+       "git restore notes.txt"
+      ],
+      "goals": [
+       {
+        "type": "fileMatchesHead",
+        "path": "notes.txt"
+       }
+      ]
+     },
+     {
+      "instruction": "Retirez todo.txt de l'index SANS perdre la ligne « Réparer la voile ».",
+      "hint": "git restore --staged ...",
+      "solution": [
+       "git restore --staged todo.txt"
+      ],
+      "goals": [
+       {
+        "type": "notStaged",
+        "path": "todo.txt"
+       },
+       {
+        "type": "fileContains",
+        "path": "todo.txt",
+        "text": "Réparer la voile"
+       }
+      ]
+     },
+     {
+      "instruction": "Finalement, validez todo.txt.",
+      "hint": "git add puis git commit -m.",
+      "solution": [
+       "git add todo.txt",
+       "git commit -m \"Ajoute la réparation de la voile\""
+      ],
+      "goals": [
+       {
+        "type": "commitCount",
+        "min": 2
+       },
+       {
+        "type": "clean"
+       }
+      ]
+     }
+    ]
+   },
+   "quiz": [
+    {
+     "id": "git-l7-q1",
+     "type": "command",
+     "prompt": "Quelle commande retire config.ini de l'index en conservant la modification ?",
+     "accepted": [
+      "git restore --staged config.ini"
+     ],
+     "explanation": "--staged agit sur l'index uniquement ; la copie de travail garde votre modification."
+    },
+    {
+     "id": "git-l7-q2",
+     "type": "single",
+     "prompt": "Que devient une modification non indexée après git restore fichier ?",
+     "choices": [
+      "Elle est perdue définitivement",
+      "Elle est mise dans l'index",
+      "Elle est sauvegardée dans un commit",
+      "Elle part dans la corbeille"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Git n'a jamais enregistré cette modification : restore la remplace par la version de l'index, sans retour possible."
+    },
+    {
+     "id": "git-l7-q3",
+     "type": "single",
+     "prompt": "Comment annuler un commit déjà partagé avec l'équipe ?",
+     "choices": [
+      "git revert, qui crée un commit inverse",
+      "git reset --hard puis push --force",
+      "Supprimer le dossier .git",
+      "Modifier le fichier à la main sans commit"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "revert préserve l'historique commun. reset + push --force réécrit l'histoire partagée et peut faire perdre le travail des autres."
+    },
+    {
+     "id": "git-l7-q4",
+     "type": "single",
+     "prompt": "Pourquoi git reset --hard est-il dangereux ?",
+     "choices": [
+      "Il écrase la copie de travail et peut réécrire un historique partagé",
+      "Il supprime Git de l'ordinateur",
+      "Il publie le dépôt",
+      "Il est très lent"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "--hard rejette les modifications locales et déplace la branche : à réserver au travail local, après avoir vérifié qu'on ne perd rien."
+    }
+   ]
+  },
+  {
+   "id": "branches",
+   "title": "Les branches",
+   "minutes": 20,
+   "objectives": [
+    "Créer, lister et changer de branche",
+    "Comprendre qu'une branche est un simple pointeur",
+    "Isoler un développement sans toucher main"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Une branche est un pointeur léger vers un commit. Créer une branche ne copie aucun fichier : c'est instantané. Chaque nouveau commit fait avancer la branche courante."
+    },
+    {
+     "type": "code",
+     "body": "git branch\ngit branch fonction/menu\ngit switch fonction/menu\ngit switch -c correctif",
+     "caption": "Lister, créer, basculer, créer et basculer"
+    },
+    {
+     "type": "text",
+     "body": "git checkout (plus ancien) fait la même chose : git checkout -b nom crée et bascule. git switch, plus récent, est réservé aux branches et donc moins ambigu."
+    },
+    {
+     "type": "text",
+     "body": "En changeant de branche, Git met à jour vos fichiers pour refléter cette branche. Si une modification locale risque d'être écrasée, Git refuse : validez (ou mettez de côté) d'abord."
+    },
+    {
+     "type": "tip",
+     "body": "Nommez les branches selon leur but : fonction/panier, correctif/date-facture, doc/readme."
+    }
+   ],
+   "exercise": {
+    "intro": "Développez un menu sur une branche dédiée sans toucher main.",
+    "setup": [
+     "git init",
+     "git config user.name \"Anne Bonny\"",
+     "git config user.email anne@cambuse.example",
+     "echo \"Accueil\" > site.txt",
+     "git add site.txt",
+     "git commit -m \"Crée le site\""
+    ],
+    "steps": [
+     {
+      "instruction": "Créez la branche fonction/menu (sans basculer).",
+      "hint": "git branch <nom>",
+      "solution": [
+       "git branch fonction/menu"
+      ],
+      "goals": [
+       {
+        "type": "branchExists",
+        "name": "fonction/menu"
+       }
+      ]
+     },
+     {
+      "instruction": "Basculez sur fonction/menu.",
+      "hint": "git switch <nom>",
+      "solution": [
+       "git switch fonction/menu"
+      ],
+      "goals": [
+       {
+        "type": "currentBranch",
+        "name": "fonction/menu"
+       }
+      ]
+     },
+     {
+      "instruction": "Créez menu.txt (« Grog, Biscuits ») et validez-le sur cette branche.",
+      "hint": "echo, add, commit.",
+      "solution": [
+       "echo \"Grog, Biscuits\" > menu.txt",
+       "git add menu.txt",
+       "git commit -m \"Ajoute le menu\""
+      ],
+      "goals": [
+       {
+        "type": "fileCommitted",
+        "path": "menu.txt"
+       },
+       {
+        "type": "currentBranch",
+        "name": "fonction/menu"
+       }
+      ]
+     },
+     {
+      "instruction": "Revenez sur main : menu.txt doit disparaître de la copie de travail.",
+      "hint": "git switch main",
+      "solution": [
+       "git switch main"
+      ],
+      "goals": [
+       {
+        "type": "currentBranch",
+        "name": "main"
+       }
+      ]
+     }
+    ]
+   },
+   "quiz": [
+    {
+     "id": "git-l8-q1",
+     "type": "single",
+     "prompt": "Qu'est-ce qu'une branche dans Git ?",
+     "choices": [
+      "Un pointeur mobile vers un commit",
+      "Une copie complète du projet",
+      "Un dossier séparé sur le disque",
+      "Un serveur distant"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Une branche n'est qu'une référence vers un commit ; c'est pourquoi elle se crée instantanément."
+    },
+    {
+     "id": "git-l8-q2",
+     "type": "command",
+     "prompt": "Quelle commande crée la branche correctif ET bascule dessus ?",
+     "accepted": [
+      "git switch -c correctif",
+      "git checkout -b correctif"
+     ],
+     "explanation": "git switch -c (ou l'ancien git checkout -b) combine création et bascule."
+    },
+    {
+     "id": "git-l8-q3",
+     "type": "single",
+     "prompt": "Git refuse de changer de branche. Pourquoi, le plus souvent ?",
+     "choices": [
+      "Des modifications locales seraient écrasées",
+      "La branche est trop ancienne",
+      "Il faut être administrateur",
+      "Le dépôt est plein"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Git protège votre travail : validez ou mettez de côté vos modifications avant de basculer."
+    },
+    {
+     "id": "git-l8-q4",
+     "type": "single",
+     "prompt": "Que fait git branch sans argument ?",
+     "choices": [
+      "Liste les branches et marque la courante d'une étoile",
+      "Crée une branche sans nom",
+      "Supprime la branche courante",
+      "Affiche l'historique"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "La branche courante est précédée de « * »."
+    }
+   ]
+  },
+  {
+   "id": "fusion",
+   "title": "Fusionner des branches",
+   "minutes": 22,
+   "objectives": [
+    "Fusionner une branche avec git merge",
+    "Distinguer avance rapide (fast-forward) et commit de fusion",
+    "Supprimer une branche fusionnée"
+   ],
+   "sections": [
+    {
+     "type": "code",
+     "body": "git switch main\ngit merge fonction/menu",
+     "caption": "Ramener le travail d'une branche dans main"
+    },
+    {
+     "type": "text",
+     "body": "Si main n'a pas bougé depuis la création de la branche, Git avance simplement le pointeur : c'est une fusion en avance rapide (fast-forward), sans nouveau commit."
+    },
+    {
+     "type": "text",
+     "body": "Si les deux branches ont avancé, Git calcule l'ancêtre commun et combine les deux séries de changements dans un commit de fusion, qui a deux parents."
+    },
+    {
+     "type": "code",
+     "body": "git branch -d fonction/menu",
+     "caption": "Supprimer une branche déjà fusionnée"
+    },
+    {
+     "type": "tip",
+     "body": "git branch -d refuse de supprimer une branche non fusionnée : c'est une sécurité. -D force la suppression ; à utiliser en sachant ce qu'on jette."
+    }
+   ],
+   "exercise": {
+    "intro": "Deux branches attendent d'être fusionnées : l'une en avance rapide, l'autre avec un commit de fusion.",
+    "setup": [
+     "git init",
+     "git config user.name \"Anne Bonny\"",
+     "git config user.email anne@cambuse.example",
+     "echo \"Cap\" > carte.txt",
+     "git add carte.txt",
+     "git commit -m \"Trace la carte\"",
+     "git switch -c fonction",
+     "echo \"Boussole\" > outils.txt",
+     "git add outils.txt",
+     "git commit -m \"Ajoute la boussole\"",
+     "git switch main"
+    ],
+    "steps": [
+     {
+      "instruction": "Fusionnez la branche fonction dans main.",
+      "hint": "git merge fonction",
+      "solution": [
+       "git merge fonction"
+      ],
+      "goals": [
+       {
+        "type": "merged",
+        "branch": "fonction"
+       },
+       {
+        "type": "fileExists",
+        "path": "outils.txt"
+       }
+      ]
+     },
+     {
+      "instruction": "Supprimez la branche fonction, désormais fusionnée.",
+      "hint": "git branch -d fonction",
+      "solution": [
+       "git branch -d fonction"
+      ],
+      "goals": [
+       {
+        "type": "branchDeleted",
+        "name": "fonction"
+       }
+      ]
+     },
+     {
+      "instruction": "Créez la branche correctif, validez-y un fichier, revenez sur main, validez-y un autre fichier, puis fusionnez correctif : un commit de fusion doit apparaître.",
+      "hint": "switch -c correctif → commit → switch main → commit → merge correctif.",
+      "solution": [
+       "git switch -c correctif",
+       "echo \"Rustine\" > coque.txt",
+       "git add coque.txt",
+       "git commit -m \"Répare la coque\"",
+       "git switch main",
+       "echo \"Voile\" > voile.txt",
+       "git add voile.txt",
+       "git commit -m \"Hisse la voile\"",
+       "git merge correctif"
+      ],
+      "goals": [
+       {
+        "type": "mergeCommitExists"
+       },
+       {
+        "type": "merged",
+        "branch": "correctif"
+       }
+      ]
+     }
+    ]
+   },
+   "quiz": [
+    {
+     "id": "git-l9-q1",
+     "type": "single",
+     "prompt": "Quand Git fait-il une fusion en avance rapide (fast-forward) ?",
+     "choices": [
+      "Quand la branche courante n'a pas avancé depuis la création de l'autre",
+      "Toujours",
+      "Quand il y a un conflit",
+      "Quand la branche est distante"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Si main est un ancêtre direct de la branche fusionnée, il suffit d'avancer le pointeur."
+    },
+    {
+     "id": "git-l9-q2",
+     "type": "single",
+     "prompt": "Combien de parents a un commit de fusion ?",
+     "choices": [
+      "Deux",
+      "Un",
+      "Zéro",
+      "Autant que de fichiers modifiés"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Un commit de fusion relie les deux lignes d'historique : il a donc deux parents."
+    },
+    {
+     "id": "git-l9-q3",
+     "type": "command",
+     "prompt": "Vous êtes sur main. Quelle commande fusionne la branche fonction ?",
+     "accepted": [
+      "git merge fonction"
+     ],
+     "explanation": "git merge intègre la branche indiquée DANS la branche courante."
+    },
+    {
+     "id": "git-l9-q4",
+     "type": "single",
+     "prompt": "Pourquoi git branch -d refuse-t-il parfois de supprimer une branche ?",
+     "choices": [
+      "Elle contient des commits non fusionnés",
+      "Elle est trop récente",
+      "Elle a un nom invalide",
+      "Elle est vide"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "C'est une protection contre la perte de travail ; -D force si vous êtes certain."
+    }
+   ]
+  },
+  {
+   "id": "conflits",
+   "title": "Résoudre un conflit",
+   "minutes": 25,
+   "objectives": [
+    "Reconnaître un conflit de fusion",
+    "Lire les marqueurs <<<<<<<, ======= et >>>>>>>",
+    "Résoudre, marquer comme résolu et conclure la fusion"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Un conflit survient quand les deux branches ont modifié la même partie d'un même fichier. Git ne choisit pas à votre place : il insère des marqueurs et vous laisse décider."
+    },
+    {
+     "type": "code",
+     "body": "<<<<<<< HEAD\nCap à l'est\n=======\nCap au sud\n>>>>>>> cap-sud",
+     "caption": "Entre <<<<<<< et ======= : votre version ; entre ======= et >>>>>>> : celle de l'autre branche"
+    },
+    {
+     "type": "text",
+     "body": "Pour résoudre : éditez le fichier pour obtenir le contenu final (en supprimant TOUS les marqueurs), puis git add fichier pour le marquer comme résolu, et enfin git commit."
+    },
+    {
+     "type": "code",
+     "body": "git status\n# éditer le fichier\ngit add carte.txt\ngit commit",
+     "caption": "Conclure une fusion"
+    },
+    {
+     "type": "tip",
+     "body": "Perdu ? git merge --abort annule la fusion en cours et revient à l'état d'avant."
+    },
+    {
+     "type": "warning",
+     "body": "Ne validez jamais un fichier qui contient encore des marqueurs de conflit : le programme ne compilerait plus, et l'erreur se propagerait à toute l'équipe."
+    }
+   ],
+   "exercise": {
+    "intro": "Deux navigateurs ont modifié le cap différemment. À vous d'arbitrer.",
+    "setup": [
+     "git init",
+     "git config user.name \"Anne Bonny\"",
+     "git config user.email anne@cambuse.example",
+     "echo \"Cap au nord\" > carte.txt",
+     "git add carte.txt",
+     "git commit -m \"Fixe le cap\"",
+     "git switch -c cap-sud",
+     "echo \"Cap au sud\" > carte.txt",
+     "git commit -am \"Cap au sud\"",
+     "git switch main",
+     "echo \"Cap à l'est\" > carte.txt",
+     "git commit -am \"Cap à l'est\""
+    ],
+    "steps": [
+     {
+      "instruction": "Fusionnez cap-sud dans main : un conflit doit apparaître.",
+      "hint": "git merge cap-sud",
+      "solution": [
+       "git merge cap-sud"
+      ],
+      "goals": [
+       {
+        "type": "fileContains",
+        "path": "carte.txt",
+        "text": "<<<<<<<"
+       }
+      ]
+     },
+     {
+      "instruction": "Inspectez le fichier en conflit.",
+      "hint": "cat carte.txt",
+      "solution": [
+       "cat carte.txt"
+      ],
+      "goals": [
+       {
+        "type": "commandUsed",
+        "prefix": "cat carte.txt"
+       }
+      ]
+     },
+     {
+      "instruction": "Écrivez le contenu final « Cap au sud-est » dans carte.txt (sans marqueurs).",
+      "hint": "echo \"Cap au sud-est\" > carte.txt",
+      "solution": [
+       "echo \"Cap au sud-est\" > carte.txt"
+      ],
+      "goals": [
+       {
+        "type": "noMarkers",
+        "path": "carte.txt"
+       },
+       {
+        "type": "fileContains",
+        "path": "carte.txt",
+        "text": "sud-est"
+       }
+      ]
+     },
+     {
+      "instruction": "Marquez le conflit comme résolu et concluez la fusion.",
+      "hint": "git add carte.txt puis git commit.",
+      "solution": [
+       "git add carte.txt",
+       "git commit"
+      ],
+      "goals": [
+       {
+        "type": "noConflicts"
+       },
+       {
+        "type": "mergeCommitExists"
+       },
+       {
+        "type": "clean"
+       }
+      ]
+     }
+    ]
+   },
+   "quiz": [
+    {
+     "id": "git-l10-q1",
+     "type": "single",
+     "prompt": "Dans un conflit, que contient la partie entre <<<<<<< HEAD et ======= ?",
+     "choices": [
+      "La version de la branche courante",
+      "La version de l'autre branche",
+      "La version de l'ancêtre commun",
+      "Un message d'erreur"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "HEAD = votre branche courante. La partie après ======= vient de la branche fusionnée."
+    },
+    {
+     "id": "git-l10-q2",
+     "type": "single",
+     "prompt": "Après avoir édité le fichier en conflit, que faut-il faire ?",
+     "choices": [
+      "git add fichier puis git commit",
+      "git push",
+      "git branch -d",
+      "Rien, Git le détecte seul"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "git add marque le fichier comme résolu ; git commit crée le commit de fusion."
+    },
+    {
+     "id": "git-l10-q3",
+     "type": "command",
+     "prompt": "Quelle commande annule une fusion en cours et revient à l'état précédent ?",
+     "accepted": [
+      "git merge --abort"
+     ],
+     "explanation": "--abort restaure l'état d'avant la fusion. Utile si le conflit est plus complexe que prévu."
+    },
+    {
+     "id": "git-l10-q4",
+     "type": "single",
+     "prompt": "Pourquoi un conflit apparaît-il ?",
+     "choices": [
+      "Les deux branches ont modifié la même zone d'un même fichier",
+      "Un fichier est trop gros",
+      "Les branches ont des noms proches",
+      "L'auteur n'est pas configuré"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Git fusionne seul les changements indépendants. Il ne s'arrête que lorsque deux changements se chevauchent."
+    },
+    {
+     "id": "git-l10-q5",
+     "type": "multiple",
+     "prompt": "Quels marqueurs doivent avoir disparu avant de valider ? (plusieurs réponses)",
+     "choices": [
+      "<<<<<<<",
+      "=======",
+      ">>>>>>>",
+      "#"
+     ],
+     "answer": [
+      0,
+      1,
+      2
+     ],
+     "explanation": "Les trois marqueurs de conflit doivent être supprimés. « # » est un caractère ordinaire."
+    }
+   ]
+  },
+  {
+   "id": "ignorer",
+   "title": "Ignorer des fichiers",
+   "minutes": 15,
+   "objectives": [
+    "Écrire un fichier .gitignore",
+    "Utiliser motifs *.ext et dossiers/",
+    "Protéger les secrets et les artefacts de build"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Certains fichiers n'ont rien à faire dans l'historique : journaux (*.log), dossiers de build, dépendances téléchargées, fichiers de l'IDE et surtout les secrets (.env, clés)."
+    },
+    {
+     "type": "code",
+     "body": "# Journaux\n*.log\n# Artefacts\nbuild/\n# Secrets\n.env",
+     "caption": ".gitignore à la racine du dépôt"
+    },
+    {
+     "type": "text",
+     "body": "Un motif sans « / » s'applique au nom de fichier partout (*.log). Un motif finissant par « / » désigne un dossier (build/). Une ligne commençant par # est un commentaire."
+    },
+    {
+     "type": "warning",
+     "body": ".gitignore n'agit que sur les fichiers NON suivis. Un secret déjà validé reste dans l'historique : il faut le retirer (git rm --cached) ET considérer le secret comme compromis (le révoquer et en générer un nouveau)."
+    },
+    {
+     "type": "tip",
+     "body": "Pour Flutter, le .gitignore généré par flutter create exclut déjà build/ et .dart_tool/."
+    }
+   ],
+   "exercise": {
+    "intro": "Le dépôt contient des fichiers à ne surtout pas versionner.",
+    "setup": [
+     "git init",
+     "git config user.name \"Anne Bonny\"",
+     "git config user.email anne@cambuse.example",
+     "echo \"void main() {}\" > main.dart",
+     "echo \"erreur 42\" > app.log",
+     "echo \"binaire\" > build/app.apk",
+     "echo \"API_KEY=exemple-factice\" > .env"
+    ],
+    "steps": [
+     {
+      "instruction": "Créez un .gitignore qui ignore tous les fichiers .log.",
+      "hint": "echo \"*.log\" > .gitignore",
+      "solution": [
+       "echo \"*.log\" > .gitignore"
+      ],
+      "goals": [
+       {
+        "type": "ignored",
+        "path": "app.log"
+       }
+      ]
+     },
+     {
+      "instruction": "Ajoutez une ligne pour ignorer le dossier build/.",
+      "hint": "echo \"build/\" >> .gitignore",
+      "solution": [
+       "echo \"build/\" >> .gitignore"
+      ],
+      "goals": [
+       {
+        "type": "ignored",
+        "path": "build/app.apk"
+       }
+      ]
+     },
+     {
+      "instruction": "Ajoutez une ligne pour ignorer le fichier .env.",
+      "hint": "echo \".env\" >> .gitignore",
+      "solution": [
+       "echo \".env\" >> .gitignore"
+      ],
+      "goals": [
+       {
+        "type": "ignored",
+        "path": ".env"
+       }
+      ]
+     },
+     {
+      "instruction": "Indexez tout avec git add . et validez : seuls .gitignore et main.dart doivent partir.",
+      "hint": "git add . puis git commit -m.",
+      "solution": [
+       "git add .",
+       "git commit -m \"Ajoute le code et le .gitignore\""
+      ],
+      "goals": [
+       {
+        "type": "fileCommitted",
+        "path": ".gitignore"
+       },
+       {
+        "type": "fileCommitted",
+        "path": "main.dart"
+       },
+       {
+        "type": "clean"
+       }
+      ]
+     }
+    ]
+   },
+   "quiz": [
+    {
+     "id": "git-l11-q1",
+     "type": "single",
+     "prompt": "Quel motif ignore tous les fichiers journaux ?",
+     "choices": [
+      "*.log",
+      "log",
+      "/log/",
+      "!*.log"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "* remplace n'importe quelle suite de caractères ; *.log vise tous les fichiers finissant par .log."
+    },
+    {
+     "id": "git-l11-q2",
+     "type": "single",
+     "prompt": "Un fichier .env a déjà été validé. L'ajouter au .gitignore suffit-il ?",
+     "choices": [
+      "Non : il reste dans l'historique et le secret doit être révoqué",
+      "Oui, Git l'efface de l'historique",
+      "Oui, après un git status",
+      "Non, il faut supprimer le dépôt"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": ".gitignore ne concerne que les fichiers non suivis. Il faut git rm --cached et surtout changer le secret, qui doit être considéré comme exposé."
+    },
+    {
+     "id": "git-l11-q3",
+     "type": "single",
+     "prompt": "Que signifie la ligne « build/ » dans un .gitignore ?",
+     "choices": [
+      "Ignorer le dossier build et tout son contenu",
+      "Ignorer un fichier nommé build",
+      "Ne versionner que build",
+      "Un commentaire"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Le « / » final désigne un dossier : tout ce qu'il contient est ignoré."
+    },
+    {
+     "id": "git-l11-q4",
+     "type": "command",
+     "prompt": "Quelle commande retire config.env de l'index tout en gardant le fichier sur le disque ?",
+     "accepted": [
+      "git rm --cached config.env"
+     ],
+     "explanation": "--cached retire le fichier du suivi sans le supprimer de la copie de travail."
+    }
+   ]
+  },
+  {
+   "id": "etiquettes",
+   "title": "Étiquettes et versions",
+   "minutes": 15,
+   "objectives": [
+    "Créer des étiquettes légères et annotées",
+    "Appliquer le versionnement sémantique",
+    "Lister et supprimer des étiquettes"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Une étiquette (tag) marque un commit précis, généralement une version publiée. Contrairement à une branche, elle ne bouge pas."
+    },
+    {
+     "type": "code",
+     "body": "git tag v0.9.0\ngit tag -a v1.0.0 -m \"Première version stable\"\ngit tag\ngit tag -d v0.9.0",
+     "caption": "Légère, annotée, lister, supprimer"
+    },
+    {
+     "type": "text",
+     "body": "Une étiquette annotée stocke un message, un auteur et une date : c'est le choix recommandé pour les versions publiées. Une étiquette légère est un simple pointeur, pratique pour un repère personnel."
+    },
+    {
+     "type": "text",
+     "body": "Versionnement sémantique MAJEUR.MINEUR.CORRECTIF : on incrémente MAJEUR pour un changement incompatible, MINEUR pour une fonctionnalité compatible, CORRECTIF pour une correction."
+    },
+    {
+     "type": "tip",
+     "body": "Sur un vrai serveur, les étiquettes ne sont pas envoyées par défaut : git push origin v1.0.0."
+    }
+   ],
+   "exercise": {
+    "intro": "La version 1.0 est prête. Marquez-la proprement.",
+    "setup": [
+     "git init",
+     "git config user.name \"Anne Bonny\"",
+     "git config user.email anne@cambuse.example",
+     "echo \"v1\" > app.txt",
+     "git add app.txt",
+     "git commit -m \"Prépare la version 1\""
+    ],
+    "steps": [
+     {
+      "instruction": "Créez une étiquette légère v0.9.0.",
+      "hint": "git tag v0.9.0",
+      "solution": [
+       "git tag v0.9.0"
+      ],
+      "goals": [
+       {
+        "type": "tagExists",
+        "name": "v0.9.0"
+       }
+      ]
+     },
+     {
+      "instruction": "Créez une étiquette annotée v1.0.0 avec un message.",
+      "hint": "git tag -a v1.0.0 -m \"...\"",
+      "solution": [
+       "git tag -a v1.0.0 -m \"Première version stable\""
+      ],
+      "goals": [
+       {
+        "type": "annotatedTag",
+        "name": "v1.0.0"
+       }
+      ]
+     },
+     {
+      "instruction": "Visualisez les étiquettes dans l'historique compact.",
+      "hint": "git log --oneline",
+      "solution": [
+       "git log --oneline"
+      ],
+      "goals": [
+       {
+        "type": "commandUsed",
+        "prefix": "git log --oneline"
+       }
+      ]
+     },
+     {
+      "instruction": "Supprimez l'étiquette v0.9.0, devenue inutile.",
+      "hint": "git tag -d v0.9.0",
+      "solution": [
+       "git tag -d v0.9.0"
+      ],
+      "goals": [
+       {
+        "type": "tagDeleted",
+        "name": "v0.9.0"
+       },
+       {
+        "type": "tagExists",
+        "name": "v1.0.0"
+       }
+      ]
+     }
+    ]
+   },
+   "quiz": [
+    {
+     "id": "git-l12-q1",
+     "type": "single",
+     "prompt": "Quelle différence entre une branche et une étiquette ?",
+     "choices": [
+      "Une étiquette reste fixée sur un commit, une branche avance avec les nouveaux commits",
+      "Aucune",
+      "Une étiquette contient des fichiers",
+      "Une branche ne peut pas être supprimée"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "L'étiquette est un repère immobile, idéal pour marquer une version."
+    },
+    {
+     "id": "git-l12-q2",
+     "type": "command",
+     "prompt": "Créez l'étiquette annotée v2.0.0 avec le message « Refonte ».",
+     "accepted": [
+      "git tag -a v2.0.0 -m \"Refonte\""
+     ],
+     "explanation": "-a crée une étiquette annotée, -m fournit son message."
+    },
+    {
+     "id": "git-l12-q3",
+     "type": "single",
+     "prompt": "Selon le versionnement sémantique, une correction de bug fait passer 1.4.2 à…",
+     "choices": [
+      "1.4.3",
+      "1.5.0",
+      "2.0.0",
+      "1.4.2.1"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Une correction compatible incrémente le CORRECTIF (troisième nombre)."
+    },
+    {
+     "id": "git-l12-q4",
+     "type": "single",
+     "prompt": "Un changement incompatible avec l'API existante fait passer 1.4.2 à…",
+     "choices": [
+      "2.0.0",
+      "1.5.0",
+      "1.4.3",
+      "1.4.2-final"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Un changement cassant incrémente le MAJEUR et remet les autres nombres à zéro."
+    }
+   ]
+  },
+  {
+   "id": "rebase",
+   "title": "Rebase : réécrire proprement",
+   "minutes": 20,
+   "objectives": [
+    "Comprendre ce que fait git rebase",
+    "Comparer rebase et merge",
+    "Appliquer la règle d'or du rebase"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "git rebase main, lancé depuis une branche, rejoue vos commits un par un au-dessus du dernier commit de main. Le résultat : un historique linéaire, comme si vous aviez commencé votre travail à partir de la version la plus récente."
+    },
+    {
+     "type": "code",
+     "body": "git switch fonction\ngit rebase main",
+     "caption": "Rejouer la branche fonction sur main"
+    },
+    {
+     "type": "text",
+     "body": "Différence avec merge : merge conserve l'historique tel qu'il s'est produit (avec un commit de fusion) ; rebase le réécrit pour le rendre linéaire. Les commits rejoués ont de nouveaux identifiants."
+    },
+    {
+     "type": "warning",
+     "body": "Règle d'or : ne jamais rebaser des commits déjà partagés (poussés sur une branche commune). Leur identifiant change : vos collègues se retrouveraient avec un historique divergent."
+    },
+    {
+     "type": "text",
+     "body": "git rebase -i (interactif) permet de réordonner, fusionner (squash) ou reformuler des commits locaux avant de les partager : idéal pour présenter une série propre en revue de code."
+    },
+    {
+     "type": "tip",
+     "body": "Le simulateur ne joue pas rebase. Vous le pratiquerez sur un dépôt jetable dans l'Atelier."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "git-l13-q1",
+     "type": "single",
+     "prompt": "Que fait git rebase main depuis la branche fonction ?",
+     "choices": [
+      "Rejoue les commits de fonction au-dessus du dernier commit de main",
+      "Fusionne main dans fonction avec un commit de fusion",
+      "Supprime main",
+      "Crée une étiquette"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Le rebase recopie vos commits sur une nouvelle base ; l'historique devient linéaire."
+    },
+    {
+     "id": "git-l13-q2",
+     "type": "single",
+     "prompt": "Quelle est la règle d'or du rebase ?",
+     "choices": [
+      "Ne pas rebaser des commits déjà partagés",
+      "Toujours rebaser avant chaque commit",
+      "Ne rebaser que main",
+      "Rebaser uniquement le vendredi"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Rebaser change les identifiants des commits : sur un historique partagé, cela crée des divergences pour toute l'équipe."
+    },
+    {
+     "id": "git-l13-q3",
+     "type": "single",
+     "prompt": "Que deviennent les identifiants des commits rejoués par un rebase ?",
+     "choices": [
+      "Ils changent",
+      "Ils restent identiques",
+      "Ils sont supprimés",
+      "Ils deviennent des étiquettes"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Un commit rejoué a un nouveau parent, donc un nouveau contenu et un nouveau hash."
+    },
+    {
+     "id": "git-l13-q4",
+     "type": "multiple",
+     "prompt": "Que permet git rebase -i ? (plusieurs réponses)",
+     "choices": [
+      "Réordonner des commits",
+      "Fusionner plusieurs commits (squash)",
+      "Reformuler un message",
+      "Publier sur GitHub"
+     ],
+     "answer": [
+      0,
+      1,
+      2
+     ],
+     "explanation": "Le rebase interactif retravaille une série locale. Il ne publie rien."
+    }
+   ]
+  },
+  {
+   "id": "hooks-pratiques",
+   "title": "Hooks et bonnes pratiques",
+   "minutes": 18,
+   "objectives": [
+    "Savoir ce qu'est un hook Git",
+    "Écrire des messages de commit conventionnels",
+    "Adopter les réflexes de sécurité"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Les hooks sont des scripts que Git exécute à certains moments : pre-commit (avant de créer le commit, par ex. lancer le formatage ou les tests), commit-msg (vérifier le message), pre-push (avant l'envoi). Ils vivent dans .git/hooks et ne sont pas versionnés par défaut."
+    },
+    {
+     "type": "code",
+     "body": "#!/bin/sh\n# .git/hooks/pre-commit\ndart format --set-exit-if-changed lib test",
+     "caption": "Exemple : refuser un commit mal formaté"
+    },
+    {
+     "type": "text",
+     "body": "Conventional Commits propose un format lisible par les humains et les outils : « type(portée): description ». Types courants : feat (fonctionnalité), fix (correction), docs, refactor, test, chore."
+    },
+    {
+     "type": "code",
+     "body": "feat(panier): ajoute la suppression d'un article\nfix(facture): corrige l'arrondi de la TVA",
+     "caption": "Messages conventionnels"
+    },
+    {
+     "type": "warning",
+     "body": "Réflexes de sécurité : jamais de secret dans un dépôt ; jamais de git push --force sur une branche partagée ; relire git diff --staged ; protéger la branche main côté serveur."
+    },
+    {
+     "type": "tip",
+     "body": "Un scanner de secrets en pre-commit (comme celui que l'Atelier appliquera avant tout push) arrête la fuite avant qu'elle n'entre dans l'historique."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "git-l14-q1",
+     "type": "single",
+     "prompt": "Quand s'exécute le hook pre-commit ?",
+     "choices": [
+      "Juste avant la création du commit",
+      "Après l'envoi sur le serveur",
+      "Au clonage",
+      "À chaque git status"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "pre-commit peut bloquer le commit (code de sortie non nul), par exemple si les tests échouent."
+    },
+    {
+     "id": "git-l14-q2",
+     "type": "single",
+     "prompt": "Quel message suit la convention Conventional Commits ?",
+     "choices": [
+      "fix(api): corrige le délai d'expiration",
+      "Correction",
+      "FIX!!!",
+      "maj 3"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Format type(portée): description, avec un type connu comme feat ou fix."
+    },
+    {
+     "id": "git-l14-q3",
+     "type": "single",
+     "prompt": "Les hooks de .git/hooks sont-ils partagés automatiquement avec l'équipe ?",
+     "choices": [
+      "Non, le dossier .git/hooks n'est pas versionné",
+      "Oui, à chaque push",
+      "Oui, via le .gitignore",
+      "Seulement sur GitHub"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Il faut un outil ou un dossier versionné (core.hooksPath) pour partager des hooks."
+    },
+    {
+     "id": "git-l14-q4",
+     "type": "multiple",
+     "prompt": "Quelles pratiques sont recommandées ? (plusieurs réponses)",
+     "choices": [
+      "Relire git diff --staged avant de valider",
+      "Protéger la branche main sur le serveur",
+      "Utiliser push --force sur main pour aller plus vite",
+      "Ne jamais versionner de secret"
+     ],
+     "answer": [
+      0,
+      1,
+      3
+     ],
+     "explanation": "push --force sur une branche partagée peut effacer le travail des autres : à proscrire."
+    }
+   ]
+  }
+ ],
+ "project": {
+  "title": "Expédition Cambuse : versionner le journal de bord",
+  "brief": "Mettez en œuvre tout le module sur un projet complet : initialisation, identité, .gitignore, commits atomiques, branche de fonctionnalité, conflit résolu et version étiquetée. Évaluez ensuite votre travail avec la grille.",
+  "exercise": {
+   "intro": "Dépôt vierge. Vous êtes seul maître à bord.",
+   "setup": [],
+   "steps": [
+    {
+     "instruction": "Initialisez le dépôt et configurez votre nom et votre e-mail.",
+     "hint": "git init puis deux git config.",
+     "solution": [
+      "git init",
+      "git config user.name \"Anne Bonny\"",
+      "git config user.email anne@cambuse.example"
+     ],
+     "goals": [
+      {
+       "type": "initialized"
+      },
+      {
+       "type": "configSet",
+       "key": "user.name"
+      },
+      {
+       "type": "configSet",
+       "key": "user.email"
+      }
+     ]
+    },
+    {
+     "instruction": "Créez journal.txt (« Départ de Nantes ») et un .gitignore qui exclut *.tmp, puis validez les deux.",
+     "hint": "echo, echo, git add ., git commit -m.",
+     "solution": [
+      "echo \"Départ de Nantes\" > journal.txt",
+      "echo \"*.tmp\" > .gitignore",
+      "git add .",
+      "git commit -m \"Commence le journal de bord\""
+     ],
+     "goals": [
+      {
+       "type": "fileCommitted",
+       "path": "journal.txt"
+      },
+      {
+       "type": "fileCommitted",
+       "path": ".gitignore"
+      }
+     ]
+    },
+    {
+     "instruction": "Sur une branche escale, ajoutez « Escale aux Açores » au journal et validez.",
+     "hint": "git switch -c escale, echo >>, commit -am.",
+     "solution": [
+      "git switch -c escale",
+      "echo \"Escale aux Açores\" >> journal.txt",
+      "git commit -am \"Ajoute l'escale\""
+     ],
+     "goals": [
+      {
+       "type": "branchExists",
+       "name": "escale"
+      },
+      {
+       "type": "currentBranch",
+       "name": "escale"
+      },
+      {
+       "type": "commitCount",
+       "min": 2
+      }
+     ]
+    },
+    {
+     "instruction": "Revenez sur main, ajoutez « Tempête au large » au journal, validez, puis fusionnez escale (conflit attendu).",
+     "hint": "switch main, echo >>, commit -am, merge escale.",
+     "solution": [
+      "git switch main",
+      "echo \"Tempête au large\" >> journal.txt",
+      "git commit -am \"Note la tempête\"",
+      "git merge escale"
+     ],
+     "goals": [
+      {
+       "type": "fileContains",
+       "path": "journal.txt",
+       "text": "<<<<<<<"
+      }
+     ]
+    },
+    {
+     "instruction": "Résolvez le conflit en gardant les trois lignes dans l'ordre, puis concluez la fusion.",
+     "hint": "Réécrivez le fichier avec echo > puis echo >>, git add, git commit.",
+     "solution": [
+      "echo \"Départ de Nantes\" > journal.txt",
+      "echo \"Tempête au large\" >> journal.txt",
+      "echo \"Escale aux Açores\" >> journal.txt",
+      "git add journal.txt",
+      "git commit"
+     ],
+     "goals": [
+      {
+       "type": "noConflicts"
+      },
+      {
+       "type": "mergeCommitExists"
+      },
+      {
+       "type": "clean"
+      }
+     ]
+    },
+    {
+     "instruction": "Étiquetez la version v1.0.0 (étiquette annotée) et supprimez la branche escale.",
+     "hint": "git tag -a v1.0.0 -m \"...\" puis git branch -d escale.",
+     "solution": [
+      "git tag -a v1.0.0 -m \"Journal complet\"",
+      "git branch -d escale"
+     ],
+     "goals": [
+      {
+       "type": "annotatedTag",
+       "name": "v1.0.0"
+      },
+      {
+       "type": "branchDeleted",
+       "name": "escale"
+      }
+     ]
+    }
+   ]
+  },
+  "rubric": [
+   {
+    "criterion": "Messages de commit",
+    "levels": [
+     "Vagues ou absents de sens (« modifs »)",
+     "Clairs mais irréguliers",
+     "Impératifs, précis, homogènes"
+    ]
+   },
+   {
+    "criterion": "Granularité des commits",
+    "levels": [
+     "Un gros commit fourre-tout",
+     "Commits séparés mais mélangés",
+     "Un commit par idée, chacun cohérent"
+    ]
+   },
+   {
+    "criterion": "Usage des branches",
+    "levels": [
+     "Tout sur main",
+     "Branche utilisée mais conservée après fusion",
+     "Branche dédiée, fusionnée puis supprimée"
+    ]
+   },
+   {
+    "criterion": "Résolution du conflit",
+    "levels": [
+     "Marqueurs laissés ou contenu perdu",
+     "Résolu mais sans vérification",
+     "Résolu, vérifié avec status/diff, aucun marqueur"
+    ]
+   },
+   {
+    "criterion": "Hygiène du dépôt",
+    "levels": [
+     "Fichiers temporaires ou secrets versionnés",
+     ".gitignore partiel",
+     ".gitignore adapté, aucun fichier indésirable"
+    ]
+   },
+   {
+    "criterion": "Versionnement",
+    "levels": [
+     "Aucune étiquette",
+     "Étiquette légère",
+     "Étiquette annotée et nommée selon SemVer"
+    ]
+   }
+  ]
+ },
+ "glossary": [
+  {
+   "term": "Dépôt (repository)",
+   "definition": "Dossier .git contenant tout l'historique d'un projet."
+  },
+  {
+   "term": "Commit",
+   "definition": "Instantané enregistré de l'état des fichiers suivis, avec auteur, date et message."
+  },
+  {
+   "term": "Index (staging area)",
+   "definition": "Zone de préparation du prochain commit, remplie avec git add."
+  },
+  {
+   "term": "Copie de travail",
+   "definition": "Les fichiers tels qu'ils sont sur votre disque, que vous modifiez."
+  },
+  {
+   "term": "Branche",
+   "definition": "Pointeur mobile vers un commit, qui avance à chaque nouveau commit."
+  },
+  {
+   "term": "HEAD",
+   "definition": "Pointeur vers la position courante, en général la branche active."
+  },
+  {
+   "term": "Fusion (merge)",
+   "definition": "Intégration des changements d'une branche dans une autre."
+  },
+  {
+   "term": "Avance rapide (fast-forward)",
+   "definition": "Fusion sans nouveau commit : le pointeur avance simplement."
+  },
+  {
+   "term": "Conflit",
+   "definition": "Situation où deux branches modifient la même zone : Git demande d'arbitrer."
+  },
+  {
+   "term": "Rebase",
+   "definition": "Rejeu de commits au-dessus d'une autre base, pour un historique linéaire."
+  },
+  {
+   "term": "Étiquette (tag)",
+   "definition": "Repère fixe sur un commit, généralement une version publiée."
+  },
+  {
+   "term": "Hash",
+   "definition": "Empreinte unique (40 caractères hexadécimaux) identifiant un commit."
+  },
+  {
+   "term": ".gitignore",
+   "definition": "Fichier listant les motifs de fichiers que Git ne doit pas suivre."
+  },
+  {
+   "term": "Non suivi (untracked)",
+   "definition": "Fichier présent sur le disque mais inconnu de Git."
+  },
+  {
+   "term": "Indexé (staged)",
+   "definition": "Modification placée dans l'index, prête pour le prochain commit."
+  },
+  {
+   "term": "Dépôt distant (remote)",
+   "definition": "Copie du dépôt hébergée ailleurs (GitHub, GitLab, serveur)."
+  },
+  {
+   "term": "Clone",
+   "definition": "Copie complète d'un dépôt distant, historique compris."
+  },
+  {
+   "term": "Push",
+   "definition": "Envoi de vos commits vers un dépôt distant."
+  },
+  {
+   "term": "Pull",
+   "definition": "Récupération et intégration des commits d'un dépôt distant."
+  },
+  {
+   "term": "Revert",
+   "definition": "Commit qui annule les effets d'un commit précédent sans réécrire l'historique."
+  },
+  {
+   "term": "Reset",
+   "definition": "Déplacement d'une branche vers un autre commit ; peut écraser des modifications."
+  },
+  {
+   "term": "Hook",
+   "definition": "Script exécuté automatiquement par Git à un moment précis (pre-commit, pre-push…)."
+  },
+  {
+   "term": "SemVer",
+   "definition": "Versionnement sémantique MAJEUR.MINEUR.CORRECTIF."
+  },
+  {
+   "term": "Conventional Commits",
+   "definition": "Convention de messages « type(portée): description »."
+  },
+  {
+   "term": "Ancêtre commun (merge base)",
+   "definition": "Dernier commit partagé par deux branches, base d'une fusion."
+  }
+ ]
+}

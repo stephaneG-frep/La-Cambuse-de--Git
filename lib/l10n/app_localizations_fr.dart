@@ -180,4 +180,241 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get shortcutsHint =>
       'Raccourcis clavier : Ctrl+1 à Ctrl+5 pour changer de section, Ctrl+, pour les paramètres.';
+
+  @override
+  String get academyTitle => 'Carte des îles';
+
+  @override
+  String get academySubtitle =>
+      'Chaque île est un module. Les îles en brume arriveront dans une phase ultérieure.';
+
+  @override
+  String get academySearch => 'Rechercher';
+
+  @override
+  String get academyGlossary => 'Glossaire';
+
+  @override
+  String get academyReviews => 'Révisions';
+
+  @override
+  String reviewsDue(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count révisions dues',
+      one: '1 révision due',
+      zero: 'Aucune révision due',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get islandAvailable => 'Disponible hors ligne';
+
+  @override
+  String islandPlanned(int phase) {
+    return 'En brume — prévu en phase $phase';
+  }
+
+  @override
+  String get moduleObjectives => 'Objectifs';
+
+  @override
+  String get modulePrerequisites => 'Prérequis';
+
+  @override
+  String get moduleLessons => 'Leçons';
+
+  @override
+  String get moduleProgress => 'Progression du module';
+
+  @override
+  String get moduleComplete => 'Module terminé ! Bravo, moussaillon.';
+
+  @override
+  String lessonMinutes(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String get lessonStatusDone => 'Validée';
+
+  @override
+  String get lessonStatusStarted => 'Commencée';
+
+  @override
+  String get lessonStatusNew => 'À découvrir';
+
+  @override
+  String get lessonTabCourse => 'Cours';
+
+  @override
+  String get lessonTabExercise => 'Exercice';
+
+  @override
+  String get lessonTabQuiz => 'Quiz';
+
+  @override
+  String get lessonObjectives => 'À la fin de cette leçon, vous saurez :';
+
+  @override
+  String get lessonNoExercise =>
+      'Pas d\'exercice dans le simulateur pour cette leçon : elle se pratique sur un vrai dépôt jetable dans l\'Atelier (phase 5).';
+
+  @override
+  String get lessonNext => 'Leçon suivante';
+
+  @override
+  String get lessonCompleteHint =>
+      'Pour valider la leçon : quiz ≥ 70 % et exercice réussi.';
+
+  @override
+  String get lessonCompleteHintNoEx => 'Pour valider la leçon : quiz ≥ 70 %.';
+
+  @override
+  String get lessonValidated => 'Leçon validée';
+
+  @override
+  String bestScore(int score) {
+    return 'Meilleur score : $score %';
+  }
+
+  @override
+  String get sandboxBanner =>
+      'Simulateur pédagogique : aucune commande réelle n\'est exécutée, aucun fichier n\'est touché.';
+
+  @override
+  String get sandboxInputHint => 'Tapez une commande (ex. git status)';
+
+  @override
+  String get sandboxRun => 'Exécuter';
+
+  @override
+  String get sandboxReset => 'Recommencer';
+
+  @override
+  String get sandboxHint => 'Indice';
+
+  @override
+  String get sandboxSolution => 'Solution';
+
+  @override
+  String exerciseStep(int current, int total) {
+    return 'Étape $current sur $total';
+  }
+
+  @override
+  String get exerciseDone => 'Exercice réussi ! Mousse Byte est fier de vous.';
+
+  @override
+  String quizQuestion(int current, int total) {
+    return 'Question $current sur $total';
+  }
+
+  @override
+  String get quizValidate => 'Valider';
+
+  @override
+  String get quizNext => 'Question suivante';
+
+  @override
+  String get quizFinish => 'Voir le résultat';
+
+  @override
+  String get quizCorrect => 'Bonne réponse !';
+
+  @override
+  String get quizWrong => 'Pas tout à fait.';
+
+  @override
+  String get quizMultipleHint => 'Plusieurs réponses possibles.';
+
+  @override
+  String get quizCommandHint => 'Saisissez la commande';
+
+  @override
+  String quizResult(int score) {
+    return 'Score : $score %';
+  }
+
+  @override
+  String get quizPassed => 'Quiz réussi.';
+
+  @override
+  String get quizFailed =>
+      'Il faut 70 % pour valider. Relisez le cours et retentez votre chance !';
+
+  @override
+  String get quizRetry => 'Recommencer le quiz';
+
+  @override
+  String expectedAnswer(String answer) {
+    return 'Réponse attendue : $answer';
+  }
+
+  @override
+  String get reviewsTitle => 'Révisions du jour';
+
+  @override
+  String get reviewsEmpty =>
+      'Aucune révision prévue maintenant. Les questions reviennent selon la répétition espacée (1, 2, 4, 8 puis 16 jours).';
+
+  @override
+  String get reviewsDone => 'Révisions terminées : à demain !';
+
+  @override
+  String get glossaryTitle => 'Glossaire';
+
+  @override
+  String get searchHint => 'Rechercher une leçon ou un terme';
+
+  @override
+  String get searchNoResult => 'Aucun résultat.';
+
+  @override
+  String get searchLessons => 'Leçons';
+
+  @override
+  String get searchGlossary => 'Glossaire';
+
+  @override
+  String get projectTitle => 'Projet final';
+
+  @override
+  String get projectRubric => 'Grille d\'auto-évaluation';
+
+  @override
+  String get projectSubmit => 'Enregistrer mon évaluation';
+
+  @override
+  String get projectSaved => 'Évaluation enregistrée.';
+
+  @override
+  String get projectExerciseFirst =>
+      'Réalisez d\'abord le projet dans le simulateur pour débloquer la grille.';
+
+  @override
+  String get projectDone => 'Projet réalisé';
+
+  @override
+  String resumeLesson(String title) {
+    return 'Reprendre : $title';
+  }
+
+  @override
+  String get academyProgressTitle => 'Votre progression';
+
+  @override
+  String get settingsProfile => 'Profil';
+
+  @override
+  String get settingsProfileRename => 'Renommer';
+
+  @override
+  String get settingsProfileSaved => 'Profil renommé.';
+
+  @override
+  String get contentLanguageNote =>
+      'Le contenu des cours est en français pour l\'instant.';
 }

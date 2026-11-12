@@ -1,36 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:la_cambuse/app/app.dart';
-import 'package:la_cambuse/app/providers.dart';
 import 'package:la_cambuse/core/db/database.dart';
 
 import '../helpers.dart';
-
-Future<AppDatabase> pumpApp(WidgetTester tester, {required Size size, AppDatabase? db}) async {
-  tester.view.physicalSize = size;
-  tester.view.devicePixelRatio = 1.0;
-  addTearDown(tester.view.reset);
-  final database = db ?? memoryDb();
-  await tester.pumpWidget(ProviderScope(
-    overrides: [databaseProvider.overrideWithValue(database)],
-    child: const CambuseApp(),
-  ));
-  await tester.pumpAndSettle();
-  return database;
-}
-
-/// Démonte l'application avant de fermer la base (évite les timers de flux).
-Future<void> teardown(WidgetTester tester, AppDatabase db) async {
-  await tester.pumpWidget(const SizedBox());
-  await tester.pump(Duration.zero);
-  // Fermeture hors de la zone de temps simulé : sinon Drift attend indéfiniment.
-  await tester.runAsync(db.close);
-}
-
-const phone = Size(400, 860);
-const desktop = Size(1280, 800);
+import 'widget_helpers.dart';
 
 void main() {
   testWidgets('démarrage sans écran blanc : le pont et le formulaire de profil',
@@ -71,7 +45,7 @@ void main() {
     await tester.sendKeyEvent(LogicalKeyboardKey.digit2);
     await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
     await tester.pumpAndSettle();
-    expect(find.textContaining('phase 2 de la feuille de route'), findsOneWidget);
+    expect(find.text('Carte des îles'), findsOneWidget);
 
     await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
     await tester.sendKeyEvent(LogicalKeyboardKey.digit5);

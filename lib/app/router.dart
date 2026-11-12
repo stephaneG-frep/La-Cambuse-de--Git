@@ -2,6 +2,11 @@ import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 
 import '../features/academy/presentation/academy_screen.dart';
+import '../features/academy/presentation/lesson_screen.dart';
+import '../features/academy/presentation/module_screen.dart';
+import '../features/academy/presentation/project_screen.dart';
+import '../features/academy/presentation/reviews_screen.dart';
+import '../features/academy/presentation/search_screen.dart';
 import '../features/captain/presentation/captain_screen.dart';
 import '../features/dashboard/presentation/dashboard_screen.dart';
 import '../features/logbook/presentation/logbook_screen.dart';
@@ -25,7 +30,36 @@ GoRouter buildRouter() => GoRouter(
           builder: (context, state, shell) => AdaptiveShell(navigationShell: shell),
           branches: [
             _branch(Routes.bridge, const DashboardScreen()),
-            _branch(Routes.academy, const AcademyScreen()),
+            StatefulShellBranch(routes: [
+              GoRoute(
+                path: Routes.academy,
+                builder: (context, state) => const AcademyScreen(),
+                routes: [
+                  GoRoute(path: 'revisions', builder: (c, s) => const ReviewsScreen()),
+                  GoRoute(
+                      path: 'glossaire',
+                      builder: (c, s) => const SearchScreen(glossaryOnly: true)),
+                  GoRoute(path: 'recherche', builder: (c, s) => const SearchScreen()),
+                  GoRoute(
+                    path: ':moduleId',
+                    builder: (c, s) => ModuleScreen(moduleId: s.pathParameters['moduleId']!),
+                    routes: [
+                      GoRoute(
+                        path: 'lecon/:lessonId',
+                        builder: (c, s) => LessonScreen(
+                          moduleId: s.pathParameters['moduleId']!,
+                          lessonId: s.pathParameters['lessonId']!,
+                        ),
+                      ),
+                      GoRoute(
+                        path: 'projet',
+                        builder: (c, s) => ProjectScreen(moduleId: s.pathParameters['moduleId']!),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ]),
             _branch(Routes.workshop, const WorkshopScreen()),
             _branch(Routes.captain, const CaptainScreen()),
             _branch(Routes.logbook, const LogbookScreen()),

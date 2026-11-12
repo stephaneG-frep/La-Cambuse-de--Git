@@ -385,6 +385,414 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Raccourcis clavier : Ctrl+1 à Ctrl+5 pour changer de section, Ctrl+, pour les paramètres.'**
   String get shortcutsHint;
+
+  /// No description provided for @academyTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Carte des îles'**
+  String get academyTitle;
+
+  /// No description provided for @academySubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Chaque île est un module. Les îles en brume arriveront dans une phase ultérieure.'**
+  String get academySubtitle;
+
+  /// No description provided for @academySearch.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rechercher'**
+  String get academySearch;
+
+  /// No description provided for @academyGlossary.
+  ///
+  /// In fr, this message translates to:
+  /// **'Glossaire'**
+  String get academyGlossary;
+
+  /// No description provided for @academyReviews.
+  ///
+  /// In fr, this message translates to:
+  /// **'Révisions'**
+  String get academyReviews;
+
+  /// No description provided for @reviewsDue.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count, plural, =0{Aucune révision due} =1{1 révision due} other{{count} révisions dues}}'**
+  String reviewsDue(int count);
+
+  /// No description provided for @islandAvailable.
+  ///
+  /// In fr, this message translates to:
+  /// **'Disponible hors ligne'**
+  String get islandAvailable;
+
+  /// No description provided for @islandPlanned.
+  ///
+  /// In fr, this message translates to:
+  /// **'En brume — prévu en phase {phase}'**
+  String islandPlanned(int phase);
+
+  /// No description provided for @moduleObjectives.
+  ///
+  /// In fr, this message translates to:
+  /// **'Objectifs'**
+  String get moduleObjectives;
+
+  /// No description provided for @modulePrerequisites.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prérequis'**
+  String get modulePrerequisites;
+
+  /// No description provided for @moduleLessons.
+  ///
+  /// In fr, this message translates to:
+  /// **'Leçons'**
+  String get moduleLessons;
+
+  /// No description provided for @moduleProgress.
+  ///
+  /// In fr, this message translates to:
+  /// **'Progression du module'**
+  String get moduleProgress;
+
+  /// No description provided for @moduleComplete.
+  ///
+  /// In fr, this message translates to:
+  /// **'Module terminé ! Bravo, moussaillon.'**
+  String get moduleComplete;
+
+  /// No description provided for @lessonMinutes.
+  ///
+  /// In fr, this message translates to:
+  /// **'{minutes} min'**
+  String lessonMinutes(int minutes);
+
+  /// No description provided for @lessonStatusDone.
+  ///
+  /// In fr, this message translates to:
+  /// **'Validée'**
+  String get lessonStatusDone;
+
+  /// No description provided for @lessonStatusStarted.
+  ///
+  /// In fr, this message translates to:
+  /// **'Commencée'**
+  String get lessonStatusStarted;
+
+  /// No description provided for @lessonStatusNew.
+  ///
+  /// In fr, this message translates to:
+  /// **'À découvrir'**
+  String get lessonStatusNew;
+
+  /// No description provided for @lessonTabCourse.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cours'**
+  String get lessonTabCourse;
+
+  /// No description provided for @lessonTabExercise.
+  ///
+  /// In fr, this message translates to:
+  /// **'Exercice'**
+  String get lessonTabExercise;
+
+  /// No description provided for @lessonTabQuiz.
+  ///
+  /// In fr, this message translates to:
+  /// **'Quiz'**
+  String get lessonTabQuiz;
+
+  /// No description provided for @lessonObjectives.
+  ///
+  /// In fr, this message translates to:
+  /// **'À la fin de cette leçon, vous saurez :'**
+  String get lessonObjectives;
+
+  /// No description provided for @lessonNoExercise.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pas d\'exercice dans le simulateur pour cette leçon : elle se pratique sur un vrai dépôt jetable dans l\'Atelier (phase 5).'**
+  String get lessonNoExercise;
+
+  /// No description provided for @lessonNext.
+  ///
+  /// In fr, this message translates to:
+  /// **'Leçon suivante'**
+  String get lessonNext;
+
+  /// No description provided for @lessonCompleteHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pour valider la leçon : quiz ≥ 70 % et exercice réussi.'**
+  String get lessonCompleteHint;
+
+  /// No description provided for @lessonCompleteHintNoEx.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pour valider la leçon : quiz ≥ 70 %.'**
+  String get lessonCompleteHintNoEx;
+
+  /// No description provided for @lessonValidated.
+  ///
+  /// In fr, this message translates to:
+  /// **'Leçon validée'**
+  String get lessonValidated;
+
+  /// No description provided for @bestScore.
+  ///
+  /// In fr, this message translates to:
+  /// **'Meilleur score : {score} %'**
+  String bestScore(int score);
+
+  /// No description provided for @sandboxBanner.
+  ///
+  /// In fr, this message translates to:
+  /// **'Simulateur pédagogique : aucune commande réelle n\'est exécutée, aucun fichier n\'est touché.'**
+  String get sandboxBanner;
+
+  /// No description provided for @sandboxInputHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tapez une commande (ex. git status)'**
+  String get sandboxInputHint;
+
+  /// No description provided for @sandboxRun.
+  ///
+  /// In fr, this message translates to:
+  /// **'Exécuter'**
+  String get sandboxRun;
+
+  /// No description provided for @sandboxReset.
+  ///
+  /// In fr, this message translates to:
+  /// **'Recommencer'**
+  String get sandboxReset;
+
+  /// No description provided for @sandboxHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Indice'**
+  String get sandboxHint;
+
+  /// No description provided for @sandboxSolution.
+  ///
+  /// In fr, this message translates to:
+  /// **'Solution'**
+  String get sandboxSolution;
+
+  /// No description provided for @exerciseStep.
+  ///
+  /// In fr, this message translates to:
+  /// **'Étape {current} sur {total}'**
+  String exerciseStep(int current, int total);
+
+  /// No description provided for @exerciseDone.
+  ///
+  /// In fr, this message translates to:
+  /// **'Exercice réussi ! Mousse Byte est fier de vous.'**
+  String get exerciseDone;
+
+  /// No description provided for @quizQuestion.
+  ///
+  /// In fr, this message translates to:
+  /// **'Question {current} sur {total}'**
+  String quizQuestion(int current, int total);
+
+  /// No description provided for @quizValidate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Valider'**
+  String get quizValidate;
+
+  /// No description provided for @quizNext.
+  ///
+  /// In fr, this message translates to:
+  /// **'Question suivante'**
+  String get quizNext;
+
+  /// No description provided for @quizFinish.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voir le résultat'**
+  String get quizFinish;
+
+  /// No description provided for @quizCorrect.
+  ///
+  /// In fr, this message translates to:
+  /// **'Bonne réponse !'**
+  String get quizCorrect;
+
+  /// No description provided for @quizWrong.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pas tout à fait.'**
+  String get quizWrong;
+
+  /// No description provided for @quizMultipleHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Plusieurs réponses possibles.'**
+  String get quizMultipleHint;
+
+  /// No description provided for @quizCommandHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Saisissez la commande'**
+  String get quizCommandHint;
+
+  /// No description provided for @quizResult.
+  ///
+  /// In fr, this message translates to:
+  /// **'Score : {score} %'**
+  String quizResult(int score);
+
+  /// No description provided for @quizPassed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Quiz réussi.'**
+  String get quizPassed;
+
+  /// No description provided for @quizFailed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Il faut 70 % pour valider. Relisez le cours et retentez votre chance !'**
+  String get quizFailed;
+
+  /// No description provided for @quizRetry.
+  ///
+  /// In fr, this message translates to:
+  /// **'Recommencer le quiz'**
+  String get quizRetry;
+
+  /// No description provided for @expectedAnswer.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réponse attendue : {answer}'**
+  String expectedAnswer(String answer);
+
+  /// No description provided for @reviewsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Révisions du jour'**
+  String get reviewsTitle;
+
+  /// No description provided for @reviewsEmpty.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune révision prévue maintenant. Les questions reviennent selon la répétition espacée (1, 2, 4, 8 puis 16 jours).'**
+  String get reviewsEmpty;
+
+  /// No description provided for @reviewsDone.
+  ///
+  /// In fr, this message translates to:
+  /// **'Révisions terminées : à demain !'**
+  String get reviewsDone;
+
+  /// No description provided for @glossaryTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Glossaire'**
+  String get glossaryTitle;
+
+  /// No description provided for @searchHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rechercher une leçon ou un terme'**
+  String get searchHint;
+
+  /// No description provided for @searchNoResult.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun résultat.'**
+  String get searchNoResult;
+
+  /// No description provided for @searchLessons.
+  ///
+  /// In fr, this message translates to:
+  /// **'Leçons'**
+  String get searchLessons;
+
+  /// No description provided for @searchGlossary.
+  ///
+  /// In fr, this message translates to:
+  /// **'Glossaire'**
+  String get searchGlossary;
+
+  /// No description provided for @projectTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Projet final'**
+  String get projectTitle;
+
+  /// No description provided for @projectRubric.
+  ///
+  /// In fr, this message translates to:
+  /// **'Grille d\'auto-évaluation'**
+  String get projectRubric;
+
+  /// No description provided for @projectSubmit.
+  ///
+  /// In fr, this message translates to:
+  /// **'Enregistrer mon évaluation'**
+  String get projectSubmit;
+
+  /// No description provided for @projectSaved.
+  ///
+  /// In fr, this message translates to:
+  /// **'Évaluation enregistrée.'**
+  String get projectSaved;
+
+  /// No description provided for @projectExerciseFirst.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réalisez d\'abord le projet dans le simulateur pour débloquer la grille.'**
+  String get projectExerciseFirst;
+
+  /// No description provided for @projectDone.
+  ///
+  /// In fr, this message translates to:
+  /// **'Projet réalisé'**
+  String get projectDone;
+
+  /// No description provided for @resumeLesson.
+  ///
+  /// In fr, this message translates to:
+  /// **'Reprendre : {title}'**
+  String resumeLesson(String title);
+
+  /// No description provided for @academyProgressTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre progression'**
+  String get academyProgressTitle;
+
+  /// No description provided for @settingsProfile.
+  ///
+  /// In fr, this message translates to:
+  /// **'Profil'**
+  String get settingsProfile;
+
+  /// No description provided for @settingsProfileRename.
+  ///
+  /// In fr, this message translates to:
+  /// **'Renommer'**
+  String get settingsProfileRename;
+
+  /// No description provided for @settingsProfileSaved.
+  ///
+  /// In fr, this message translates to:
+  /// **'Profil renommé.'**
+  String get settingsProfileSaved;
+
+  /// No description provided for @contentLanguageNote.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le contenu des cours est en français pour l\'instant.'**
+  String get contentLanguageNote;
 }
 
 class _AppLocalizationsDelegate

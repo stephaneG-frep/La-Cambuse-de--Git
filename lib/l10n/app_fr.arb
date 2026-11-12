@@ -9,33 +9,69 @@
   "navSettings": "Paramètres",
   "bridgeTitle": "Le pont du navire",
   "bridgeWelcome": "Bienvenue à bord, {name} !",
-  "@bridgeWelcome": {"placeholders": {"name": {"type": "String"}}},
+  "@bridgeWelcome": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "createProfileTitle": "Créez votre profil de matelot",
   "createProfileHint": "Votre nom ou pseudonyme",
   "createProfileAction": "Embarquer",
   "createProfileInvalid": "Entre 1 et 40 caractères.",
   "profileLocalNote": "Profil stocké uniquement sur cet appareil. Aucune donnée n'est envoyée.",
   "bridgeLogbookCount": "{count, plural, =0{Aucune entrée au journal} =1{1 entrée au journal} other{{count} entrées au journal}}",
-  "@bridgeLogbookCount": {"placeholders": {"count": {"type": "int"}}},
+  "@bridgeLogbookCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "sectionAcademyDesc": "Apprendre Git, GitHub, GitLab, Docker et DevOps de zéro à expert.",
   "sectionWorkshopDesc": "Importer un projet, l'auditer sans le modifier et préparer Git et la CI.",
   "sectionCaptainDesc": "Orchestration supervisée : plan, validations, pause et arrêt d'urgence.",
   "openSection": "Ouvrir",
   "plannedPhaseTitle": "En construction",
   "plannedPhaseBody": "Cette section sera livrée en phase {phase} de la feuille de route. Aucune fonctionnalité n'est simulée ici.",
-  "@plannedPhaseBody": {"placeholders": {"phase": {"type": "int"}}},
+  "@plannedPhaseBody": {
+    "placeholders": {
+      "phase": {
+        "type": "int"
+      }
+    }
+  },
   "logbookTitle": "Journal de bord",
   "logbookEmpty": "Le journal est vide.",
   "logbookFilterAll": "Toutes",
   "logbookExport": "Copier en JSON",
   "logbookExported": "Journal copié dans le presse-papiers ({count} entrées).",
-  "@logbookExported": {"placeholders": {"count": {"type": "int"}}},
+  "@logbookExported": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "logbookClear": "Effacer le journal",
   "logbookClearConfirmTitle": "Effacer le journal de bord ?",
   "logbookClearConfirmBody": "{count} entrées seront supprimées définitivement de cet appareil. Une entrée indiquant l'effacement sera conservée.",
-  "@logbookClearConfirmBody": {"placeholders": {"count": {"type": "int"}}},
+  "@logbookClearConfirmBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "logbookCleared": "{count} entrées effacées.",
-  "@logbookCleared": {"placeholders": {"count": {"type": "int"}}},
+  "@logbookCleared": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "cancel": "Annuler",
   "confirmDelete": "Effacer définitivement",
   "outcomeSuccess": "Réussi",
@@ -52,7 +88,150 @@
   "languageFrench": "Français",
   "languageEnglish": "English",
   "errorGeneric": "Une erreur est survenue : {message}",
-  "@errorGeneric": {"placeholders": {"message": {"type": "String"}}},
+  "@errorGeneric": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
   "loading": "Chargement…",
-  "shortcutsHint": "Raccourcis clavier : Ctrl+1 à Ctrl+5 pour changer de section, Ctrl+, pour les paramètres."
+  "shortcutsHint": "Raccourcis clavier : Ctrl+1 à Ctrl+5 pour changer de section, Ctrl+, pour les paramètres.",
+  "academyTitle": "Carte des îles",
+  "academySubtitle": "Chaque île est un module. Les îles en brume arriveront dans une phase ultérieure.",
+  "academySearch": "Rechercher",
+  "academyGlossary": "Glossaire",
+  "academyReviews": "Révisions",
+  "reviewsDue": "{count, plural, =0{Aucune révision due} =1{1 révision due} other{{count} révisions dues}}",
+  "@reviewsDue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "islandAvailable": "Disponible hors ligne",
+  "islandPlanned": "En brume — prévu en phase {phase}",
+  "@islandPlanned": {
+    "placeholders": {
+      "phase": {
+        "type": "int"
+      }
+    }
+  },
+  "moduleObjectives": "Objectifs",
+  "modulePrerequisites": "Prérequis",
+  "moduleLessons": "Leçons",
+  "moduleProgress": "Progression du module",
+  "moduleComplete": "Module terminé ! Bravo, moussaillon.",
+  "lessonMinutes": "{minutes} min",
+  "@lessonMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "lessonStatusDone": "Validée",
+  "lessonStatusStarted": "Commencée",
+  "lessonStatusNew": "À découvrir",
+  "lessonTabCourse": "Cours",
+  "lessonTabExercise": "Exercice",
+  "lessonTabQuiz": "Quiz",
+  "lessonObjectives": "À la fin de cette leçon, vous saurez :",
+  "lessonNoExercise": "Pas d'exercice dans le simulateur pour cette leçon : elle se pratique sur un vrai dépôt jetable dans l'Atelier (phase 5).",
+  "lessonNext": "Leçon suivante",
+  "lessonCompleteHint": "Pour valider la leçon : quiz ≥ 70 % et exercice réussi.",
+  "lessonCompleteHintNoEx": "Pour valider la leçon : quiz ≥ 70 %.",
+  "lessonValidated": "Leçon validée",
+  "bestScore": "Meilleur score : {score} %",
+  "@bestScore": {
+    "placeholders": {
+      "score": {
+        "type": "int"
+      }
+    }
+  },
+  "sandboxBanner": "Simulateur pédagogique : aucune commande réelle n'est exécutée, aucun fichier n'est touché.",
+  "sandboxInputHint": "Tapez une commande (ex. git status)",
+  "sandboxRun": "Exécuter",
+  "sandboxReset": "Recommencer",
+  "sandboxHint": "Indice",
+  "sandboxSolution": "Solution",
+  "exerciseStep": "Étape {current} sur {total}",
+  "@exerciseStep": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "exerciseDone": "Exercice réussi ! Mousse Byte est fier de vous.",
+  "quizQuestion": "Question {current} sur {total}",
+  "@quizQuestion": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "quizValidate": "Valider",
+  "quizNext": "Question suivante",
+  "quizFinish": "Voir le résultat",
+  "quizCorrect": "Bonne réponse !",
+  "quizWrong": "Pas tout à fait.",
+  "quizMultipleHint": "Plusieurs réponses possibles.",
+  "quizCommandHint": "Saisissez la commande",
+  "quizResult": "Score : {score} %",
+  "@quizResult": {
+    "placeholders": {
+      "score": {
+        "type": "int"
+      }
+    }
+  },
+  "quizPassed": "Quiz réussi.",
+  "quizFailed": "Il faut 70 % pour valider. Relisez le cours et retentez votre chance !",
+  "quizRetry": "Recommencer le quiz",
+  "expectedAnswer": "Réponse attendue : {answer}",
+  "@expectedAnswer": {
+    "placeholders": {
+      "answer": {
+        "type": "String"
+      }
+    }
+  },
+  "reviewsTitle": "Révisions du jour",
+  "reviewsEmpty": "Aucune révision prévue maintenant. Les questions reviennent selon la répétition espacée (1, 2, 4, 8 puis 16 jours).",
+  "reviewsDone": "Révisions terminées : à demain !",
+  "glossaryTitle": "Glossaire",
+  "searchHint": "Rechercher une leçon ou un terme",
+  "searchNoResult": "Aucun résultat.",
+  "searchLessons": "Leçons",
+  "searchGlossary": "Glossaire",
+  "projectTitle": "Projet final",
+  "projectRubric": "Grille d'auto-évaluation",
+  "projectSubmit": "Enregistrer mon évaluation",
+  "projectSaved": "Évaluation enregistrée.",
+  "projectExerciseFirst": "Réalisez d'abord le projet dans le simulateur pour débloquer la grille.",
+  "projectDone": "Projet réalisé",
+  "resumeLesson": "Reprendre : {title}",
+  "@resumeLesson": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "academyProgressTitle": "Votre progression",
+  "settingsProfile": "Profil",
+  "settingsProfileRename": "Renommer",
+  "settingsProfileSaved": "Profil renommé.",
+  "contentLanguageNote": "Le contenu des cours est en français pour l'instant."
 }

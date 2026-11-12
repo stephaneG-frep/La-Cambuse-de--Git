@@ -8,7 +8,9 @@ import '../../../app/theme/tokens.dart';
 import '../../../core/db/database.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/state_views.dart';
+import '../../academy/presentation/academy_providers.dart';
 import '../../profile/presentation/profile_form.dart';
+import '../../../shared/widgets/gauge_progress.dart';
 
 /// Le pont du navire : accueil et tableau de bord.
 class DashboardScreen extends ConsumerWidget {
@@ -81,6 +83,8 @@ class _DashboardBody extends ConsumerWidget {
             ),
           ),
         const SizedBox(height: CambuseSpacing.md),
+        const _AcademyProgressCard(),
+        const SizedBox(height: CambuseSpacing.md),
         Wrap(
           spacing: CambuseSpacing.md,
           runSpacing: CambuseSpacing.md,
@@ -118,6 +122,59 @@ class _DashboardBody extends ConsumerWidget {
           Text(l.shortcutsHint, style: TextStyle(color: pal.textSecondary)),
         ],
       ],
+    );
+  }
+}
+
+/// Progression de l'Académie, reprise de leçon et révisions dues.
+class _AcademyProgressCard extends ConsumerWidget {
+  const _AcademyProgressCard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
+    final pal = CambuseTheme.of(context);
+    final course = ref.watch(courseProvider('git')).value;
+    final stats = ref.watch(moduleStatsProvider('git'));
+    final last = ref.watch(lastLessonProvider).value;
+    final due = ref.watch(dueCardsProvider).value?.length ?? 0;
+    if (course == null || stats == null) return const SizedBox.shrink();
+    final lastLesson = last == null ? null : course.lesson(last.$2);
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(CambuseSpacing.md),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(l.academyProgressTitle, style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(height: CambuseSpacing.sm),
+            Text('${course.title} — ${stats.completedLessons}/${stats.totalLessons} '
+                '${l.moduleLessons.toLowerCase()}',
+                style: TextStyle(color: pal.textSecondary)),
+            const SizedBox(height: CambuseSpacing.sm),
+            GaugeProgress(value: stats.ratio, label: l.moduleProgress),
+            const SizedBox(height: CambuseSpacing.md),
+            Wrap(
+              spacing: CambuseSpacing.sm,
+              runSpacing: CambuseSpacing.sm,
+              children: [
+                if (lastLesson != null)
+                  FilledButton.icon(
+                    onPressed: () => context.go('/academie/git/lecon/${lastLesson.id}'),
+                    icon: const Icon(Icons.play_arrow),
+                    label: Text(l.resumeLesson(lastLesson.title)),
+                  ),
+                OutlinedButton.icon(
+                  onPressed: () => context.go('/academie/revisions'),
+                  icon: const Icon(Icons.replay),
+                  label: Text(l.reviewsDue(due)),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

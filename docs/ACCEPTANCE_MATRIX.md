@@ -2,7 +2,7 @@
 
 États : ⬜ non commencé · 🟨 partiel · ✅ réel et testé · ⛔ bloqué
 
-Dernière mise à jour : 2026-11-12 (fin de phase 1)
+Dernière mise à jour : 2026-11-12 (fin de phase 2)
 
 | Phase | Fonctionnalité | État | Preuve / remarque |
 |---|---|---|---|
@@ -12,11 +12,11 @@ Dernière mise à jour : 2026-11-12 (fin de phase 1)
 | 1 | Thème tokens pirate-steampunk, contraste AA | ✅ | tests de contraste ; illustrations personnages non faites |
 | 1 | Navigation adaptative (barre / rail) | ✅ | tests widgets + raccourcis clavier ; panneaux redimensionnables non faits |
 | 1 | i18n FR (EN préparé) | ✅ | FR + EN interface |
-| 1 | Persistance Drift + migrations testées | 🟨 | schéma v1 + persistance testés ; aucune migration encore (première en v2) |
+| 1 | Persistance Drift + migrations testées | ✅ | migration v1→v2 testée et réalisée sur appareil réel |
 | 1 | Accueil et journal de bord fonctionnels | ✅ | [PHASE1_BILAN.md](PHASE1_BILAN.md) |
 | 1 | CI analyse + tests | 🟨 | workflow écrit et validé ; non exécuté sur GitHub (aucun remote) |
-| 2 | Module Git complet (≥ 8 leçons, quiz, exercices, projet, grille) | ⬜ | |
-| 2 | Progression persistante, reprise après redémarrage | ⬜ | |
+| 2 | Module Git complet (≥ 8 leçons, quiz, exercices, projet, grille) | ✅ | 14 leçons, 60 questions, 12 exercices rejoués, projet + grille — [PHASE2_BILAN.md](PHASE2_BILAN.md) |
+| 2 | Progression persistante, reprise après redémarrage | ✅ | widget + Honor (base lue après redémarrage) ; répétition espacée Leitner |
 | 3 | Agent IA multifournisseur, coffre de clés, mode sans IA | ⬜ | |
 | 4 | Compagnon Linux, appairage, API v1 | ⬜ | |
 | 5 | Atelier Git local (import, audit, diff, init, commit) | ⬜ | |
@@ -32,8 +32,8 @@ Dernière mise à jour : 2026-11-12 (fin de phase 1)
 | Critère | État |
 |---|---|
 | APK debug installé sur appareil + .deb sur Linux, démarrage sans écran blanc | 🟨 APK installé et démarré sur Honor MTN-NX1M ; .deb en phase 8 |
-| Profil local, 1 module Git complet, progression conservée | ⬜ |
-| Chat IA avec fournisseur ; contenu consultable sans fournisseur | ⬜ |
+| Profil local, 1 module Git complet, progression conservée | ✅ |
+| Chat IA avec fournisseur ; contenu consultable sans fournisseur | 🟨 contenu hors ligne sans IA ✅ ; chat IA en phase 3 |
 | Import projet Flutter Linux, audit, diff, plan sans mutation non consentie | ⬜ |
 | Git local, dépôt privé de test avec consentement, push, rapport | ⬜ |
 | Pipeline analyse/tests + APK de test, limites de signature affichées | ⬜ |

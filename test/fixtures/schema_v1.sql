@@ -1,0 +1,3 @@
+CREATE TABLE "profiles" ("id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "display_name" TEXT NOT NULL, "created_at" INTEGER NOT NULL);
+CREATE TABLE "app_settings" ("key" TEXT NOT NULL, "value" TEXT NOT NULL, PRIMARY KEY ("key"));
+CREATE TABLE "audit_entries" ("id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "timestamp" INTEGER NOT NULL, "category" TEXT NOT NULL, "action" TEXT NOT NULL, "details" TEXT NOT NULL DEFAULT '', "outcome" TEXT NOT NULL);
