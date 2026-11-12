@@ -417,4 +417,246 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get contentLanguageNote =>
       'Le contenu des cours est en français pour l\'instant.';
+
+  @override
+  String get aiTeacher => 'Professeur IA';
+
+  @override
+  String get aiNewConversation => 'Nouvelle conversation';
+
+  @override
+  String get aiConversations => 'Conversations';
+
+  @override
+  String get aiNoConversations => 'Aucune conversation pour l\'instant.';
+
+  @override
+  String get aiDeleteConversation => 'Supprimer la conversation';
+
+  @override
+  String get aiDeleteConfirm =>
+      'Supprimer définitivement cette conversation de cet appareil ?';
+
+  @override
+  String get aiNoKeyTitle => 'Professeur IA non configuré';
+
+  @override
+  String get aiNoKeyBody =>
+      'Ajoutez une clé API dans Paramètres → Professeur IA. Tout le reste de l\'application fonctionne sans IA, hors ligne.';
+
+  @override
+  String get aiOpenSettings => 'Configurer';
+
+  @override
+  String get aiLevel => 'Niveau';
+
+  @override
+  String get aiLevelBeginner => 'Débutant';
+
+  @override
+  String get aiLevelIntermediate => 'Intermédiaire';
+
+  @override
+  String get aiLevelExpert => 'Expert';
+
+  @override
+  String get aiInputHint => 'Votre question au Capitaine Commit';
+
+  @override
+  String get aiSend => 'Envoyer';
+
+  @override
+  String get aiStop => 'Arrêter';
+
+  @override
+  String get aiThinking => 'Le Capitaine réfléchit…';
+
+  @override
+  String get aiDisclaimer =>
+      'Les réponses de l\'IA peuvent contenir des erreurs. Rien n\'est exécuté automatiquement : vérifiez chaque commande.';
+
+  @override
+  String aiPrivacy(String provider) {
+    return 'Vos questions sont envoyées à $provider via Internet. N\'y mettez aucune donnée sensible.';
+  }
+
+  @override
+  String get aiSecretMasked =>
+      'Un secret probable a été masqué avant l\'envoi. Pensez à le révoquer.';
+
+  @override
+  String aiUsageLine(int tokens, String model) {
+    return '$tokens jetons · $model';
+  }
+
+  @override
+  String aiCostLine(String cost) {
+    return '≈ $cost \$';
+  }
+
+  @override
+  String aiTokensToday(int used, int budget) {
+    return 'Jetons aujourd\'hui : $used / $budget';
+  }
+
+  @override
+  String aiTokensTodayUnlimited(int used) {
+    return 'Jetons aujourd\'hui : $used (sans plafond)';
+  }
+
+  @override
+  String aiContextLesson(String title) {
+    return 'Contexte : $title';
+  }
+
+  @override
+  String get aiAsk => 'Demander au professeur';
+
+  @override
+  String get aiErrAuth =>
+      'Clé API refusée (401). Vérifiez-la dans Paramètres → Professeur IA.';
+
+  @override
+  String get aiErrPermission => 'Accès refusé (403) pour cette clé.';
+
+  @override
+  String get aiErrBilling =>
+      'Problème de facturation sur le compte du fournisseur (402).';
+
+  @override
+  String get aiErrNotFound =>
+      'Modèle introuvable ou non disponible pour ce compte (404).';
+
+  @override
+  String aiErrInvalid(String message) {
+    return 'Requête refusée (400) : $message';
+  }
+
+  @override
+  String get aiErrTooLarge =>
+      'Conversation trop longue (413). Commencez une nouvelle conversation.';
+
+  @override
+  String get aiErrRate => 'Trop de requêtes (429). Réessayez dans un instant.';
+
+  @override
+  String get aiErrOverloaded =>
+      'Service surchargé (529). Réessayez dans un instant.';
+
+  @override
+  String aiErrServer(String code) {
+    return 'Erreur du service ($code). Réessayez plus tard.';
+  }
+
+  @override
+  String get aiErrNetwork =>
+      'Pas de connexion : le professeur IA nécessite Internet. Les cours, quiz et exercices restent disponibles hors ligne.';
+
+  @override
+  String get aiErrTimeout => 'Délai dépassé. Vérifiez votre connexion.';
+
+  @override
+  String get aiErrRefusal =>
+      'Le modèle a refusé de répondre. Reformulez la question.';
+
+  @override
+  String get aiErrBudget =>
+      'Budget quotidien de jetons atteint. Modifiable dans Paramètres → Professeur IA.';
+
+  @override
+  String get aiErrCancelled => 'Réponse annulée.';
+
+  @override
+  String get aiErrNoKey => 'Aucune clé API enregistrée.';
+
+  @override
+  String aiErrUnknown(String message) {
+    return 'Erreur inattendue : $message';
+  }
+
+  @override
+  String get aiSettingsTitle => 'Professeur IA';
+
+  @override
+  String get aiProvider => 'Fournisseur';
+
+  @override
+  String get aiProviderAnthropic => 'Anthropic (Claude)';
+
+  @override
+  String get aiProviderOpenAi => 'Compatible OpenAI (OpenAI, Mistral, Ollama…)';
+
+  @override
+  String get aiModel => 'Modèle';
+
+  @override
+  String get aiModelCustom => 'Identifiant du modèle';
+
+  @override
+  String get aiBaseUrl => 'URL de base (ex. https://api.mistral.ai/v1)';
+
+  @override
+  String get aiApiKey => 'Clé API';
+
+  @override
+  String aiKeyStored(String hint) {
+    return 'Clé enregistrée dans le coffre du système ($hint)';
+  }
+
+  @override
+  String get aiKeyNone => 'Aucune clé enregistrée';
+
+  @override
+  String get aiKeySave => 'Enregistrer la clé';
+
+  @override
+  String get aiKeyDelete => 'Supprimer la clé';
+
+  @override
+  String get aiKeySaved => 'Clé enregistrée dans le coffre du système.';
+
+  @override
+  String get aiKeyDeleted => 'Clé supprimée.';
+
+  @override
+  String get aiEffort => 'Effort de réflexion';
+
+  @override
+  String get aiEffortDesc =>
+      'Plus d\'effort : réponses plus approfondies, mais plus lentes et plus coûteuses.';
+
+  @override
+  String get aiBudget => 'Budget quotidien (jetons, 0 = illimité)';
+
+  @override
+  String get aiTest => 'Tester la connexion';
+
+  @override
+  String aiTestOk(String model) {
+    return 'Connexion réussie : $model est disponible.';
+  }
+
+  @override
+  String get aiPricesNote =>
+      'Coûts estimés d\'après les tarifs publics relevés le 2026-11-03 ; seule la facture du fournisseur fait foi.';
+
+  @override
+  String get aiSaveSettings => 'Enregistrer';
+
+  @override
+  String get aiSettingsSaved => 'Paramètres IA enregistrés.';
+
+  @override
+  String aiKeyStorageError(String message) {
+    return 'Coffre du système indisponible : $message';
+  }
+
+  @override
+  String get aiEffortLow => 'Faible';
+
+  @override
+  String get aiEffortMedium => 'Moyen';
+
+  @override
+  String get aiEffortHigh => 'Élevé';
 }

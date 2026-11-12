@@ -2,7 +2,7 @@
 
 États : ⬜ non commencé · 🟨 partiel · ✅ réel et testé · ⛔ bloqué
 
-Dernière mise à jour : 2026-11-12 (fin de phase 2)
+Dernière mise à jour : 2026-11-12 (fin de phase 3)
 
 | Phase | Fonctionnalité | État | Preuve / remarque |
 |---|---|---|---|
@@ -17,7 +17,7 @@ Dernière mise à jour : 2026-11-12 (fin de phase 2)
 | 1 | CI analyse + tests | 🟨 | workflow écrit et validé ; non exécuté sur GitHub (aucun remote) |
 | 2 | Module Git complet (≥ 8 leçons, quiz, exercices, projet, grille) | ✅ | 14 leçons, 60 questions, 12 exercices rejoués, projet + grille — [PHASE2_BILAN.md](PHASE2_BILAN.md) |
 | 2 | Progression persistante, reprise après redémarrage | ✅ | widget + Honor (base lue après redémarrage) ; répétition espacée Leitner |
-| 3 | Agent IA multifournisseur, coffre de clés, mode sans IA | ⬜ | |
+| 3 | Agent IA multifournisseur, coffre de clés, mode sans IA | ✅ | Anthropic testé en réel sur Honor ; compatible OpenAI testé sur serveur simulé — [PHASE3_BILAN.md](PHASE3_BILAN.md) |
 | 4 | Compagnon Linux, appairage, API v1 | ⬜ | |
 | 5 | Atelier Git local (import, audit, diff, init, commit) | ⬜ | |
 | 6 | GitHub / GitLab (dépôt privé, push avec consentement) | ⬜ | glab absent |
@@ -33,7 +33,7 @@ Dernière mise à jour : 2026-11-12 (fin de phase 2)
 |---|---|
 | APK debug installé sur appareil + .deb sur Linux, démarrage sans écran blanc | 🟨 APK installé et démarré sur Honor MTN-NX1M ; .deb en phase 8 |
 | Profil local, 1 module Git complet, progression conservée | ✅ |
-| Chat IA avec fournisseur ; contenu consultable sans fournisseur | 🟨 contenu hors ligne sans IA ✅ ; chat IA en phase 3 |
+| Chat IA avec fournisseur ; contenu consultable sans fournisseur | ✅ (claude-opus-5-5, essai réel) |
 | Import projet Flutter Linux, audit, diff, plan sans mutation non consentie | ⬜ |
 | Git local, dépôt privé de test avec consentement, push, rapport | ⬜ |
 | Pipeline analyse/tests + APK de test, limites de signature affichées | ⬜ |

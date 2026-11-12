@@ -2,7 +2,19 @@
 
 Format inspiré de « Keep a Changelog ». Versions non publiées.
 
-## [Non publié] — Phase 2 : Académie Git (2026-11-12)
+## [Non publié] — Phase 3 : professeur IA (2026-11-12)
+
+### Ajouté
+- Professeur IA « Capitaine Commit » : chat contextualisé à la leçon, niveaux débutant/intermédiaire/expert, historique, arrêt en cours de réponse.
+- Adaptateurs Anthropic (API Messages, flux SSE, repli serveur, refus) et compatible OpenAI.
+- Clé API dans le coffre du système ; masquage des secrets avant envoi ; budget quotidien de jetons ; coût estimé par réponse.
+- Paramètres → Professeur IA : fournisseur, modèle, clé, effort, budget, test de connexion sans coût de génération.
+- Rendu Markdown simplifié et sûr ; base v3 (conversations) et migration v2 → v3.
+
+### Corrigé
+- Permission INTERNET ajoutée au manifeste Android principal (absente hors debug).
+
+## Phase 2 : Académie Git (2026-11-12)
 
 ### Ajouté
 - Module Git : 14 leçons, 60 questions avec corrections expliquées, 12 exercices guidés, projet final et grille d'évaluation, glossaire (25 termes). Source : `tool/content/git_module.py`.

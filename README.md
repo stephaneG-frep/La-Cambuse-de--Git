@@ -2,7 +2,7 @@
 
 Application Flutter **Android** et **Linux** : académie Git / GitHub / GitLab / Docker / DevOps de zéro à expert, atelier d'opérations réelles sur projets et capitaine automatique supervisé.
 
-> État actuel : **fin de phase 2** (Académie Git complète, hors ligne). Voir [docs/ACCEPTANCE_MATRIX.md](docs/ACCEPTANCE_MATRIX.md) pour l'état réel de chaque fonctionnalité. L'Atelier et le Capitaine affichent honnêtement la phase où ils seront livrés. Le bac à sable de l'Académie est un **simulateur pédagogique** clairement signalé : il n'exécute aucune commande réelle.
+> État actuel : **fin de phase 3** (Académie Git hors ligne + professeur IA facultatif). Voir [docs/ACCEPTANCE_MATRIX.md](docs/ACCEPTANCE_MATRIX.md) pour l'état réel de chaque fonctionnalité. L'Atelier et le Capitaine affichent honnêtement la phase où ils seront livrés. Le bac à sable de l'Académie est un **simulateur pédagogique** clairement signalé : il n'exécute aucune commande réelle.
 
 ## Documents de référence
 
@@ -12,6 +12,7 @@ Application Flutter **Android** et **Linux** : académie Git / GitHub / GitLab /
 - [docs/PHASE0_DIAGNOSTIC.md](docs/PHASE0_DIAGNOSTIC.md) — environnement, décisions, menaces, contrat API
 - [docs/PHASE1_BILAN.md](docs/PHASE1_BILAN.md) — bilan de la phase 1
 - [docs/PHASE2_BILAN.md](docs/PHASE2_BILAN.md) — bilan de la phase 2
+- [docs/PHASE3_BILAN.md](docs/PHASE3_BILAN.md) — bilan de la phase 3
 - [CHANGELOG.md](CHANGELOG.md)
 
 ## Prérequis développeur
@@ -39,7 +40,8 @@ L'APK produit ainsi est signé avec la **clé debug** : il sert aux tests et **n
 ## Données et confidentialité
 
 - Base SQLite locale : Linux `~/.local/share/fr.lacambuse.la_cambuse/cambuse.sqlite`, Android stockage interne de l'app.
-- Aucune télémétrie. Aucune donnée envoyée.
+- Aucune télémétrie. Seul le professeur IA, facultatif, envoie vos questions au fournisseur que vous configurez.
+- Clé API stockée dans le coffre du système (Keystore Android, libsecret Linux), jamais en base ni dans les journaux.
 - Le journal de bord masque automatiquement les secrets probables (jetons GitHub/GitLab, clés API, en-têtes Bearer, identifiants dans les URL, clés privées).
 
 ## Architecture

@@ -7,6 +7,8 @@ import '../features/academy/presentation/module_screen.dart';
 import '../features/academy/presentation/project_screen.dart';
 import '../features/academy/presentation/reviews_screen.dart';
 import '../features/academy/presentation/search_screen.dart';
+import '../features/ai/presentation/ai_settings_screen.dart';
+import '../features/ai/presentation/chat_screen.dart';
 import '../features/captain/presentation/captain_screen.dart';
 import '../features/dashboard/presentation/dashboard_screen.dart';
 import '../features/logbook/presentation/logbook_screen.dart';
@@ -41,6 +43,25 @@ GoRouter buildRouter() => GoRouter(
                       builder: (c, s) => const SearchScreen(glossaryOnly: true)),
                   GoRoute(path: 'recherche', builder: (c, s) => const SearchScreen()),
                   GoRoute(
+                    path: 'professeur',
+                    builder: (c, s) => const TeacherHomeScreen(),
+                    routes: [
+                      GoRoute(
+                        path: 'nouvelle',
+                        builder: (c, s) => ChatScreen(
+                          moduleId: s.uri.queryParameters['module'],
+                          lessonId: s.uri.queryParameters['lecon'],
+                        ),
+                      ),
+                      GoRoute(
+                        path: ':conversationId',
+                        builder: (c, s) => ChatScreen(
+                          conversationId: int.tryParse(s.pathParameters['conversationId']!),
+                        ),
+                      ),
+                    ],
+                  ),
+                  GoRoute(
                     path: ':moduleId',
                     builder: (c, s) => ModuleScreen(moduleId: s.pathParameters['moduleId']!),
                     routes: [
@@ -68,6 +89,7 @@ GoRouter buildRouter() => GoRouter(
         GoRoute(
           path: Routes.settings,
           builder: (context, state) => const SettingsScreen(),
+          routes: [GoRoute(path: 'ia', builder: (c, s) => const AiSettingsScreen())],
         ),
       ],
     );

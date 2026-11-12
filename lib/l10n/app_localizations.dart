@@ -793,6 +793,414 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Le contenu des cours est en français pour l\'instant.'**
   String get contentLanguageNote;
+
+  /// No description provided for @aiTeacher.
+  ///
+  /// In fr, this message translates to:
+  /// **'Professeur IA'**
+  String get aiTeacher;
+
+  /// No description provided for @aiNewConversation.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouvelle conversation'**
+  String get aiNewConversation;
+
+  /// No description provided for @aiConversations.
+  ///
+  /// In fr, this message translates to:
+  /// **'Conversations'**
+  String get aiConversations;
+
+  /// No description provided for @aiNoConversations.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune conversation pour l\'instant.'**
+  String get aiNoConversations;
+
+  /// No description provided for @aiDeleteConversation.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimer la conversation'**
+  String get aiDeleteConversation;
+
+  /// No description provided for @aiDeleteConfirm.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimer définitivement cette conversation de cet appareil ?'**
+  String get aiDeleteConfirm;
+
+  /// No description provided for @aiNoKeyTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Professeur IA non configuré'**
+  String get aiNoKeyTitle;
+
+  /// No description provided for @aiNoKeyBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajoutez une clé API dans Paramètres → Professeur IA. Tout le reste de l\'application fonctionne sans IA, hors ligne.'**
+  String get aiNoKeyBody;
+
+  /// No description provided for @aiOpenSettings.
+  ///
+  /// In fr, this message translates to:
+  /// **'Configurer'**
+  String get aiOpenSettings;
+
+  /// No description provided for @aiLevel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Niveau'**
+  String get aiLevel;
+
+  /// No description provided for @aiLevelBeginner.
+  ///
+  /// In fr, this message translates to:
+  /// **'Débutant'**
+  String get aiLevelBeginner;
+
+  /// No description provided for @aiLevelIntermediate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Intermédiaire'**
+  String get aiLevelIntermediate;
+
+  /// No description provided for @aiLevelExpert.
+  ///
+  /// In fr, this message translates to:
+  /// **'Expert'**
+  String get aiLevelExpert;
+
+  /// No description provided for @aiInputHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre question au Capitaine Commit'**
+  String get aiInputHint;
+
+  /// No description provided for @aiSend.
+  ///
+  /// In fr, this message translates to:
+  /// **'Envoyer'**
+  String get aiSend;
+
+  /// No description provided for @aiStop.
+  ///
+  /// In fr, this message translates to:
+  /// **'Arrêter'**
+  String get aiStop;
+
+  /// No description provided for @aiThinking.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le Capitaine réfléchit…'**
+  String get aiThinking;
+
+  /// No description provided for @aiDisclaimer.
+  ///
+  /// In fr, this message translates to:
+  /// **'Les réponses de l\'IA peuvent contenir des erreurs. Rien n\'est exécuté automatiquement : vérifiez chaque commande.'**
+  String get aiDisclaimer;
+
+  /// No description provided for @aiPrivacy.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vos questions sont envoyées à {provider} via Internet. N\'y mettez aucune donnée sensible.'**
+  String aiPrivacy(String provider);
+
+  /// No description provided for @aiSecretMasked.
+  ///
+  /// In fr, this message translates to:
+  /// **'Un secret probable a été masqué avant l\'envoi. Pensez à le révoquer.'**
+  String get aiSecretMasked;
+
+  /// No description provided for @aiUsageLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'{tokens} jetons · {model}'**
+  String aiUsageLine(int tokens, String model);
+
+  /// No description provided for @aiCostLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'≈ {cost} \$'**
+  String aiCostLine(String cost);
+
+  /// No description provided for @aiTokensToday.
+  ///
+  /// In fr, this message translates to:
+  /// **'Jetons aujourd\'hui : {used} / {budget}'**
+  String aiTokensToday(int used, int budget);
+
+  /// No description provided for @aiTokensTodayUnlimited.
+  ///
+  /// In fr, this message translates to:
+  /// **'Jetons aujourd\'hui : {used} (sans plafond)'**
+  String aiTokensTodayUnlimited(int used);
+
+  /// No description provided for @aiContextLesson.
+  ///
+  /// In fr, this message translates to:
+  /// **'Contexte : {title}'**
+  String aiContextLesson(String title);
+
+  /// No description provided for @aiAsk.
+  ///
+  /// In fr, this message translates to:
+  /// **'Demander au professeur'**
+  String get aiAsk;
+
+  /// No description provided for @aiErrAuth.
+  ///
+  /// In fr, this message translates to:
+  /// **'Clé API refusée (401). Vérifiez-la dans Paramètres → Professeur IA.'**
+  String get aiErrAuth;
+
+  /// No description provided for @aiErrPermission.
+  ///
+  /// In fr, this message translates to:
+  /// **'Accès refusé (403) pour cette clé.'**
+  String get aiErrPermission;
+
+  /// No description provided for @aiErrBilling.
+  ///
+  /// In fr, this message translates to:
+  /// **'Problème de facturation sur le compte du fournisseur (402).'**
+  String get aiErrBilling;
+
+  /// No description provided for @aiErrNotFound.
+  ///
+  /// In fr, this message translates to:
+  /// **'Modèle introuvable ou non disponible pour ce compte (404).'**
+  String get aiErrNotFound;
+
+  /// No description provided for @aiErrInvalid.
+  ///
+  /// In fr, this message translates to:
+  /// **'Requête refusée (400) : {message}'**
+  String aiErrInvalid(String message);
+
+  /// No description provided for @aiErrTooLarge.
+  ///
+  /// In fr, this message translates to:
+  /// **'Conversation trop longue (413). Commencez une nouvelle conversation.'**
+  String get aiErrTooLarge;
+
+  /// No description provided for @aiErrRate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Trop de requêtes (429). Réessayez dans un instant.'**
+  String get aiErrRate;
+
+  /// No description provided for @aiErrOverloaded.
+  ///
+  /// In fr, this message translates to:
+  /// **'Service surchargé (529). Réessayez dans un instant.'**
+  String get aiErrOverloaded;
+
+  /// No description provided for @aiErrServer.
+  ///
+  /// In fr, this message translates to:
+  /// **'Erreur du service ({code}). Réessayez plus tard.'**
+  String aiErrServer(String code);
+
+  /// No description provided for @aiErrNetwork.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pas de connexion : le professeur IA nécessite Internet. Les cours, quiz et exercices restent disponibles hors ligne.'**
+  String get aiErrNetwork;
+
+  /// No description provided for @aiErrTimeout.
+  ///
+  /// In fr, this message translates to:
+  /// **'Délai dépassé. Vérifiez votre connexion.'**
+  String get aiErrTimeout;
+
+  /// No description provided for @aiErrRefusal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le modèle a refusé de répondre. Reformulez la question.'**
+  String get aiErrRefusal;
+
+  /// No description provided for @aiErrBudget.
+  ///
+  /// In fr, this message translates to:
+  /// **'Budget quotidien de jetons atteint. Modifiable dans Paramètres → Professeur IA.'**
+  String get aiErrBudget;
+
+  /// No description provided for @aiErrCancelled.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réponse annulée.'**
+  String get aiErrCancelled;
+
+  /// No description provided for @aiErrNoKey.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune clé API enregistrée.'**
+  String get aiErrNoKey;
+
+  /// No description provided for @aiErrUnknown.
+  ///
+  /// In fr, this message translates to:
+  /// **'Erreur inattendue : {message}'**
+  String aiErrUnknown(String message);
+
+  /// No description provided for @aiSettingsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Professeur IA'**
+  String get aiSettingsTitle;
+
+  /// No description provided for @aiProvider.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fournisseur'**
+  String get aiProvider;
+
+  /// No description provided for @aiProviderAnthropic.
+  ///
+  /// In fr, this message translates to:
+  /// **'Anthropic (Claude)'**
+  String get aiProviderAnthropic;
+
+  /// No description provided for @aiProviderOpenAi.
+  ///
+  /// In fr, this message translates to:
+  /// **'Compatible OpenAI (OpenAI, Mistral, Ollama…)'**
+  String get aiProviderOpenAi;
+
+  /// No description provided for @aiModel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Modèle'**
+  String get aiModel;
+
+  /// No description provided for @aiModelCustom.
+  ///
+  /// In fr, this message translates to:
+  /// **'Identifiant du modèle'**
+  String get aiModelCustom;
+
+  /// No description provided for @aiBaseUrl.
+  ///
+  /// In fr, this message translates to:
+  /// **'URL de base (ex. https://api.mistral.ai/v1)'**
+  String get aiBaseUrl;
+
+  /// No description provided for @aiApiKey.
+  ///
+  /// In fr, this message translates to:
+  /// **'Clé API'**
+  String get aiApiKey;
+
+  /// No description provided for @aiKeyStored.
+  ///
+  /// In fr, this message translates to:
+  /// **'Clé enregistrée dans le coffre du système ({hint})'**
+  String aiKeyStored(String hint);
+
+  /// No description provided for @aiKeyNone.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune clé enregistrée'**
+  String get aiKeyNone;
+
+  /// No description provided for @aiKeySave.
+  ///
+  /// In fr, this message translates to:
+  /// **'Enregistrer la clé'**
+  String get aiKeySave;
+
+  /// No description provided for @aiKeyDelete.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimer la clé'**
+  String get aiKeyDelete;
+
+  /// No description provided for @aiKeySaved.
+  ///
+  /// In fr, this message translates to:
+  /// **'Clé enregistrée dans le coffre du système.'**
+  String get aiKeySaved;
+
+  /// No description provided for @aiKeyDeleted.
+  ///
+  /// In fr, this message translates to:
+  /// **'Clé supprimée.'**
+  String get aiKeyDeleted;
+
+  /// No description provided for @aiEffort.
+  ///
+  /// In fr, this message translates to:
+  /// **'Effort de réflexion'**
+  String get aiEffort;
+
+  /// No description provided for @aiEffortDesc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Plus d\'effort : réponses plus approfondies, mais plus lentes et plus coûteuses.'**
+  String get aiEffortDesc;
+
+  /// No description provided for @aiBudget.
+  ///
+  /// In fr, this message translates to:
+  /// **'Budget quotidien (jetons, 0 = illimité)'**
+  String get aiBudget;
+
+  /// No description provided for @aiTest.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tester la connexion'**
+  String get aiTest;
+
+  /// No description provided for @aiTestOk.
+  ///
+  /// In fr, this message translates to:
+  /// **'Connexion réussie : {model} est disponible.'**
+  String aiTestOk(String model);
+
+  /// No description provided for @aiPricesNote.
+  ///
+  /// In fr, this message translates to:
+  /// **'Coûts estimés d\'après les tarifs publics relevés le 2026-11-03 ; seule la facture du fournisseur fait foi.'**
+  String get aiPricesNote;
+
+  /// No description provided for @aiSaveSettings.
+  ///
+  /// In fr, this message translates to:
+  /// **'Enregistrer'**
+  String get aiSaveSettings;
+
+  /// No description provided for @aiSettingsSaved.
+  ///
+  /// In fr, this message translates to:
+  /// **'Paramètres IA enregistrés.'**
+  String get aiSettingsSaved;
+
+  /// No description provided for @aiKeyStorageError.
+  ///
+  /// In fr, this message translates to:
+  /// **'Coffre du système indisponible : {message}'**
+  String aiKeyStorageError(String message);
+
+  /// No description provided for @aiEffortLow.
+  ///
+  /// In fr, this message translates to:
+  /// **'Faible'**
+  String get aiEffortLow;
+
+  /// No description provided for @aiEffortMedium.
+  ///
+  /// In fr, this message translates to:
+  /// **'Moyen'**
+  String get aiEffortMedium;
+
+  /// No description provided for @aiEffortHigh.
+  ///
+  /// In fr, this message translates to:
+  /// **'Élevé'**
+  String get aiEffortHigh;
 }
 
 class _AppLocalizationsDelegate

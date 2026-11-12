@@ -34,7 +34,37 @@ void main() {
       expect(await db.select(db.reviewCards).get(), isEmpty);
       expect(await db.select(db.projectProgress).get(), isEmpty);
       final version = await db.customSelect('PRAGMA user_version').getSingle();
-      expect(version.read<int>('user_version'), 2);
+      expect(version.read<int>('user_version'), 3);
+      await db.close();
+    } finally {
+      await dir.delete(recursive: true);
+    }
+  });
+
+  test('migration v2 → v3 : progression conservée, tables IA créées', () async {
+    driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
+    final dir = await Directory.systemTemp.createTemp('cambuse_mig3_');
+    final file = File('${dir.path}/v2.sqlite');
+    final v2 = File('test/fixtures/schema_v2.sql').readAsStringSync();
+    try {
+      final db = AppDatabase(NativeDatabase(file, setup: (raw) {
+        if (raw.userVersion == 0) {
+          raw.execute(v2);
+          raw.execute("INSERT INTO lesson_progress (module_id, lesson_id, started_at, exercise_done) "
+              "VALUES ('git', 'pourquoi-git', 1762900000, 1)");
+          raw.userVersion = 2;
+        }
+      }));
+      final row = await db.select(db.lessonProgress).getSingle();
+      expect(row.exerciseDone, isTrue);
+      final id = await db.into(db.aiConversations).insert(AiConversationsCompanion.insert(
+          title: 't', systemPrompt: 's', providerKind: 'anthropic', model: 'm', level: 'debutant',
+          createdAt: DateTime(2026), updatedAt: DateTime(2026)));
+      await db.into(db.aiMessages).insert(AiMessagesCompanion.insert(
+          conversationId: id, role: 'user', contentJson: '[]', createdAt: DateTime(2026)));
+      // Suppression en cascade des messages avec la conversation.
+      await (db.delete(db.aiConversations)..where((t) => t.id.equals(id))).go();
+      expect(await db.select(db.aiMessages).get(), isEmpty);
       await db.close();
     } finally {
       await dir.delete(recursive: true);

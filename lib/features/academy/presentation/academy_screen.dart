@@ -48,6 +48,11 @@ class AcademyScreen extends ConsumerWidget {
               label: Text(l.academyGlossary),
             ),
             OutlinedButton.icon(
+              onPressed: () => context.go('/academie/professeur'),
+              icon: const Icon(Icons.smart_toy_outlined),
+              label: Text(l.aiTeacher),
+            ),
+            OutlinedButton.icon(
               onPressed: () => context.go('/academie/revisions'),
               icon: Badge(
                 isLabelVisible: due > 0,

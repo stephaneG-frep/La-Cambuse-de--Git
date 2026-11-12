@@ -1,4 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Requise par le professeur IA (seule fonctionnalité réseau à ce stade). -->
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
         android:label="La Cambuse de Git"
         android:name="${applicationName}"

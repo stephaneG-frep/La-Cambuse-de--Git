@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../app/providers.dart';
 import '../../../app/theme/theme.dart';
 import '../../../app/theme/tokens.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/state_views.dart';
+import '../../ai/domain/ai_models.dart';
+import '../../ai/presentation/ai_providers.dart';
 import '../../profile/data/profile_repository.dart';
 import '../domain/app_settings.dart';
 
@@ -46,6 +49,25 @@ class _SettingsBody extends ConsumerWidget {
           padding: const EdgeInsets.all(CambuseSpacing.md),
           children: [
             const _ProfileCard(),
+            Padding(
+              padding: const EdgeInsets.only(bottom: CambuseSpacing.md),
+              child: Card(
+                clipBehavior: Clip.antiAlias,
+                child: ListTile(
+                  leading: Icon(Icons.smart_toy_outlined, color: p.copper),
+                  title: Text(l.aiSettingsTitle),
+                  subtitle: Text(
+                    switch (ref.watch(aiConfigProvider).value) {
+                      final c? => '${c.kind == AiProviderKind.anthropic ? l.aiProviderAnthropic : l.aiProviderOpenAi} · ${c.model}',
+                      null => '',
+                    },
+                    style: TextStyle(color: p.textSecondary),
+                  ),
+                  trailing: Icon(Icons.chevron_right, color: p.turquoise),
+                  onTap: () => context.push('/parametres/ia'),
+                ),
+              ),
+            ),
             Card(
               child: Padding(
                 padding: const EdgeInsets.all(CambuseSpacing.md),

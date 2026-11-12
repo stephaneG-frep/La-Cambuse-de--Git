@@ -1,0 +1,6 @@
+CREATE TABLE "app_settings" ("key" TEXT NOT NULL, "value" TEXT NOT NULL, PRIMARY KEY ("key"));
+CREATE TABLE "audit_entries" ("id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "timestamp" INTEGER NOT NULL, "category" TEXT NOT NULL, "action" TEXT NOT NULL, "details" TEXT NOT NULL DEFAULT '', "outcome" TEXT NOT NULL);
+CREATE TABLE "lesson_progress" ("module_id" TEXT NOT NULL, "lesson_id" TEXT NOT NULL, "started_at" INTEGER NOT NULL, "completed_at" INTEGER NULL, "best_score" INTEGER NOT NULL DEFAULT 0, "quiz_attempts" INTEGER NOT NULL DEFAULT 0, "exercise_done" INTEGER NOT NULL DEFAULT 0 CHECK ("exercise_done" IN (0, 1)), PRIMARY KEY ("module_id", "lesson_id"));
+CREATE TABLE "profiles" ("id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "display_name" TEXT NOT NULL, "created_at" INTEGER NOT NULL);
+CREATE TABLE "project_progress" ("module_id" TEXT NOT NULL, "exercise_completed_at" INTEGER NULL, "rubric_json" TEXT NOT NULL DEFAULT '{}', "submitted_at" INTEGER NULL, PRIMARY KEY ("module_id"));
+CREATE TABLE "review_cards" ("question_id" TEXT NOT NULL, "module_id" TEXT NOT NULL, "box" INTEGER NOT NULL DEFAULT 1, "due_at" INTEGER NOT NULL, "correct_count" INTEGER NOT NULL DEFAULT 0, "wrong_count" INTEGER NOT NULL DEFAULT 0, PRIMARY KEY ("question_id"));

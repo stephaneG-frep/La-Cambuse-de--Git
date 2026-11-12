@@ -76,6 +76,36 @@ class ProjectProgress extends Table {
   Set<Column> get primaryKey => {moduleId};
 }
 
+/// Conversation avec le professeur IA (v3). Le prompt système est figé.
+@DataClassName('AiConversationRow')
+class AiConversations extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get title => text()();
+  TextColumn get systemPrompt => text()();
+  TextColumn get providerKind => text()();
+  TextColumn get model => text()();
+  TextColumn get level => text()();
+  TextColumn get moduleId => text().nullable()();
+  TextColumn get lessonId => text().nullable()();
+  DateTimeColumn get createdAt => dateTime()();
+  DateTimeColumn get updatedAt => dateTime()();
+}
+
+/// Message d'une conversation IA (v3). [contentJson] = blocs bruts rejoués tels
+/// quels (texte, réflexion signée).
+@DataClassName('AiMessageRow')
+class AiMessages extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get conversationId =>
+      integer().references(AiConversations, #id, onDelete: KeyAction.cascade)();
+  TextColumn get role => text()();
+  TextColumn get contentJson => text()();
+  IntColumn get inputTokens => integer().withDefault(const Constant(0))();
+  IntColumn get outputTokens => integer().withDefault(const Constant(0))();
+  TextColumn get model => text().nullable()();
+  DateTimeColumn get createdAt => dateTime()();
+}
+
 @DriftDatabase(tables: [
   Profiles,
   AppSettingsTable,
@@ -83,6 +113,8 @@ class ProjectProgress extends Table {
   LessonProgress,
   ReviewCards,
   ProjectProgress,
+  AiConversations,
+  AiMessages,
 ])
 class AppDatabase extends _$AppDatabase {
   AppDatabase(super.executor);
@@ -102,7 +134,7 @@ class AppDatabase extends _$AppDatabase {
   /// Version du schéma. Toute modification doit ajouter une étape de migration
   /// dans [migration] et un test dans `test/core/db/`.
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -115,6 +147,10 @@ class AppDatabase extends _$AppDatabase {
             await m.createTable(lessonProgress);
             await m.createTable(reviewCards);
             await m.createTable(projectProgress);
+          }
+          if (from < 3) {
+            await m.createTable(aiConversations);
+            await m.createTable(aiMessages);
           }
         },
         beforeOpen: (details) async {

@@ -233,5 +233,163 @@
   "settingsProfile": "Profil",
   "settingsProfileRename": "Renommer",
   "settingsProfileSaved": "Profil renommé.",
-  "contentLanguageNote": "Le contenu des cours est en français pour l'instant."
+  "contentLanguageNote": "Le contenu des cours est en français pour l'instant.",
+  "aiTeacher": "Professeur IA",
+  "aiNewConversation": "Nouvelle conversation",
+  "aiConversations": "Conversations",
+  "aiNoConversations": "Aucune conversation pour l'instant.",
+  "aiDeleteConversation": "Supprimer la conversation",
+  "aiDeleteConfirm": "Supprimer définitivement cette conversation de cet appareil ?",
+  "aiNoKeyTitle": "Professeur IA non configuré",
+  "aiNoKeyBody": "Ajoutez une clé API dans Paramètres → Professeur IA. Tout le reste de l'application fonctionne sans IA, hors ligne.",
+  "aiOpenSettings": "Configurer",
+  "aiLevel": "Niveau",
+  "aiLevelBeginner": "Débutant",
+  "aiLevelIntermediate": "Intermédiaire",
+  "aiLevelExpert": "Expert",
+  "aiInputHint": "Votre question au Capitaine Commit",
+  "aiSend": "Envoyer",
+  "aiStop": "Arrêter",
+  "aiThinking": "Le Capitaine réfléchit…",
+  "aiDisclaimer": "Les réponses de l'IA peuvent contenir des erreurs. Rien n'est exécuté automatiquement : vérifiez chaque commande.",
+  "aiPrivacy": "Vos questions sont envoyées à {provider} via Internet. N'y mettez aucune donnée sensible.",
+  "@aiPrivacy": {
+    "placeholders": {
+      "provider": {
+        "type": "String"
+      }
+    }
+  },
+  "aiSecretMasked": "Un secret probable a été masqué avant l'envoi. Pensez à le révoquer.",
+  "aiUsageLine": "{tokens} jetons · {model}",
+  "@aiUsageLine": {
+    "placeholders": {
+      "tokens": {
+        "type": "int"
+      },
+      "model": {
+        "type": "String"
+      }
+    }
+  },
+  "aiCostLine": "≈ {cost} $",
+  "@aiCostLine": {
+    "placeholders": {
+      "cost": {
+        "type": "String"
+      }
+    }
+  },
+  "aiTokensToday": "Jetons aujourd'hui : {used} / {budget}",
+  "@aiTokensToday": {
+    "placeholders": {
+      "used": {
+        "type": "int"
+      },
+      "budget": {
+        "type": "int"
+      }
+    }
+  },
+  "aiTokensTodayUnlimited": "Jetons aujourd'hui : {used} (sans plafond)",
+  "@aiTokensTodayUnlimited": {
+    "placeholders": {
+      "used": {
+        "type": "int"
+      }
+    }
+  },
+  "aiContextLesson": "Contexte : {title}",
+  "@aiContextLesson": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "aiAsk": "Demander au professeur",
+  "aiErrAuth": "Clé API refusée (401). Vérifiez-la dans Paramètres → Professeur IA.",
+  "aiErrPermission": "Accès refusé (403) pour cette clé.",
+  "aiErrBilling": "Problème de facturation sur le compte du fournisseur (402).",
+  "aiErrNotFound": "Modèle introuvable ou non disponible pour ce compte (404).",
+  "aiErrInvalid": "Requête refusée (400) : {message}",
+  "@aiErrInvalid": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "aiErrTooLarge": "Conversation trop longue (413). Commencez une nouvelle conversation.",
+  "aiErrRate": "Trop de requêtes (429). Réessayez dans un instant.",
+  "aiErrOverloaded": "Service surchargé (529). Réessayez dans un instant.",
+  "aiErrServer": "Erreur du service ({code}). Réessayez plus tard.",
+  "@aiErrServer": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "aiErrNetwork": "Pas de connexion : le professeur IA nécessite Internet. Les cours, quiz et exercices restent disponibles hors ligne.",
+  "aiErrTimeout": "Délai dépassé. Vérifiez votre connexion.",
+  "aiErrRefusal": "Le modèle a refusé de répondre. Reformulez la question.",
+  "aiErrBudget": "Budget quotidien de jetons atteint. Modifiable dans Paramètres → Professeur IA.",
+  "aiErrCancelled": "Réponse annulée.",
+  "aiErrNoKey": "Aucune clé API enregistrée.",
+  "aiErrUnknown": "Erreur inattendue : {message}",
+  "@aiErrUnknown": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "aiSettingsTitle": "Professeur IA",
+  "aiProvider": "Fournisseur",
+  "aiProviderAnthropic": "Anthropic (Claude)",
+  "aiProviderOpenAi": "Compatible OpenAI (OpenAI, Mistral, Ollama…)",
+  "aiModel": "Modèle",
+  "aiModelCustom": "Identifiant du modèle",
+  "aiBaseUrl": "URL de base (ex. https://api.mistral.ai/v1)",
+  "aiApiKey": "Clé API",
+  "aiKeyStored": "Clé enregistrée dans le coffre du système ({hint})",
+  "@aiKeyStored": {
+    "placeholders": {
+      "hint": {
+        "type": "String"
+      }
+    }
+  },
+  "aiKeyNone": "Aucune clé enregistrée",
+  "aiKeySave": "Enregistrer la clé",
+  "aiKeyDelete": "Supprimer la clé",
+  "aiKeySaved": "Clé enregistrée dans le coffre du système.",
+  "aiKeyDeleted": "Clé supprimée.",
+  "aiEffort": "Effort de réflexion",
+  "aiEffortDesc": "Plus d'effort : réponses plus approfondies, mais plus lentes et plus coûteuses.",
+  "aiBudget": "Budget quotidien (jetons, 0 = illimité)",
+  "aiTest": "Tester la connexion",
+  "aiTestOk": "Connexion réussie : {model} est disponible.",
+  "@aiTestOk": {
+    "placeholders": {
+      "model": {
+        "type": "String"
+      }
+    }
+  },
+  "aiPricesNote": "Coûts estimés d'après les tarifs publics relevés le 2026-11-03 ; seule la facture du fournisseur fait foi.",
+  "aiSaveSettings": "Enregistrer",
+  "aiSettingsSaved": "Paramètres IA enregistrés.",
+  "aiKeyStorageError": "Coffre du système indisponible : {message}",
+  "@aiKeyStorageError": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "aiEffortLow": "Faible",
+  "aiEffortMedium": "Moyen",
+  "aiEffortHigh": "Élevé"
 }

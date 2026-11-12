@@ -418,4 +418,244 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get contentLanguageNote =>
       'Course content is currently in French only.';
+
+  @override
+  String get aiTeacher => 'AI teacher';
+
+  @override
+  String get aiNewConversation => 'New conversation';
+
+  @override
+  String get aiConversations => 'Conversations';
+
+  @override
+  String get aiNoConversations => 'No conversations yet.';
+
+  @override
+  String get aiDeleteConversation => 'Delete conversation';
+
+  @override
+  String get aiDeleteConfirm =>
+      'Permanently delete this conversation from this device?';
+
+  @override
+  String get aiNoKeyTitle => 'AI teacher not configured';
+
+  @override
+  String get aiNoKeyBody =>
+      'Add an API key in Settings → AI teacher. Everything else in the app works offline, without AI.';
+
+  @override
+  String get aiOpenSettings => 'Configure';
+
+  @override
+  String get aiLevel => 'Level';
+
+  @override
+  String get aiLevelBeginner => 'Beginner';
+
+  @override
+  String get aiLevelIntermediate => 'Intermediate';
+
+  @override
+  String get aiLevelExpert => 'Expert';
+
+  @override
+  String get aiInputHint => 'Your question for Captain Commit';
+
+  @override
+  String get aiSend => 'Send';
+
+  @override
+  String get aiStop => 'Stop';
+
+  @override
+  String get aiThinking => 'The Captain is thinking…';
+
+  @override
+  String get aiDisclaimer =>
+      'AI answers may contain mistakes. Nothing is executed automatically: check every command.';
+
+  @override
+  String aiPrivacy(String provider) {
+    return 'Your questions are sent to $provider over the Internet. Do not include sensitive data.';
+  }
+
+  @override
+  String get aiSecretMasked =>
+      'A likely secret was masked before sending. Remember to revoke it.';
+
+  @override
+  String aiUsageLine(int tokens, String model) {
+    return '$tokens tokens · $model';
+  }
+
+  @override
+  String aiCostLine(String cost) {
+    return '≈ $cost \$';
+  }
+
+  @override
+  String aiTokensToday(int used, int budget) {
+    return 'Tokens today: $used / $budget';
+  }
+
+  @override
+  String aiTokensTodayUnlimited(int used) {
+    return 'Tokens today: $used (no limit)';
+  }
+
+  @override
+  String aiContextLesson(String title) {
+    return 'Context: $title';
+  }
+
+  @override
+  String get aiAsk => 'Ask the teacher';
+
+  @override
+  String get aiErrAuth =>
+      'API key rejected (401). Check it in Settings → AI teacher.';
+
+  @override
+  String get aiErrPermission => 'Access denied (403) for this key.';
+
+  @override
+  String get aiErrBilling => 'Billing problem on the provider account (402).';
+
+  @override
+  String get aiErrNotFound =>
+      'Model not found or not available for this account (404).';
+
+  @override
+  String aiErrInvalid(String message) {
+    return 'Request rejected (400): $message';
+  }
+
+  @override
+  String get aiErrTooLarge =>
+      'Conversation too long (413). Start a new conversation.';
+
+  @override
+  String get aiErrRate => 'Too many requests (429). Try again shortly.';
+
+  @override
+  String get aiErrOverloaded => 'Service overloaded (529). Try again shortly.';
+
+  @override
+  String aiErrServer(String code) {
+    return 'Service error ($code). Try again later.';
+  }
+
+  @override
+  String get aiErrNetwork =>
+      'No connection: the AI teacher needs the Internet. Lessons, quizzes and exercises remain available offline.';
+
+  @override
+  String get aiErrTimeout => 'Timed out. Check your connection.';
+
+  @override
+  String get aiErrRefusal =>
+      'The model declined to answer. Rephrase your question.';
+
+  @override
+  String get aiErrBudget =>
+      'Daily token budget reached. Change it in Settings → AI teacher.';
+
+  @override
+  String get aiErrCancelled => 'Answer cancelled.';
+
+  @override
+  String get aiErrNoKey => 'No API key saved.';
+
+  @override
+  String aiErrUnknown(String message) {
+    return 'Unexpected error: $message';
+  }
+
+  @override
+  String get aiSettingsTitle => 'AI teacher';
+
+  @override
+  String get aiProvider => 'Provider';
+
+  @override
+  String get aiProviderAnthropic => 'Anthropic (Claude)';
+
+  @override
+  String get aiProviderOpenAi => 'OpenAI-compatible (OpenAI, Mistral, Ollama…)';
+
+  @override
+  String get aiModel => 'Model';
+
+  @override
+  String get aiModelCustom => 'Model ID';
+
+  @override
+  String get aiBaseUrl => 'Base URL (e.g. https://api.mistral.ai/v1)';
+
+  @override
+  String get aiApiKey => 'API key';
+
+  @override
+  String aiKeyStored(String hint) {
+    return 'Key stored in the system keychain ($hint)';
+  }
+
+  @override
+  String get aiKeyNone => 'No key saved';
+
+  @override
+  String get aiKeySave => 'Save key';
+
+  @override
+  String get aiKeyDelete => 'Delete key';
+
+  @override
+  String get aiKeySaved => 'Key saved in the system keychain.';
+
+  @override
+  String get aiKeyDeleted => 'Key deleted.';
+
+  @override
+  String get aiEffort => 'Thinking effort';
+
+  @override
+  String get aiEffortDesc =>
+      'More effort: deeper answers, but slower and more expensive.';
+
+  @override
+  String get aiBudget => 'Daily budget (tokens, 0 = unlimited)';
+
+  @override
+  String get aiTest => 'Test connection';
+
+  @override
+  String aiTestOk(String model) {
+    return 'Connection OK: $model is available.';
+  }
+
+  @override
+  String get aiPricesNote =>
+      'Costs estimated from public prices recorded on 2026-11-03; only the provider\'s invoice is authoritative.';
+
+  @override
+  String get aiSaveSettings => 'Save';
+
+  @override
+  String get aiSettingsSaved => 'AI settings saved.';
+
+  @override
+  String aiKeyStorageError(String message) {
+    return 'System keychain unavailable: $message';
+  }
+
+  @override
+  String get aiEffortLow => 'Low';
+
+  @override
+  String get aiEffortMedium => 'Medium';
+
+  @override
+  String get aiEffortHigh => 'High';
 }

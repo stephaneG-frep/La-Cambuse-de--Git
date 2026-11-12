@@ -97,12 +97,23 @@ class _LessonBodyState extends ConsumerState<_LessonBody> {
               l.lessonMinutes(lesson.minutes),
               if (row != null && row.quizAttempts > 0) l.bestScore(row.bestScore),
             ].join(' · '),
-            trailing: done
-                ? Chip(
-                    avatar: Icon(Icons.check_circle, color: p.turquoise),
-                    label: Text(l.lessonValidated),
-                  )
-                : null,
+            trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+              if (done && wide)
+                Chip(
+                  avatar: Icon(Icons.check_circle, color: p.turquoise),
+                  label: Text(l.lessonValidated),
+                ),
+              if (done && !wide)
+                Tooltip(
+                  message: l.lessonValidated,
+                  child: Icon(Icons.check_circle, color: p.turquoise, semanticLabel: l.lessonValidated),
+                ),
+              IconButton(
+                tooltip: l.aiAsk,
+                icon: Icon(Icons.smart_toy_outlined, color: p.gold),
+                onPressed: () => context.go('/academie/professeur/nouvelle?module=$moduleId&lecon=${lesson.id}'),
+              ),
+            ]),
           ),
           TabBar(
             labelColor: p.gold,

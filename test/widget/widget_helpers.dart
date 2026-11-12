@@ -7,13 +7,16 @@ import 'package:la_cambuse/app/app.dart';
 import 'package:la_cambuse/app/providers.dart';
 import 'package:la_cambuse/core/db/database.dart';
 import 'package:la_cambuse/features/academy/presentation/academy_providers.dart';
+import 'package:la_cambuse/features/ai/data/secret_store.dart';
+import 'package:la_cambuse/features/ai/presentation/ai_providers.dart';
 
 import '../helpers.dart';
 
 const phone = Size(400, 860);
 const desktop = Size(1280, 800);
 
-Future<AppDatabase> pumpApp(WidgetTester tester, {required Size size, AppDatabase? db}) async {
+Future<AppDatabase> pumpApp(WidgetTester tester,
+    {required Size size, AppDatabase? db, List overrides = const [], SecretStore? secrets}) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1.0;
   addTearDown(tester.view.reset);
@@ -24,6 +27,9 @@ Future<AppDatabase> pumpApp(WidgetTester tester, {required Size size, AppDatabas
       // Lecture synchrone du vrai fichier de contenu (même JSON que l'app).
       courseLoaderProvider.overrideWithValue(
           (id) async => File('assets/courses/$id.json').readAsStringSync()),
+      // Jamais le vrai trousseau du système dans les tests.
+      secretStoreProvider.overrideWithValue(secrets ?? MemorySecretStore()),
+      ...overrides,
     ],
     child: const CambuseApp(),
   ));
