@@ -31,7 +31,7 @@ Dernière mise à jour : 2026-11-12 (fin de phase 1)
 
 | Critère | État |
 |---|---|
-| APK debug installé sur appareil + .deb sur Linux, démarrage sans écran blanc | ⬜ |
+| APK debug installé sur appareil + .deb sur Linux, démarrage sans écran blanc | 🟨 APK installé et démarré sur Honor MTN-NX1M ; .deb en phase 8 |
 | Profil local, 1 module Git complet, progression conservée | ⬜ |
 | Chat IA avec fournisseur ; contenu consultable sans fournisseur | ⬜ |
 | Import projet Flutter Linux, audit, diff, plan sans mutation non consentie | ⬜ |

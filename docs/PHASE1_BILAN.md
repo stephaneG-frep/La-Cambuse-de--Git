@@ -30,6 +30,9 @@ Sections Académie (phase 2), Atelier (phase 5) et Capitaine (phase 10) : écran
 | `flutter build apk --debug --target-platform android-arm64` | `✓ Built build/app/outputs/flutter-apk/app-debug.apk` (100 Mo) |
 | `apksigner verify --print-certs` | signataire `CN=Android Debug` → **APK de test, non distribuable** |
 | Validation YAML de la CI | `yaml.safe_load` OK |
+| `adb install -r app-debug.apk` sur HONOR MTN-NX1M (Android API 36, arm64) — avec accord | `Success` |
+| Lancement sur le Honor | processus actif, aucun `FATAL` dans logcat, rendu Impeller/Vulkan, écran d'accueil affiché (capture vérifiée) |
+| Saisie d'un profil « Matelot Test » via `adb input`, `am force-stop`, relance | « Bienvenue à bord, Matelot Test ! — 3 entrées au journal » : **progression conservée après arrêt forcé** |
 
 Sommes SHA-256 (artefacts locaux, non versionnés) :
 
@@ -42,7 +45,6 @@ Sommes SHA-256 (artefacts locaux, non versionnés) :
 ## 3. Non exécuté (explicitement)
 
 - **CI sur GitHub** : aucun dépôt distant configuré, rien n'a été poussé. Les mêmes commandes ont été lancées localement.
-- **Installation de l'APK sur l'appareil** `MTN-NX1M` : appareil détecté mais installation non faite sans votre accord.
 - Lecteur d'écran réel (TalkBack / Orca) : seules les règles automatiques Flutter ont été vérifiées.
 - Saisie dans l'app Linux réelle : non automatisée (pas de `xdotool`) ; le parcours profil est couvert par les tests de widgets.
 
