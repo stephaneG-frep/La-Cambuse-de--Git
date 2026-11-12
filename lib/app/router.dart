@@ -1,0 +1,43 @@
+import 'package:flutter/widgets.dart';
+import 'package:go_router/go_router.dart';
+
+import '../features/academy/presentation/academy_screen.dart';
+import '../features/captain/presentation/captain_screen.dart';
+import '../features/dashboard/presentation/dashboard_screen.dart';
+import '../features/logbook/presentation/logbook_screen.dart';
+import '../features/settings/presentation/settings_screen.dart';
+import '../features/workshop/presentation/workshop_screen.dart';
+import 'shell/adaptive_shell.dart';
+
+abstract final class Routes {
+  static const bridge = '/pont';
+  static const academy = '/academie';
+  static const workshop = '/atelier';
+  static const captain = '/capitaine';
+  static const logbook = '/journal';
+  static const settings = '/parametres';
+}
+
+GoRouter buildRouter() => GoRouter(
+      initialLocation: Routes.bridge,
+      routes: [
+        StatefulShellRoute.indexedStack(
+          builder: (context, state, shell) => AdaptiveShell(navigationShell: shell),
+          branches: [
+            _branch(Routes.bridge, const DashboardScreen()),
+            _branch(Routes.academy, const AcademyScreen()),
+            _branch(Routes.workshop, const WorkshopScreen()),
+            _branch(Routes.captain, const CaptainScreen()),
+            _branch(Routes.logbook, const LogbookScreen()),
+          ],
+        ),
+        GoRoute(
+          path: Routes.settings,
+          builder: (context, state) => const SettingsScreen(),
+        ),
+      ],
+    );
+
+StatefulShellBranch _branch(String path, Widget screen) => StatefulShellBranch(
+      routes: [GoRoute(path: path, builder: (context, state) => screen)],
+    );

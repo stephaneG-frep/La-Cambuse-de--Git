@@ -2,19 +2,19 @@
 
 États : ⬜ non commencé · 🟨 partiel · ✅ réel et testé · ⛔ bloqué
 
-Dernière mise à jour : 2026-11-12 (fin de phase 0)
+Dernière mise à jour : 2026-11-12 (fin de phase 1)
 
 | Phase | Fonctionnalité | État | Preuve / remarque |
 |---|---|---|---|
 | 0 | Diagnostic environnement | ✅ | [PHASE0_DIAGNOSTIC.md](PHASE0_DIAGNOSTIC.md) |
 | 0 | Décisions, menaces, contrat API, matrice OS | ✅ | idem §2–7 |
-| 1 | Projet Flutter Android + Linux | ⬜ | |
-| 1 | Thème tokens pirate-steampunk, contraste AA | ⬜ | |
-| 1 | Navigation adaptative (barre / rail) | ⬜ | |
-| 1 | i18n FR (EN préparé) | ⬜ | |
-| 1 | Persistance Drift + migrations testées | ⬜ | |
-| 1 | Accueil et journal de bord fonctionnels | ⬜ | |
-| 1 | CI analyse + tests | ⬜ | |
+| 1 | Projet Flutter Android + Linux | ✅ | builds Linux release et APK debug arm64 réussis |
+| 1 | Thème tokens pirate-steampunk, contraste AA | ✅ | tests de contraste ; illustrations personnages non faites |
+| 1 | Navigation adaptative (barre / rail) | ✅ | tests widgets + raccourcis clavier ; panneaux redimensionnables non faits |
+| 1 | i18n FR (EN préparé) | ✅ | FR + EN interface |
+| 1 | Persistance Drift + migrations testées | 🟨 | schéma v1 + persistance testés ; aucune migration encore (première en v2) |
+| 1 | Accueil et journal de bord fonctionnels | ✅ | [PHASE1_BILAN.md](PHASE1_BILAN.md) |
+| 1 | CI analyse + tests | 🟨 | workflow écrit et validé ; non exécuté sur GitHub (aucun remote) |
 | 2 | Module Git complet (≥ 8 leçons, quiz, exercices, projet, grille) | ⬜ | |
 | 2 | Progression persistante, reprise après redémarrage | ⬜ | |
 | 3 | Agent IA multifournisseur, coffre de clés, mode sans IA | ⬜ | |
@@ -37,4 +37,4 @@ Dernière mise à jour : 2026-11-12 (fin de phase 0)
 | Import projet Flutter Linux, audit, diff, plan sans mutation non consentie | ⬜ |
 | Git local, dépôt privé de test avec consentement, push, rapport | ⬜ |
 | Pipeline analyse/tests + APK de test, limites de signature affichées | ⬜ |
-| Logs, erreurs, artefacts, historique, reprise après échec | ⬜ |
+| Logs, erreurs, artefacts, historique, reprise après échec | 🟨 (journal de bord seulement) |

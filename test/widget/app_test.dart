@@ -1,0 +1,167 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:la_cambuse/app/app.dart';
+import 'package:la_cambuse/app/providers.dart';
+import 'package:la_cambuse/core/db/database.dart';
+
+import '../helpers.dart';
+
+Future<AppDatabase> pumpApp(WidgetTester tester, {required Size size, AppDatabase? db}) async {
+  tester.view.physicalSize = size;
+  tester.view.devicePixelRatio = 1.0;
+  addTearDown(tester.view.reset);
+  final database = db ?? memoryDb();
+  await tester.pumpWidget(ProviderScope(
+    overrides: [databaseProvider.overrideWithValue(database)],
+    child: const CambuseApp(),
+  ));
+  await tester.pumpAndSettle();
+  return database;
+}
+
+/// Démonte l'application avant de fermer la base (évite les timers de flux).
+Future<void> teardown(WidgetTester tester, AppDatabase db) async {
+  await tester.pumpWidget(const SizedBox());
+  await tester.pump(Duration.zero);
+  // Fermeture hors de la zone de temps simulé : sinon Drift attend indéfiniment.
+  await tester.runAsync(db.close);
+}
+
+const phone = Size(400, 860);
+const desktop = Size(1280, 800);
+
+void main() {
+  testWidgets('démarrage sans écran blanc : le pont et le formulaire de profil',
+      (tester) async {
+    final db = await pumpApp(tester, size: phone);
+    expect(find.text('Le pont du navire'), findsOneWidget);
+    expect(find.text('Créez votre profil de matelot'), findsOneWidget);
+    expect(find.byType(NavigationBar), findsOneWidget);
+    expect(find.byType(NavigationRail), findsNothing);
+    await teardown(tester, db);
+  });
+
+  testWidgets('création de profil : validation puis bienvenue et entrée au journal',
+      (tester) async {
+    final db = await pumpApp(tester, size: phone);
+    await tester.tap(find.text('Embarquer'));
+    await tester.pumpAndSettle();
+    expect(find.text('Entre 1 et 40 caractères.'), findsOneWidget);
+
+    await tester.enterText(find.byType(TextFormField), 'Capitaine Test');
+    await tester.tap(find.text('Embarquer'));
+    await tester.pumpAndSettle();
+    expect(find.text('Bienvenue à bord, Capitaine Test !'), findsOneWidget);
+
+    await tester.tap(find.text('Journal'));
+    await tester.pumpAndSettle();
+    expect(find.text('Profil créé'), findsOneWidget);
+    await teardown(tester, db);
+  });
+
+  testWidgets('bureau : rail latéral et raccourcis Ctrl+2 / Ctrl+5 / Ctrl+,',
+      (tester) async {
+    final db = await pumpApp(tester, size: desktop);
+    expect(find.byType(NavigationRail), findsOneWidget);
+    expect(find.byType(NavigationBar), findsNothing);
+
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+    await tester.sendKeyEvent(LogicalKeyboardKey.digit2);
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+    await tester.pumpAndSettle();
+    expect(find.textContaining('phase 2 de la feuille de route'), findsOneWidget);
+
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+    await tester.sendKeyEvent(LogicalKeyboardKey.digit5);
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+    await tester.pumpAndSettle();
+    expect(find.text('Journal de bord'), findsOneWidget);
+
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+    await tester.sendKeyEvent(LogicalKeyboardKey.comma);
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+    await tester.pumpAndSettle();
+    expect(find.text('Contraste renforcé'), findsOneWidget);
+    await teardown(tester, db);
+  });
+
+  testWidgets('les cartes du pont ouvrent la section correspondante', (tester) async {
+    final db = await pumpApp(tester, size: desktop);
+    await tester.tap(find.text('Atelier').last);
+    await tester.pumpAndSettle();
+    expect(find.textContaining('phase 5 de la feuille de route'), findsOneWidget);
+    await teardown(tester, db);
+  });
+
+  testWidgets('paramètres : contraste et langue persistés et consignés', (tester) async {
+    final db = await pumpApp(tester, size: phone);
+    await tester.tap(find.byTooltip('Paramètres'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Contraste renforcé'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('English'));
+    await tester.pumpAndSettle();
+    expect(find.text('Settings'), findsOneWidget);
+    expect(find.text('High contrast'), findsOneWidget);
+
+    final rows = (await tester.runAsync(() => db.select(db.appSettingsTable).get()))!;
+    final map = {for (final r in rows) r.key: r.value};
+    expect(map['high_contrast'], 'true');
+    expect(map['language'], 'en');
+    final audit = (await tester.runAsync(() => db.select(db.auditEntries).get()))!;
+    expect(audit.where((e) => e.category == 'paramètres'), hasLength(2));
+    await teardown(tester, db);
+  });
+
+  testWidgets('journal : effacement uniquement après confirmation', (tester) async {
+    final db = memoryDb();
+    await db.into(db.auditEntries).insert(AuditEntriesCompanion.insert(
+        timestamp: DateTime(2026), category: 'test', action: 'Entrée A', outcome: 'info'));
+    await pumpApp(tester, size: phone, db: db);
+    await tester.tap(find.text('Journal'));
+    await tester.pumpAndSettle();
+    expect(find.text('Entrée A'), findsOneWidget);
+
+    await tester.tap(find.text('Effacer le journal'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Annuler'));
+    await tester.pumpAndSettle();
+    expect(find.text('Entrée A'), findsOneWidget);
+
+    await tester.tap(find.text('Effacer le journal'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Effacer définitivement'));
+    await tester.pumpAndSettle();
+    expect(find.text('Entrée A'), findsNothing);
+    expect(find.text('Journal effacé'), findsOneWidget);
+    await teardown(tester, db);
+  });
+
+  group('accessibilité', () {
+    for (final (name, size) in [('téléphone', phone), ('bureau', desktop)]) {
+      testWidgets('règles Flutter ($name) : cibles tactiles, libellés, contraste',
+          (tester) async {
+        final handle = tester.ensureSemantics();
+        final db = await pumpApp(tester, size: size);
+        await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
+        await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
+        await expectLater(tester, meetsGuideline(textContrastGuideline));
+        handle.dispose();
+        await teardown(tester, db);
+      });
+    }
+
+    testWidgets('texte agrandi à 200 % : pas de débordement sur téléphone',
+        (tester) async {
+      final db = memoryDb();
+      await db.into(db.appSettingsTable).insert(
+          AppSettingsTableCompanion.insert(key: 'text_scale', value: '2.00'));
+      await pumpApp(tester, size: phone, db: db);
+      expect(tester.takeException(), isNull);
+      expect(find.text('Le pont du navire'), findsOneWidget);
+      await teardown(tester, db);
+    });
+  });
+}

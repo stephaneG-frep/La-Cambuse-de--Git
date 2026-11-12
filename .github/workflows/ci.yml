@@ -1,0 +1,39 @@
+# CI — analyse statique et tests (ROADMAP phase 1).
+# Les builds APK/.deb seront ajoutés en phase 8.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  analyze-test:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.47.2
+          channel: stable
+          cache: true
+      - name: Dépendances
+        run: flutter pub get
+      - name: Génération de code (Drift) et vérification qu'elle est à jour
+        run: |
+          dart run build_runner build --delete-conflicting-outputs
+          git diff --exit-code -- lib/
+      - name: Analyse statique
+        run: flutter analyze --fatal-infos
+      - name: Tests
+        run: flutter test --reporter expanded
