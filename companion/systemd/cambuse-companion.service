@@ -1,0 +1,23 @@
+# Service utilisateur systemd (modèle, NON installé automatiquement).
+# Installation manuelle, sans privilèges :
+#   mkdir -p ~/.config/systemd/user
+#   cp cambuse-companion.service ~/.config/systemd/user/
+#   # adapter ExecStart (chemin du binaire et dossiers --root)
+#   systemctl --user daemon-reload && systemctl --user enable --now cambuse-companion
+[Unit]
+Description=Compagnon Linux de La Cambuse de Git (API locale 127.0.0.1)
+
+[Service]
+ExecStart=%h/.local/bin/cambuse-companion serve --root %h/Projets
+Restart=on-failure
+# Durcissement : aucun privilège supplémentaire, système en lecture seule
+# hormis les dossiers de données et de projets.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=%h/Projets %h/.local/share/cambuse-companion
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+LockPersonality=true
+
+[Install]
+WantedBy=default.target

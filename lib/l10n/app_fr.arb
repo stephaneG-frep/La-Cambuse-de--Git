@@ -391,5 +391,81 @@
   },
   "aiEffortLow": "Faible",
   "aiEffortMedium": "Moyen",
-  "aiEffortHigh": "Élevé"
+  "aiEffortHigh": "Élevé",
+  "compTitle": "Compagnon Linux",
+  "compIntro": "Le compagnon est un petit service qui tourne sur votre PC Linux. L'application ne lance jamais de commande elle-même : elle demande au compagnon des opérations typées, limitées aux dossiers que vous avez autorisés, et chaque modification exige votre accord.",
+  "compHostSteps": "Sur le PC Linux :",
+  "compAddress": "Adresse du compagnon",
+  "compFingerprint": "Empreinte TLS (HTTPS uniquement)",
+  "compDeviceName": "Nom de cet appareil",
+  "compCode": "Code d'appairage (6 chiffres)",
+  "compCheck": "Vérifier la connexion",
+  "compPair": "Appairer",
+  "compPaired": "Appairé avec {address}",
+  "@compPaired": {
+    "placeholders": {
+      "address": {
+        "type": "String"
+      }
+    }
+  },
+  "compScopes": "Portées : {scopes}",
+  "@compScopes": {
+    "placeholders": {
+      "scopes": {
+        "type": "String"
+      }
+    }
+  },
+  "compReachable": "Compagnon joignable (API v{version}).",
+  "@compReachable": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "compInfo": "Informations du compagnon",
+  "compRoots": "Dossiers autorisés",
+  "compFolder": "Dossier (dans un dossier autorisé)",
+  "compGitStatus": "État Git",
+  "compDetect": "Détecter le projet",
+  "compGitInit": "Initialiser Git",
+  "compReadOnly": "Lecture seule",
+  "compMutating": "Modification (accord demandé)",
+  "compResult": "Résultat",
+  "compState": "État : {state}",
+  "@compState": {
+    "placeholders": {
+      "state": {
+        "type": "String"
+      }
+    }
+  },
+  "compAudit": "Journal du compagnon",
+  "compAuditEmpty": "Aucun événement pour cet appareil.",
+  "compForget": "Oublier ce compagnon",
+  "compForgetBody": "Les jetons seront supprimés de cet appareil. Pour révoquer aussi l'accès côté PC : cambuse-companion revoke {id}",
+  "@compForgetBody": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "compApproveTitle": "Autoriser cette opération ?",
+  "compApproveWarning": "Cette opération modifie le dépôt. Rien n'est fait sans votre accord.",
+  "compApprove": "Autoriser",
+  "compReject": "Refuser",
+  "compRejected": "Opération refusée : rien n'a été modifié.",
+  "compSettingsSubtitle": "Appairage et opérations sur le PC Linux",
+  "compPairedOk": "Appareil appairé.",
+  "compGit": "Git : {version}",
+  "@compGit": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  }
 }

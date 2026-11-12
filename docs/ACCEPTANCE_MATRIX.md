@@ -2,7 +2,7 @@
 
 États : ⬜ non commencé · 🟨 partiel · ✅ réel et testé · ⛔ bloqué
 
-Dernière mise à jour : 2026-11-12 (fin de phase 3)
+Dernière mise à jour : 2026-11-12 (fin de phase 4)
 
 | Phase | Fonctionnalité | État | Preuve / remarque |
 |---|---|---|---|
@@ -18,7 +18,7 @@ Dernière mise à jour : 2026-11-12 (fin de phase 3)
 | 2 | Module Git complet (≥ 8 leçons, quiz, exercices, projet, grille) | ✅ | 14 leçons, 60 questions, 12 exercices rejoués, projet + grille — [PHASE2_BILAN.md](PHASE2_BILAN.md) |
 | 2 | Progression persistante, reprise après redémarrage | ✅ | widget + Honor (base lue après redémarrage) ; répétition espacée Leitner |
 | 3 | Agent IA multifournisseur, coffre de clés, mode sans IA | ✅ | Anthropic testé en réel sur Honor ; compatible OpenAI testé sur serveur simulé — [PHASE3_BILAN.md](PHASE3_BILAN.md) |
-| 4 | Compagnon Linux, appairage, API v1 | ⬜ | |
+| 4 | Compagnon Linux, appairage, API v1 | ✅ | 27 tests sécurité + contrat réel ; essai réel Honor (lecture + mutation approuvée) ; LAN TLS non essayé depuis le téléphone — [PHASE4_BILAN.md](PHASE4_BILAN.md) |
 | 5 | Atelier Git local (import, audit, diff, init, commit) | ⬜ | |
 | 6 | GitHub / GitLab (dépôt privé, push avec consentement) | ⬜ | glab absent |
 | 7 | Docker et Compose | ⬜ | |

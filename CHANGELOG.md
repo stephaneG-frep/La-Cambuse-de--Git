@@ -2,7 +2,19 @@
 
 Format inspiré de « Keep a Changelog ». Versions non publiées.
 
-## [Non publié] — Phase 3 : professeur IA (2026-11-12)
+## [Non publié] — Phase 4 : compagnon Linux (2026-11-12)
+
+### Ajouté
+- Paquet partagé `cambuse_protocol` (contrat d'API v1) et exécutable `cambuse-companion` (serve, pair, devices, revoke, audit).
+- Appairage par code à usage unique, jetons courts tournants et hachés, portées, révocation, audit.
+- Opérations typées sans shell, confinées aux dossiers autorisés ; mutations soumises à approbation explicite.
+- Durcissement contre les dépôts piégés (hooks, fsmonitor, filtres, pagers).
+- Écran Paramètres → Compagnon Linux avec panneau d'approbation ; épinglage TLS côté application.
+
+### Corrigé
+- Contexte de leçon perdu en rouvrant une conversation IA.
+
+## Phase 3 : professeur IA (2026-11-12)
 
 ### Ajouté
 - Professeur IA « Capitaine Commit » : chat contextualisé à la leçon, niveaux débutant/intermédiaire/expert, historique, arrêt en cours de réponse.

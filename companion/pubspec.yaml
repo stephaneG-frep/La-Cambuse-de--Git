@@ -1,0 +1,16 @@
+name: cambuse_companion
+description: Compagnon Linux sécurisé de La Cambuse de Git (API locale versionnée).
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.13.2
+
+dependencies:
+  args: ^2.7.0
+  cambuse_protocol:
+    path: ../packages/cambuse_protocol
+  crypto: ^3.0.8
+dev_dependencies:
+  lints: ^6.1.0
+  test: ^1.33.0

@@ -1201,6 +1201,210 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Élevé'**
   String get aiEffortHigh;
+
+  /// No description provided for @compTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Compagnon Linux'**
+  String get compTitle;
+
+  /// No description provided for @compIntro.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le compagnon est un petit service qui tourne sur votre PC Linux. L\'application ne lance jamais de commande elle-même : elle demande au compagnon des opérations typées, limitées aux dossiers que vous avez autorisés, et chaque modification exige votre accord.'**
+  String get compIntro;
+
+  /// No description provided for @compHostSteps.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sur le PC Linux :'**
+  String get compHostSteps;
+
+  /// No description provided for @compAddress.
+  ///
+  /// In fr, this message translates to:
+  /// **'Adresse du compagnon'**
+  String get compAddress;
+
+  /// No description provided for @compFingerprint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Empreinte TLS (HTTPS uniquement)'**
+  String get compFingerprint;
+
+  /// No description provided for @compDeviceName.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nom de cet appareil'**
+  String get compDeviceName;
+
+  /// No description provided for @compCode.
+  ///
+  /// In fr, this message translates to:
+  /// **'Code d\'appairage (6 chiffres)'**
+  String get compCode;
+
+  /// No description provided for @compCheck.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vérifier la connexion'**
+  String get compCheck;
+
+  /// No description provided for @compPair.
+  ///
+  /// In fr, this message translates to:
+  /// **'Appairer'**
+  String get compPair;
+
+  /// No description provided for @compPaired.
+  ///
+  /// In fr, this message translates to:
+  /// **'Appairé avec {address}'**
+  String compPaired(String address);
+
+  /// No description provided for @compScopes.
+  ///
+  /// In fr, this message translates to:
+  /// **'Portées : {scopes}'**
+  String compScopes(String scopes);
+
+  /// No description provided for @compReachable.
+  ///
+  /// In fr, this message translates to:
+  /// **'Compagnon joignable (API v{version}).'**
+  String compReachable(String version);
+
+  /// No description provided for @compInfo.
+  ///
+  /// In fr, this message translates to:
+  /// **'Informations du compagnon'**
+  String get compInfo;
+
+  /// No description provided for @compRoots.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dossiers autorisés'**
+  String get compRoots;
+
+  /// No description provided for @compFolder.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dossier (dans un dossier autorisé)'**
+  String get compFolder;
+
+  /// No description provided for @compGitStatus.
+  ///
+  /// In fr, this message translates to:
+  /// **'État Git'**
+  String get compGitStatus;
+
+  /// No description provided for @compDetect.
+  ///
+  /// In fr, this message translates to:
+  /// **'Détecter le projet'**
+  String get compDetect;
+
+  /// No description provided for @compGitInit.
+  ///
+  /// In fr, this message translates to:
+  /// **'Initialiser Git'**
+  String get compGitInit;
+
+  /// No description provided for @compReadOnly.
+  ///
+  /// In fr, this message translates to:
+  /// **'Lecture seule'**
+  String get compReadOnly;
+
+  /// No description provided for @compMutating.
+  ///
+  /// In fr, this message translates to:
+  /// **'Modification (accord demandé)'**
+  String get compMutating;
+
+  /// No description provided for @compResult.
+  ///
+  /// In fr, this message translates to:
+  /// **'Résultat'**
+  String get compResult;
+
+  /// No description provided for @compState.
+  ///
+  /// In fr, this message translates to:
+  /// **'État : {state}'**
+  String compState(String state);
+
+  /// No description provided for @compAudit.
+  ///
+  /// In fr, this message translates to:
+  /// **'Journal du compagnon'**
+  String get compAudit;
+
+  /// No description provided for @compAuditEmpty.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun événement pour cet appareil.'**
+  String get compAuditEmpty;
+
+  /// No description provided for @compForget.
+  ///
+  /// In fr, this message translates to:
+  /// **'Oublier ce compagnon'**
+  String get compForget;
+
+  /// No description provided for @compForgetBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'Les jetons seront supprimés de cet appareil. Pour révoquer aussi l\'accès côté PC : cambuse-companion revoke {id}'**
+  String compForgetBody(String id);
+
+  /// No description provided for @compApproveTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Autoriser cette opération ?'**
+  String get compApproveTitle;
+
+  /// No description provided for @compApproveWarning.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cette opération modifie le dépôt. Rien n\'est fait sans votre accord.'**
+  String get compApproveWarning;
+
+  /// No description provided for @compApprove.
+  ///
+  /// In fr, this message translates to:
+  /// **'Autoriser'**
+  String get compApprove;
+
+  /// No description provided for @compReject.
+  ///
+  /// In fr, this message translates to:
+  /// **'Refuser'**
+  String get compReject;
+
+  /// No description provided for @compRejected.
+  ///
+  /// In fr, this message translates to:
+  /// **'Opération refusée : rien n\'a été modifié.'**
+  String get compRejected;
+
+  /// No description provided for @compSettingsSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Appairage et opérations sur le PC Linux'**
+  String get compSettingsSubtitle;
+
+  /// No description provided for @compPairedOk.
+  ///
+  /// In fr, this message translates to:
+  /// **'Appareil appairé.'**
+  String get compPairedOk;
+
+  /// No description provided for @compGit.
+  ///
+  /// In fr, this message translates to:
+  /// **'Git : {version}'**
+  String compGit(String version);
 }
 
 class _AppLocalizationsDelegate

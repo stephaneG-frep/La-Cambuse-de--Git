@@ -1,0 +1,7 @@
+name: cambuse_protocol
+description: Contrat d'API partagé entre La Cambuse de Git et son compagnon Linux.
+version: 1.0.0
+publish_to: none
+
+environment:
+  sdk: ^3.13.2

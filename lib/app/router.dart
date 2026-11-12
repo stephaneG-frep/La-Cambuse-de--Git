@@ -10,6 +10,7 @@ import '../features/academy/presentation/search_screen.dart';
 import '../features/ai/presentation/ai_settings_screen.dart';
 import '../features/ai/presentation/chat_screen.dart';
 import '../features/captain/presentation/captain_screen.dart';
+import '../features/companion_link/presentation/companion_screen.dart';
 import '../features/dashboard/presentation/dashboard_screen.dart';
 import '../features/logbook/presentation/logbook_screen.dart';
 import '../features/settings/presentation/settings_screen.dart';
@@ -89,7 +90,10 @@ GoRouter buildRouter() => GoRouter(
         GoRoute(
           path: Routes.settings,
           builder: (context, state) => const SettingsScreen(),
-          routes: [GoRoute(path: 'ia', builder: (c, s) => const AiSettingsScreen())],
+          routes: [
+            GoRoute(path: 'ia', builder: (c, s) => const AiSettingsScreen()),
+            GoRoute(path: 'compagnon', builder: (c, s) => const CompanionScreen()),
+          ],
         ),
       ],
     );

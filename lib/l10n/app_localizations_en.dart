@@ -658,4 +658,120 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get aiEffortHigh => 'High';
+
+  @override
+  String get compTitle => 'Linux companion';
+
+  @override
+  String get compIntro =>
+      'The companion is a small service running on your Linux PC. The app never runs commands itself: it asks the companion for typed operations, restricted to folders you allowed, and every change requires your approval.';
+
+  @override
+  String get compHostSteps => 'On the Linux PC:';
+
+  @override
+  String get compAddress => 'Companion address';
+
+  @override
+  String get compFingerprint => 'TLS fingerprint (HTTPS only)';
+
+  @override
+  String get compDeviceName => 'Name of this device';
+
+  @override
+  String get compCode => 'Pairing code (6 digits)';
+
+  @override
+  String get compCheck => 'Check connection';
+
+  @override
+  String get compPair => 'Pair';
+
+  @override
+  String compPaired(String address) {
+    return 'Paired with $address';
+  }
+
+  @override
+  String compScopes(String scopes) {
+    return 'Scopes: $scopes';
+  }
+
+  @override
+  String compReachable(String version) {
+    return 'Companion reachable (API v$version).';
+  }
+
+  @override
+  String get compInfo => 'Companion information';
+
+  @override
+  String get compRoots => 'Allowed folders';
+
+  @override
+  String get compFolder => 'Folder (inside an allowed folder)';
+
+  @override
+  String get compGitStatus => 'Git status';
+
+  @override
+  String get compDetect => 'Detect project';
+
+  @override
+  String get compGitInit => 'Initialise Git';
+
+  @override
+  String get compReadOnly => 'Read-only';
+
+  @override
+  String get compMutating => 'Change (approval required)';
+
+  @override
+  String get compResult => 'Result';
+
+  @override
+  String compState(String state) {
+    return 'State: $state';
+  }
+
+  @override
+  String get compAudit => 'Companion log';
+
+  @override
+  String get compAuditEmpty => 'No events for this device.';
+
+  @override
+  String get compForget => 'Forget this companion';
+
+  @override
+  String compForgetBody(String id) {
+    return 'Tokens will be deleted from this device. To also revoke access on the PC: cambuse-companion revoke $id';
+  }
+
+  @override
+  String get compApproveTitle => 'Allow this operation?';
+
+  @override
+  String get compApproveWarning =>
+      'This operation changes the repository. Nothing happens without your approval.';
+
+  @override
+  String get compApprove => 'Allow';
+
+  @override
+  String get compReject => 'Reject';
+
+  @override
+  String get compRejected => 'Operation rejected: nothing was changed.';
+
+  @override
+  String get compSettingsSubtitle => 'Pairing and operations on the Linux PC';
+
+  @override
+  String get compPairedOk => 'Device paired.';
+
+  @override
+  String compGit(String version) {
+    return 'Git: $version';
+  }
 }

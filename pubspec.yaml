@@ -22,8 +22,13 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   http: ^1.6.0
+  cambuse_protocol:
+    path: packages/cambuse_protocol
+  crypto: ^3.0.8
 
 dev_dependencies:
+  cambuse_companion:
+    path: companion
   flutter_test:
     sdk: flutter
 

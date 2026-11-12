@@ -241,9 +241,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     final conv = _conversationId == null
         ? null
         : ref.watch(conversationsProvider).value?.where((c) => c.id == _conversationId).firstOrNull;
-    final lessonTitle = widget.lessonId == null || widget.moduleId == null
+    // Contexte : celui demandé à l'ouverture, ou celui stocké avec la conversation.
+    final moduleId = widget.moduleId ?? conv?.moduleId;
+    final lessonId = widget.lessonId ?? conv?.lessonId;
+    final lessonTitle = lessonId == null || moduleId == null
         ? null
-        : ref.watch(courseProvider(widget.moduleId!)).value?.lesson(widget.lessonId!)?.title;
+        : ref.watch(courseProvider(moduleId)).value?.lesson(lessonId)?.title;
     final used = ref.watch(tokensTodayProvider).value;
     final model = conv?.model ?? config.model;
     final providerName = config.kind == AiProviderKind.anthropic ? 'Anthropic' : config.baseUrl;

@@ -659,4 +659,120 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get aiEffortHigh => 'Élevé';
+
+  @override
+  String get compTitle => 'Compagnon Linux';
+
+  @override
+  String get compIntro =>
+      'Le compagnon est un petit service qui tourne sur votre PC Linux. L\'application ne lance jamais de commande elle-même : elle demande au compagnon des opérations typées, limitées aux dossiers que vous avez autorisés, et chaque modification exige votre accord.';
+
+  @override
+  String get compHostSteps => 'Sur le PC Linux :';
+
+  @override
+  String get compAddress => 'Adresse du compagnon';
+
+  @override
+  String get compFingerprint => 'Empreinte TLS (HTTPS uniquement)';
+
+  @override
+  String get compDeviceName => 'Nom de cet appareil';
+
+  @override
+  String get compCode => 'Code d\'appairage (6 chiffres)';
+
+  @override
+  String get compCheck => 'Vérifier la connexion';
+
+  @override
+  String get compPair => 'Appairer';
+
+  @override
+  String compPaired(String address) {
+    return 'Appairé avec $address';
+  }
+
+  @override
+  String compScopes(String scopes) {
+    return 'Portées : $scopes';
+  }
+
+  @override
+  String compReachable(String version) {
+    return 'Compagnon joignable (API v$version).';
+  }
+
+  @override
+  String get compInfo => 'Informations du compagnon';
+
+  @override
+  String get compRoots => 'Dossiers autorisés';
+
+  @override
+  String get compFolder => 'Dossier (dans un dossier autorisé)';
+
+  @override
+  String get compGitStatus => 'État Git';
+
+  @override
+  String get compDetect => 'Détecter le projet';
+
+  @override
+  String get compGitInit => 'Initialiser Git';
+
+  @override
+  String get compReadOnly => 'Lecture seule';
+
+  @override
+  String get compMutating => 'Modification (accord demandé)';
+
+  @override
+  String get compResult => 'Résultat';
+
+  @override
+  String compState(String state) {
+    return 'État : $state';
+  }
+
+  @override
+  String get compAudit => 'Journal du compagnon';
+
+  @override
+  String get compAuditEmpty => 'Aucun événement pour cet appareil.';
+
+  @override
+  String get compForget => 'Oublier ce compagnon';
+
+  @override
+  String compForgetBody(String id) {
+    return 'Les jetons seront supprimés de cet appareil. Pour révoquer aussi l\'accès côté PC : cambuse-companion revoke $id';
+  }
+
+  @override
+  String get compApproveTitle => 'Autoriser cette opération ?';
+
+  @override
+  String get compApproveWarning =>
+      'Cette opération modifie le dépôt. Rien n\'est fait sans votre accord.';
+
+  @override
+  String get compApprove => 'Autoriser';
+
+  @override
+  String get compReject => 'Refuser';
+
+  @override
+  String get compRejected => 'Opération refusée : rien n\'a été modifié.';
+
+  @override
+  String get compSettingsSubtitle => 'Appairage et opérations sur le PC Linux';
+
+  @override
+  String get compPairedOk => 'Appareil appairé.';
+
+  @override
+  String compGit(String version) {
+    return 'Git : $version';
+  }
 }
