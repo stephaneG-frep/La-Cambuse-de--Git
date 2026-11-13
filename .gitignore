@@ -57,3 +57,6 @@ app.*.map.json
 key.properties
 android/key.properties
 /dist/
+
+# Caches Python des générateurs de contenu
+__pycache__/

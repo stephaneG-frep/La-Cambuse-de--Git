@@ -1,0 +1,1130 @@
+{
+ "id": "linux",
+ "version": 1,
+ "title": "Terminal Linux, la salle des cartes",
+ "summary": "Se repérer dans le terminal, gérer fichiers, droits, processus et services, écrire des scripts Bash sûrs et durcir SSH.",
+ "objectives": [
+  "Naviguer et manipuler les fichiers sans risque",
+  "Appliquer le moindre privilège (droits, sudo)",
+  "Observer processus, services et journaux",
+  "Écrire des scripts Bash robustes",
+  "Accéder à un serveur par clé SSH et durcir sshd"
+ ],
+ "prerequisites": [],
+ "lessons": [
+  {
+   "id": "terminal",
+   "title": "Le terminal et le shell",
+   "minutes": 15,
+   "objectives": [
+    "Comprendre ce qu'est un shell",
+    "Se repérer dans l'arborescence avec des chemins absolus et relatifs"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Le terminal est la fenêtre ; le shell (Bash le plus souvent) est le programme qui lit vos commandes, les interprète et lance les programmes. Une commande s'écrit : programme, options, arguments — par exemple ls -l /etc."
+    },
+    {
+     "type": "text",
+     "body": "Tout part de la racine « / ». Un chemin absolu commence par / (/home/ana/projets), un chemin relatif part du dossier courant (projets/site). « . » désigne le dossier courant, « .. » le parent et « ~ » votre dossier personnel."
+    },
+    {
+     "type": "code",
+     "body": "pwd\nls -la\ncd ~/projets\ncd ..\ncd -",
+     "caption": "Où suis-je, que contient ce dossier, se déplacer, revenir au dossier précédent"
+    },
+    {
+     "type": "tip",
+     "body": "Tab complète les noms de fichiers et de commandes ; flèche haut rappelle l'historique ; Ctrl+R le recherche."
+    },
+    {
+     "type": "tip",
+     "body": "man ls ouvre le manuel d'une commande ; ls --help en donne un résumé. Lire le manuel est un réflexe de pro, pas un aveu."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "lx-1-1",
+     "type": "single",
+     "prompt": "Que désigne « .. » ?",
+     "choices": [
+      "Le dossier parent",
+      "Le dossier courant",
+      "Le dossier personnel",
+      "La racine"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "« . » est le dossier courant, « .. » son parent : cd .. remonte d'un niveau."
+    },
+    {
+     "id": "lx-1-2",
+     "type": "single",
+     "prompt": "Lequel est un chemin absolu ?",
+     "choices": [
+      "/var/log/syslog",
+      "log/syslog",
+      "./syslog",
+      "../syslog"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Un chemin absolu commence toujours par la racine « / »."
+    },
+    {
+     "id": "lx-1-3",
+     "type": "command",
+     "prompt": "Affichez le dossier courant.",
+     "accepted": [
+      "pwd"
+     ],
+     "explanation": "pwd signifie « print working directory »."
+    },
+    {
+     "id": "lx-1-4",
+     "type": "command",
+     "prompt": "Listez tous les fichiers du dossier courant, cachés compris, en format long.",
+     "accepted": [
+      "ls -la",
+      "ls -al",
+      "ls -l -a",
+      "ls -a -l"
+     ],
+     "explanation": "-l pour le format long (droits, taille, date), -a pour inclure les fichiers cachés qui commencent par un point."
+    }
+   ]
+  },
+  {
+   "id": "fichiers",
+   "title": "Fichiers et dossiers",
+   "minutes": 18,
+   "objectives": [
+    "Créer, copier, déplacer et supprimer sans surprise",
+    "Trouver un fichier et lire son contenu"
+   ],
+   "sections": [
+    {
+     "type": "code",
+     "body": "mkdir -p projets/site/css\ntouch projets/site/index.html\ncp -r projets/site projets/site-copie\nmv projets/site-copie /tmp/\nrm projets/site/index.html",
+     "caption": "Créer une arborescence, un fichier, copier, déplacer, supprimer"
+    },
+    {
+     "type": "warning",
+     "body": "rm ne passe pas par une corbeille : ce qui est supprimé est perdu. rm -r supprime récursivement un dossier entier. Relisez toujours la commande, surtout avec des jokers (*) ou des variables."
+    },
+    {
+     "type": "code",
+     "body": "find . -name '*.log' -mtime +7\nless /var/log/syslog\nhead -n 20 fichier.txt\ntail -f /var/log/nginx/access.log",
+     "caption": "Chercher des fichiers, lire page par page, début, suivi en direct"
+    },
+    {
+     "type": "tip",
+     "body": "ls *.txt laisse le shell remplacer le joker avant d'exécuter la commande : echo rm *.txt montre ce qui serait supprimé."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "lx-2-1",
+     "type": "single",
+     "prompt": "Que fait mkdir -p a/b/c ?",
+     "choices": [
+      "Crée a, b et c si besoin, sans erreur s'ils existent",
+      "Crée un fichier",
+      "Supprime a/b/c",
+      "Affiche le chemin"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "-p crée les parents manquants et ne se plaint pas si le dossier existe déjà."
+    },
+    {
+     "id": "lx-2-2",
+     "type": "single",
+     "prompt": "Que devient un fichier supprimé avec rm ?",
+     "choices": [
+      "Il est perdu (pas de corbeille)",
+      "Il va dans la corbeille",
+      "Il est compressé",
+      "Il est caché"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Les sauvegardes et Git sont vos filets de sécurité, pas rm."
+    },
+    {
+     "id": "lx-2-3",
+     "type": "command",
+     "prompt": "Suivez en direct la fin du fichier app.log.",
+     "accepted": [
+      "tail -f app.log"
+     ],
+     "explanation": "tail -f affiche les nouvelles lignes au fur et à mesure (Ctrl+C pour quitter)."
+    },
+    {
+     "id": "lx-2-4",
+     "type": "command",
+     "prompt": "Cherchez, depuis le dossier courant, les fichiers nommés *.log.",
+     "accepted": [
+      "find . -name '*.log'",
+      "find . -name \"*.log\""
+     ],
+     "explanation": "Les guillemets empêchent le shell de remplacer le joker avant que find ne le reçoive."
+    }
+   ]
+  },
+  {
+   "id": "permissions",
+   "title": "Permissions et propriétaires",
+   "minutes": 20,
+   "objectives": [
+    "Lire rwx et la notation octale",
+    "Appliquer le moindre privilège aux fichiers"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "ls -l affiche par exemple -rwxr-x--- : type, puis trois triplets pour le propriétaire, le groupe et les autres. r = lire (4), w = écrire (2), x = exécuter ou traverser un dossier (1)."
+    },
+    {
+     "type": "code",
+     "body": "chmod 755 deploy.sh      # rwx r-x r-x\nchmod 644 index.html     # rw- r-- r--\nchmod 600 ~/.ssh/id_ed25519\nchown ana:web site/ -R",
+     "caption": "Exécutable, fichier public, secret privé, changement de propriétaire"
+    },
+    {
+     "type": "warning",
+     "body": "chmod 777 « répare » une erreur de droits en donnant tout à tout le monde : n'importe quel compte peut alors modifier le script… puis le faire exécuter par vous. Cherchez plutôt QUI doit accéder à QUOI."
+    },
+    {
+     "type": "tip",
+     "body": "umask fixe les droits par défaut des nouveaux fichiers (022 → 644 pour un fichier, 755 pour un dossier)."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "lx-3-1",
+     "type": "single",
+     "prompt": "Que vaut rw-r----- en octal ?",
+     "choices": [
+      "640",
+      "644",
+      "750",
+      "600"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "rw- = 6, r-- = 4, --- = 0."
+    },
+    {
+     "id": "lx-3-2",
+     "type": "single",
+     "prompt": "Quels droits pour une clé SSH privée ?",
+     "choices": [
+      "600",
+      "644",
+      "755",
+      "777"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Seul le propriétaire lit et écrit ; ssh refuse une clé trop ouverte."
+    },
+    {
+     "id": "lx-3-3",
+     "type": "single",
+     "prompt": "Le droit x sur un dossier permet de…",
+     "choices": [
+      "Le traverser (y entrer)",
+      "L'exécuter comme un programme",
+      "Le supprimer",
+      "Le compresser"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Sans x, on ne peut pas faire cd dedans ni accéder à ses fichiers."
+    },
+    {
+     "id": "lx-3-4",
+     "type": "command",
+     "prompt": "Rendez deploy.sh exécutable pour tous, modifiable par son seul propriétaire (octal).",
+     "accepted": [
+      "chmod 755 deploy.sh"
+     ],
+     "explanation": "7 = rwx pour le propriétaire, 5 = r-x pour le groupe et les autres."
+    }
+   ],
+   "lab": {
+    "kind": "shell",
+    "intro": "Ce script d'installation « répare » les droits à la hache. Donnez le minimum nécessaire.",
+    "starter": "#!/usr/bin/env bash\nset -euo pipefail\nmkdir -p /srv/app\ncp app.sh /srv/app/\nchmod -R 777 /srv/app\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "Plus de chmod 777",
+      "rule": "SH006"
+     },
+     {
+      "type": "contains",
+      "label": "Le script reste exécutable (755)",
+      "text": "chmod 755"
+     },
+     {
+      "type": "valid",
+      "label": "Fichier valide"
+     }
+    ],
+    "hint": "Le script doit être exécutable par tous mais modifiable seulement par son propriétaire.",
+    "solution": "#!/usr/bin/env bash\nset -euo pipefail\nmkdir -p /srv/app\ncp app.sh /srv/app/\nchmod 755 /srv/app/app.sh\n"
+   }
+  },
+  {
+   "id": "utilisateurs",
+   "title": "Utilisateurs, groupes et sudo",
+   "minutes": 15,
+   "objectives": [
+    "Distinguer root, comptes humains et comptes de service",
+    "Utiliser sudo de façon traçable"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "root peut tout faire, y compris casser le système. On travaille avec un compte nominatif et on élève ses droits ponctuellement avec sudo, ce qui laisse une trace dans les journaux (qui a fait quoi)."
+    },
+    {
+     "type": "code",
+     "body": "id\ngroups\nsudo apt update\nsudo -l\nsudo adduser deploy\nsudo usermod -aG web deploy",
+     "caption": "Mon identité, mes groupes, une commande en root, ce que j'ai le droit de faire, créer un compte, l'ajouter à un groupe"
+    },
+    {
+     "type": "text",
+     "body": "Les services (nginx, postgres) tournent sous des comptes dédiés sans shell de connexion : si le service est compromis, l'attaquant n'a que ses droits limités."
+    },
+    {
+     "type": "warning",
+     "body": "usermod -G sans -a remplace TOUS les groupes de l'utilisateur ; ajoutez toujours -a pour « ajouter »."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "lx-4-1",
+     "type": "single",
+     "prompt": "Pourquoi éviter de travailler en root ?",
+     "choices": [
+      "Une erreur ou un programme malveillant a tous les droits",
+      "C'est plus lent",
+      "root n'a pas de dossier personnel",
+      "root ne peut pas utiliser Bash"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Le moindre privilège limite les dégâts d'une erreur."
+    },
+    {
+     "id": "lx-4-2",
+     "type": "single",
+     "prompt": "Avantage de sudo par rapport à une session root ?",
+     "choices": [
+      "Élévation ponctuelle et journalisée",
+      "Aucun mot de passe",
+      "Plus de droits que root",
+      "Fonctionne hors ligne"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Chaque commande sudo est consignée avec son auteur."
+    },
+    {
+     "id": "lx-4-3",
+     "type": "command",
+     "prompt": "Ajoutez l'utilisateur deploy au groupe web sans retirer ses autres groupes.",
+     "accepted": [
+      "sudo usermod -aG web deploy",
+      "sudo usermod -a -G web deploy"
+     ],
+     "explanation": "-a (append) est indispensable avec -G."
+    },
+    {
+     "id": "lx-4-4",
+     "type": "command",
+     "prompt": "Affichez ce que sudo vous autorise à faire.",
+     "accepted": [
+      "sudo -l"
+     ],
+     "explanation": "Utile pour vérifier une délégation avant de l'utiliser."
+    }
+   ]
+  },
+  {
+   "id": "processus",
+   "title": "Processus, services et journaux",
+   "minutes": 20,
+   "objectives": [
+    "Observer et arrêter un processus",
+    "Piloter un service systemd et lire ses journaux"
+   ],
+   "sections": [
+    {
+     "type": "code",
+     "body": "ps aux | grep nginx\ntop\nkill 1234\nkill -9 1234",
+     "caption": "Lister, observer, demander l'arrêt (SIGTERM), forcer (SIGKILL) en dernier recours"
+    },
+    {
+     "type": "text",
+     "body": "kill envoie un signal. SIGTERM (par défaut) demande poliment de s'arrêter : le programme peut fermer ses fichiers. SIGKILL (-9) tue sans délai : à réserver aux processus bloqués."
+    },
+    {
+     "type": "code",
+     "body": "systemctl status nginx\nsudo systemctl restart nginx\nsudo systemctl enable --now nginx\njournalctl -u nginx --since '1 hour ago'",
+     "caption": "État, redémarrage, activation au démarrage, journaux d'un service"
+    },
+    {
+     "type": "tip",
+     "body": "journalctl -f suit les journaux en direct ; -p err ne montre que les erreurs."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "lx-5-1",
+     "type": "single",
+     "prompt": "Quel signal laisse un programme se terminer proprement ?",
+     "choices": [
+      "SIGTERM",
+      "SIGKILL",
+      "SIGSTOP",
+      "Aucun"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "SIGTERM est intercepté par le programme pour fermer ses ressources."
+    },
+    {
+     "id": "lx-5-2",
+     "type": "single",
+     "prompt": "Que fait systemctl enable --now nginx ?",
+     "choices": [
+      "Active au démarrage et lance immédiatement",
+      "Supprime le service",
+      "Affiche les journaux",
+      "Redémarre la machine"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "enable seul n'agit qu'au prochain démarrage ; --now démarre aussi tout de suite."
+    },
+    {
+     "id": "lx-5-3",
+     "type": "command",
+     "prompt": "Affichez les journaux du service nginx.",
+     "accepted": [
+      "journalctl -u nginx",
+      "sudo journalctl -u nginx"
+     ],
+     "explanation": "-u filtre par unité systemd."
+    },
+    {
+     "id": "lx-5-4",
+     "type": "command",
+     "prompt": "Affichez l'état du service ssh.",
+     "accepted": [
+      "systemctl status ssh",
+      "sudo systemctl status ssh"
+     ],
+     "explanation": "Montre s'il tourne, depuis quand et les dernières lignes de journal."
+    }
+   ]
+  },
+  {
+   "id": "flux",
+   "title": "Redirections, tubes et filtres",
+   "minutes": 18,
+   "objectives": [
+    "Rediriger sortie et erreurs",
+    "Composer des commandes avec des tubes"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Chaque programme a trois flux : entrée (0), sortie (1) et erreurs (2). > écrase un fichier, >> ajoute à la fin, 2> redirige les erreurs, 2>&1 envoie les erreurs au même endroit que la sortie."
+    },
+    {
+     "type": "code",
+     "body": "ls /inexistant 2> erreurs.txt\n./build.sh > build.log 2>&1\ngrep -c ERROR app.log\ncut -d' ' -f1 access.log | sort | uniq -c | sort -rn | head",
+     "caption": "Erreurs dans un fichier, tout dans un journal, compter, top des adresses IP"
+    },
+    {
+     "type": "tip",
+     "body": "Le tube | branche la sortie d'une commande sur l'entrée de la suivante : de petits outils combinés font de grandes choses."
+    },
+    {
+     "type": "warning",
+     "body": "Dans un script, une erreur au milieu d'un tube est ignorée par défaut : set -o pipefail la fait remonter."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "lx-6-1",
+     "type": "single",
+     "prompt": "Différence entre > et >> ?",
+     "choices": [
+      "> écrase, >> ajoute à la fin",
+      "Aucune",
+      "> ajoute, >> écrase",
+      ">> redirige les erreurs"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Attention : > vide le fichier avant d'écrire."
+    },
+    {
+     "id": "lx-6-2",
+     "type": "single",
+     "prompt": "Que signifie 2>&1 ?",
+     "choices": [
+      "Envoyer les erreurs là où va la sortie",
+      "Lancer deux fois",
+      "Ignorer les erreurs",
+      "Lire le fichier 1"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Ordre important : > fichier 2>&1."
+    },
+    {
+     "id": "lx-6-3",
+     "type": "command",
+     "prompt": "Comptez les lignes contenant ERROR dans app.log.",
+     "accepted": [
+      "grep -c ERROR app.log",
+      "grep ERROR app.log | wc -l"
+     ],
+     "explanation": "grep -c compte directement."
+    },
+    {
+     "id": "lx-6-4",
+     "type": "command",
+     "prompt": "Lancez ./build.sh en envoyant sortie et erreurs dans build.log.",
+     "accepted": [
+      "./build.sh > build.log 2>&1",
+      "./build.sh &> build.log"
+     ],
+     "explanation": "&> est un raccourci Bash équivalent."
+    }
+   ]
+  },
+  {
+   "id": "scripts-surs",
+   "title": "Écrire un script Bash sûr",
+   "minutes": 22,
+   "objectives": [
+    "Démarrer chaque script par un shebang et le mode strict",
+    "Comprendre ce que change set -euo pipefail"
+   ],
+   "sections": [
+    {
+     "type": "code",
+     "body": "#!/usr/bin/env bash\nset -euo pipefail\n\necho \"Déploiement de $1\"",
+     "caption": "Squelette minimal d'un script robuste"
+    },
+    {
+     "type": "text",
+     "body": "-e arrête le script à la première commande en échec ; -u fait échouer l'usage d'une variable non définie (fini les rm -rf \"$DOSIER/\" mal orthographiés qui deviennent rm -rf /) ; -o pipefail fait échouer un tube si une de ses commandes échoue."
+    },
+    {
+     "type": "text",
+     "body": "Le shebang (#!) indique quel interpréteur lancer : sans lui, le script dépend du shell de la personne qui l'exécute."
+    },
+    {
+     "type": "tip",
+     "body": "shellcheck (paquet du même nom) analyse vos scripts bien plus finement que ce labo : adoptez-le dans la CI."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "lx-7-1",
+     "type": "single",
+     "prompt": "Que fait set -u ?",
+     "choices": [
+      "Échoue si une variable non définie est utilisée",
+      "Passe en majuscules",
+      "Désactive les erreurs",
+      "Active le débogage"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Une faute de frappe dans un nom de variable devient une erreur visible."
+    },
+    {
+     "id": "lx-7-2",
+     "type": "single",
+     "prompt": "Sans pipefail, que vaut le code de retour de « false | true » ?",
+     "choices": [
+      "0 (succès)",
+      "1 (échec)",
+      "Erreur de syntaxe",
+      "Indéfini"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Seule la dernière commande compte… d'où pipefail."
+    },
+    {
+     "id": "lx-7-3",
+     "type": "single",
+     "prompt": "Rôle du shebang ?",
+     "choices": [
+      "Choisir l'interpréteur du script",
+      "Commenter",
+      "Rendre exécutable",
+      "Signer le script"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "#!/usr/bin/env bash trouve bash dans le PATH."
+    },
+    {
+     "id": "lx-7-4",
+     "type": "command",
+     "prompt": "Écrivez la ligne qui active le mode strict.",
+     "accepted": [
+      "set -euo pipefail",
+      "set -eu -o pipefail",
+      "set -Eeuo pipefail"
+     ],
+     "explanation": "À placer juste après le shebang."
+    }
+   ],
+   "lab": {
+    "kind": "shell",
+    "intro": "Ce script de déploiement continue même quand une étape échoue. Rendez-le robuste.",
+    "starter": "cd /srv/app\ngit pull\nnpm ci\nsystemctl restart app\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "Shebang présent",
+      "rule": "SH001"
+     },
+     {
+      "type": "noRule",
+      "label": "Mode strict activé",
+      "rule": "SH002"
+     },
+     {
+      "type": "noRule",
+      "label": "Plus de cd non vérifié",
+      "rule": "SH009"
+     },
+     {
+      "type": "valid",
+      "label": "Fichier valide"
+     }
+    ],
+    "hint": "Ajoutez le shebang puis set -euo pipefail : cd en échec arrêtera alors le script.",
+    "solution": "#!/usr/bin/env bash\nset -euo pipefail\ncd /srv/app\ngit pull\nnpm ci\nsystemctl restart app\n"
+   }
+  },
+  {
+   "id": "variables",
+   "title": "Variables, guillemets, conditions et boucles",
+   "minutes": 22,
+   "objectives": [
+    "Toujours protéger les expansions de variables",
+    "Écrire des conditions et des boucles lisibles"
+   ],
+   "sections": [
+    {
+     "type": "code",
+     "body": "nom=\"mon fichier.txt\"\nrm $nom      # supprime « mon » et « fichier.txt » !\nrm \"$nom\"    # supprime le bon fichier",
+     "caption": "Pourquoi les guillemets comptent"
+    },
+    {
+     "type": "code",
+     "body": "if [[ -f \"$cible\" ]]; then\n  echo \"existe\"\nfi\nfor f in \"$@\"; do\n  echo \"traitement de $f\"\ndone",
+     "caption": "Condition sur un fichier, boucle sur les arguments"
+    },
+    {
+     "type": "text",
+     "body": "\"${VAR:?message}\" arrête le script si VAR est vide ou absente : indispensable avant toute commande destructrice."
+    },
+    {
+     "type": "warning",
+     "body": "rm -rf \"$DOSSIER/\"* avec DOSSIER vide devient rm -rf /* : écrivez rm -rf -- \"${DOSSIER:?}/\"*."
+    },
+    {
+     "type": "tip",
+     "body": "$(commande) capture la sortie d'une commande ; préférez-le aux accents graves `commande`."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "lx-8-1",
+     "type": "single",
+     "prompt": "Pourquoi écrire \"$fichier\" plutôt que $fichier ?",
+     "choices": [
+      "Pour qu'un nom avec espaces reste un seul argument",
+      "Pour aller plus vite",
+      "C'est obligatoire en Bash 5",
+      "Pour masquer la valeur"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Sans guillemets, le shell découpe la valeur sur les espaces et interprète les jokers."
+    },
+    {
+     "id": "lx-8-2",
+     "type": "single",
+     "prompt": "Que fait \"${CIBLE:?}\" si CIBLE est vide ?",
+     "choices": [
+      "Le script s'arrête avec une erreur",
+      "Il vaut « / »",
+      "Il vaut « . »",
+      "Rien"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "C'est le garde-fou des commandes destructrices."
+    },
+    {
+     "id": "lx-8-3",
+     "type": "single",
+     "prompt": "Comment parcourir tous les arguments en respectant les espaces ?",
+     "choices": [
+      "for a in \"$@\"",
+      "for a in $*",
+      "for a in $@",
+      "for a in \"$*\""
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "\"$@\" conserve chaque argument intact."
+    },
+    {
+     "id": "lx-8-4",
+     "type": "single",
+     "prompt": "Quelle syntaxe de substitution de commande préférer ?",
+     "choices": [
+      "$(date +%F)",
+      "`date +%F`",
+      "${date +%F}",
+      "$[date]"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "$( ) s'imbrique et se lit mieux."
+    }
+   ],
+   "lab": {
+    "kind": "shell",
+    "intro": "Ce script de nettoyage peut effacer bien plus que prévu. Sécurisez-le.",
+    "starter": "#!/usr/bin/env bash\nset -euo pipefail\nCIBLE=$1\nfor f in $CIBLE/*.tmp; do\n  echo Suppression de $f\ndone\nrm -rf $CIBLE/cache\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "rm -rf protégé contre une variable vide",
+      "rule": "SH004"
+     },
+     {
+      "type": "noRule",
+      "label": "Toutes les variables entre guillemets",
+      "rule": "SH003"
+     },
+     {
+      "type": "noSeverity",
+      "label": "Aucun problème bloquant",
+      "severity": "blocking"
+     }
+    ],
+    "hint": "Entourez chaque $… de guillemets et utilisez \"${CIBLE:?}\" dans le rm.",
+    "solution": "#!/usr/bin/env bash\nset -euo pipefail\nCIBLE=\"${1:?dossier requis}\"\nfor f in \"$CIBLE\"/*.tmp; do\n  echo \"Suppression de $f\"\ndone\nrm -rf -- \"${CIBLE:?}/cache\"\n"
+   }
+  },
+  {
+   "id": "paquets-secrets",
+   "title": "Paquets, téléchargements et secrets",
+   "minutes": 18,
+   "objectives": [
+    "Installer des logiciels depuis une source de confiance",
+    "Ne jamais écrire un secret dans un script"
+   ],
+   "sections": [
+    {
+     "type": "code",
+     "body": "sudo apt update\nsudo apt install --no-install-recommends jq\napt list --upgradable\nsudo apt full-upgrade",
+     "caption": "Gestionnaire de paquets Debian/Ubuntu"
+    },
+    {
+     "type": "warning",
+     "body": "curl https://… | sh exécute un script distant sans que vous l'ayez lu ni vérifié : si le serveur est compromis, vous exécutez le code de l'attaquant avec vos droits."
+    },
+    {
+     "type": "code",
+     "body": "curl -fsSLo outil.tar.gz https://exemple.org/outil-1.4.2.tar.gz\necho \"<sha256 publié>  outil.tar.gz\" | sha256sum -c -",
+     "caption": "Télécharger, puis vérifier l'empreinte publiée avant d'utiliser"
+    },
+    {
+     "type": "text",
+     "body": "Un mot de passe ou un jeton écrit dans un script finit dans Git, dans les sauvegardes et dans l'historique du shell. Lisez-le depuis l'environnement ou un fichier en 600, et faites échouer le script s'il manque."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "lx-9-1",
+     "type": "single",
+     "prompt": "Pourquoi éviter curl … | sh ?",
+     "choices": [
+      "Le code distant s'exécute sans lecture ni vérification",
+      "C'est lent",
+      "curl ne gère pas HTTPS",
+      "sh n'existe pas"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Téléchargez, vérifiez, puis exécutez."
+    },
+    {
+     "id": "lx-9-2",
+     "type": "single",
+     "prompt": "Où ranger un jeton utilisé par un script ?",
+     "choices": [
+      "Variable d'environnement ou fichier protégé en 600",
+      "En clair dans le script",
+      "Dans le nom du fichier",
+      "Dans un commentaire"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Le script échoue proprement s'il est absent."
+    },
+    {
+     "id": "lx-9-3",
+     "type": "command",
+     "prompt": "Vérifiez l'empreinte SHA-256 décrite dans le fichier SHA256SUMS.",
+     "accepted": [
+      "sha256sum -c SHA256SUMS"
+     ],
+     "explanation": "Chaque ligne « empreinte  fichier » est comparée au fichier réel."
+    },
+    {
+     "id": "lx-9-4",
+     "type": "command",
+     "prompt": "Mettez à jour la liste des paquets disponibles.",
+     "accepted": [
+      "sudo apt update"
+     ],
+     "explanation": "À faire avant install ou upgrade."
+    }
+   ],
+   "lab": {
+    "kind": "shell",
+    "intro": "Ce script d'installation exécute un script distant et contient un jeton en clair. Corrigez les deux problèmes.",
+    "starter": "#!/usr/bin/env bash\nset -euo pipefail\nAPI_TOKEN=ghp_exempleNonValide1234\ncurl -fsSL https://exemple.org/install.sh | bash\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "Plus de curl | bash",
+      "rule": "SH005"
+     },
+     {
+      "type": "noRule",
+      "label": "Plus de secret en dur",
+      "rule": "SH010"
+     },
+     {
+      "type": "contains",
+      "label": "Empreinte vérifiée",
+      "text": "sha256sum -c"
+     },
+     {
+      "type": "noSeverity",
+      "label": "Aucun problème bloquant",
+      "severity": "blocking"
+     }
+    ],
+    "hint": "Lisez le jeton avec : \"${API_TOKEN:?}\" ; téléchargez install.sh dans un fichier et vérifiez-le avec sha256sum -c.",
+    "solution": "#!/usr/bin/env bash\nset -euo pipefail\n: \"${API_TOKEN:?variable API_TOKEN requise}\"\ncurl -fsSLo install.sh https://exemple.org/install.sh\nsha256sum -c install.sh.sha256\nbash install.sh\n"
+   }
+  },
+  {
+   "id": "ssh",
+   "title": "SSH : clés et durcissement du serveur",
+   "minutes": 25,
+   "objectives": [
+    "Se connecter avec une clé plutôt qu'un mot de passe",
+    "Durcir la configuration d'un serveur SSH"
+   ],
+   "sections": [
+    {
+     "type": "code",
+     "body": "ssh-keygen -t ed25519 -C \"ana@portable\"\nssh-copy-id deploy@serveur\nssh deploy@serveur",
+     "caption": "Créer une paire de clés, installer la clé publique, se connecter"
+    },
+    {
+     "type": "text",
+     "body": "La clé privée reste sur votre machine (protégée par une phrase de passe) ; seule la clé publique est copiée sur le serveur dans ~/.ssh/authorized_keys. Une clé ne se devine pas, contrairement à un mot de passe."
+    },
+    {
+     "type": "code",
+     "body": "PermitRootLogin no\nPasswordAuthentication no\nKbdInteractiveAuthentication no\nAllowUsers deploy\nMaxAuthTries 3",
+     "caption": "Extrait d'un /etc/ssh/sshd_config durci"
+    },
+    {
+     "type": "warning",
+     "body": "Avant de désactiver les mots de passe, vérifiez dans une SECONDE session que la connexion par clé fonctionne : sinon vous vous enfermez dehors. Testez la configuration avec sudo sshd -t avant de recharger."
+    },
+    {
+     "type": "tip",
+     "body": "~/.ssh/config évite de retaper les options : Host prod / HostName 203.0.113.10 / User deploy."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "lx-10-1",
+     "type": "single",
+     "prompt": "Que copie-t-on sur le serveur ?",
+     "choices": [
+      "La clé publique",
+      "La clé privée",
+      "Les deux",
+      "La phrase de passe"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "La clé privée ne quitte jamais votre machine."
+    },
+    {
+     "id": "lx-10-2",
+     "type": "single",
+     "prompt": "Quel type de clé recommander aujourd'hui ?",
+     "choices": [
+      "ed25519",
+      "dsa",
+      "rsa 1024",
+      "Aucune, le mot de passe suffit"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Courte, rapide et sûre."
+    },
+    {
+     "id": "lx-10-3",
+     "type": "single",
+     "prompt": "Avant de recharger sshd après modification, il faut…",
+     "choices": [
+      "Tester la syntaxe (sshd -t) et garder une session ouverte",
+      "Redémarrer la machine",
+      "Supprimer authorized_keys",
+      "Désactiver le pare-feu"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Une erreur de configuration peut couper l'accès distant."
+    },
+    {
+     "id": "lx-10-4",
+     "type": "command",
+     "prompt": "Générez une clé ed25519.",
+     "accepted": [
+      "ssh-keygen -t ed25519"
+     ],
+     "explanation": "Ajoutez -C pour un commentaire identifiant la machine."
+    }
+   ],
+   "lab": {
+    "kind": "sshd",
+    "intro": "Ce serveur accepte root et les mots de passe. Durcissez sa configuration.",
+    "starter": "Port 22\nPermitRootLogin yes\nPasswordAuthentication yes\nPermitEmptyPasswords yes\nX11Forwarding yes\nMaxAuthTries 10\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "root ne peut plus se connecter",
+      "rule": "SS001"
+     },
+     {
+      "type": "noRule",
+      "label": "Mots de passe désactivés",
+      "rule": "SS002"
+     },
+     {
+      "type": "noRule",
+      "label": "Pas de mot de passe vide",
+      "rule": "SS003"
+     },
+     {
+      "type": "noRule",
+      "label": "Essais limités",
+      "rule": "SS005"
+     },
+     {
+      "type": "noRule",
+      "label": "Utilisateurs autorisés listés",
+      "rule": "SS006"
+     },
+     {
+      "type": "valid",
+      "label": "Fichier valide"
+     }
+    ],
+    "hint": "Passez les directives à no, MaxAuthTries à 3 et ajoutez AllowUsers deploy.",
+    "solution": "Port 22\nPermitRootLogin no\nPasswordAuthentication no\nPermitEmptyPasswords no\nX11Forwarding no\nMaxAuthTries 3\nAllowUsers deploy\n"
+   }
+  }
+ ],
+ "project": {
+  "title": "Script de sauvegarde digne de la production",
+  "brief": "Écrivez le script qui archive chaque nuit un dossier d'application : robuste aux erreurs, sans secret, sans suppression dangereuse.",
+  "lab": {
+   "kind": "shell",
+   "intro": "Objectif : aucun problème bloquant ni avertissement, mode strict, garde-fous sur les variables.",
+   "starter": "SOURCE=$1\nDEST=/sauvegardes\ncd $DEST\nPASSWORD=s3cretSauvegarde\ntar -czf sauvegarde.tar.gz $SOURCE\nrm -rf $DEST/ancienne\nchmod 777 sauvegarde.tar.gz\n",
+   "goals": [
+    {
+     "type": "noSeverity",
+     "label": "Aucun problème bloquant",
+     "severity": "blocking"
+    },
+    {
+     "type": "noSeverity",
+     "label": "Aucun avertissement",
+     "severity": "warning"
+    },
+    {
+     "type": "contains",
+     "label": "Mode strict",
+     "text": "set -euo pipefail"
+    },
+    {
+     "type": "contains",
+     "label": "Variables obligatoires vérifiées",
+     "text": ":?"
+    },
+    {
+     "type": "contains",
+     "label": "Archive privée (600)",
+     "text": "chmod 600"
+    }
+   ],
+   "hint": "Reprenez les labos du module : shebang, mode strict, guillemets, ${VAR:?}, secret lu depuis l'environnement, droits minimaux.",
+   "solution": "#!/usr/bin/env bash\nset -euo pipefail\nSOURCE=\"${1:?dossier source requis}\"\nDEST=\"${DEST:-/sauvegardes}\"\n: \"${PASSWORD:?variable PASSWORD requise}\"\narchive=\"$DEST/sauvegarde-$(date +%F).tar.gz\"\ntar -czf \"$archive\" -C \"$SOURCE\" .\nchmod 600 \"$archive\"\nrm -rf -- \"${DEST:?}/ancienne\"\n"
+  },
+  "rubric": [
+   {
+    "criterion": "Robustesse",
+    "levels": [
+     "Continue après une erreur",
+     "set -euo pipefail",
+     "Mode strict et codes de retour vérifiés, messages clairs"
+    ]
+   },
+   {
+    "criterion": "Variables",
+    "levels": [
+     "Expansions non protégées",
+     "Guillemets partout",
+     "Guillemets et ${VAR:?} avant toute action destructrice"
+    ]
+   },
+   {
+    "criterion": "Secrets",
+    "levels": [
+     "Secret dans le script",
+     "Lu depuis l'environnement",
+     "Lu depuis l'environnement ou un fichier 600, absent des journaux"
+    ]
+   },
+   {
+    "criterion": "Droits",
+    "levels": [
+     "chmod 777",
+     "Droits adaptés",
+     "Moindre privilège (600 pour les archives) et compte dédié"
+    ]
+   },
+   {
+    "criterion": "Exploitation",
+    "levels": [
+     "Aucune trace",
+     "Journal de sortie",
+     "Journal, rotation des archives et test de restauration documenté"
+    ]
+   }
+  ]
+ },
+ "glossary": [
+  {
+   "term": "Shell",
+   "definition": "Programme qui interprète les commandes (Bash, Zsh)."
+  },
+  {
+   "term": "Chemin absolu",
+   "definition": "Chemin qui commence à la racine « / »."
+  },
+  {
+   "term": "Permissions",
+   "definition": "Droits lecture (r), écriture (w), exécution (x) pour propriétaire, groupe, autres."
+  },
+  {
+   "term": "root",
+   "definition": "Super-utilisateur qui a tous les droits."
+  },
+  {
+   "term": "sudo",
+   "definition": "Exécute une commande avec d'autres droits, de façon journalisée."
+  },
+  {
+   "term": "Processus",
+   "definition": "Programme en cours d'exécution, identifié par un PID."
+  },
+  {
+   "term": "Signal",
+   "definition": "Message envoyé à un processus (SIGTERM, SIGKILL)."
+  },
+  {
+   "term": "systemd",
+   "definition": "Gestionnaire de services et de démarrage de la plupart des distributions."
+  },
+  {
+   "term": "Tube (pipe)",
+   "definition": "Branchement de la sortie d'une commande sur l'entrée d'une autre."
+  },
+  {
+   "term": "Mode strict",
+   "definition": "set -euo pipefail en tête de script."
+  },
+  {
+   "term": "Shebang",
+   "definition": "Première ligne #! qui choisit l'interpréteur."
+  },
+  {
+   "term": "Clé SSH",
+   "definition": "Paire publique/privée pour s'authentifier sans mot de passe."
+  },
+  {
+   "term": "sshd_config",
+   "definition": "Fichier de configuration du serveur SSH."
+  }
+ ]
+}

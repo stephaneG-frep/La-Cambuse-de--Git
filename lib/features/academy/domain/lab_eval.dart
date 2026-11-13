@@ -11,7 +11,7 @@ class LabResult {
 }
 
 LabResult evaluateLab(FileLab lab, String content) {
-  final findings = lab.kind == 'dockerfile' ? lintDockerfile(content) : lintCompose(content);
+  final findings = lintLabFile(lab.kind, content);
   final rules = findings.map((f) => f.rule).toSet();
   bool met(LabGoal g) => switch (g.type) {
         'noRule' => !rules.contains(g.params['rule']),
@@ -22,7 +22,7 @@ LabResult evaluateLab(FileLab lab, String content) {
             parseDockerfile(content).any((i) => i.keyword == (g.params['keyword'] as String).toUpperCase()),
         'stages' => lab.kind == 'dockerfile' &&
             parseDockerfile(content).where((i) => i.keyword == 'FROM').length >= (g.params['min'] as int),
-        'valid' => !rules.contains('DF000') && !rules.contains('DC000'),
+        'valid' => !lintInvalid(findings),
         _ => false,
       };
   return LabResult(findings, [for (final g in lab.goals) met(g)]);

@@ -186,7 +186,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get academySubtitle =>
-      'Chaque île est un module. Les îles en brume arriveront dans une phase ultérieure.';
+      'Chaque île est un module, du terminal Linux jusqu\'au SRE. Tout est disponible hors ligne ; les prérequis sont des conseils, pas des verrous.';
 
   @override
   String get academySearch => 'Rechercher';
@@ -1163,7 +1163,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get labStatic =>
-      'Labo hors ligne : le fichier est analysé, aucun conteneur n\'est lancé.';
+      'Labo hors ligne : le fichier est analysé, rien n\'est exécuté (aucun conteneur, script ni cluster).';
 
   @override
   String get labAnalyze => 'Analyser';

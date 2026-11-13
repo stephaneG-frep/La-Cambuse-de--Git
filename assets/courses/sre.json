@@ -1,0 +1,1191 @@
+{
+ "id": "sre",
+ "version": 1,
+ "title": "Observabilité, sécurité et SRE, la vigie",
+ "summary": "Métriques, journaux et traces, alertes utiles, runbooks, SLO et budget d'erreur, incidents, chaîne d'approvisionnement et vulnérabilités.",
+ "objectives": [
+  "Instrumenter et observer un service",
+  "Écrire des alertes actionnables liées aux SLO",
+  "Conduire un incident et en tirer des leçons",
+  "Sécuriser la chaîne d'approvisionnement et la CI"
+ ],
+ "prerequisites": [
+  "Module Terraform et Ansible"
+ ],
+ "lessons": [
+  {
+   "id": "observabilite",
+   "title": "Observabilité : métriques, journaux, traces",
+   "minutes": 18,
+   "objectives": [
+    "Distinguer les trois signaux",
+    "Comprendre la différence entre surveiller et observer"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Les métriques sont des nombres dans le temps (requêtes par seconde, latence, mémoire) : peu coûteuses, idéales pour alerter. Les journaux racontent des événements précis. Les traces suivent une requête à travers plusieurs services."
+    },
+    {
+     "type": "text",
+     "body": "Surveiller, c'est vérifier des problèmes connus d'avance. Observer, c'est pouvoir répondre à des questions qu'on ne s'était pas posées, en croisant les signaux pendant un incident."
+    },
+    {
+     "type": "text",
+     "body": "OpenTelemetry est le standard ouvert pour produire ces trois signaux depuis le code, quel que soit l'outil de stockage (Prometheus, Loki, Tempo, Jaeger, services commerciaux)."
+    },
+    {
+     "type": "tip",
+     "body": "Commencez par les « signaux dorés » : latence, trafic, erreurs, saturation."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "sr-1-1",
+     "type": "single",
+     "prompt": "Signal le plus adapté pour déclencher une alerte ?",
+     "choices": [
+      "Les métriques",
+      "Les traces uniquement",
+      "Les captures d'écran",
+      "Les tickets"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Peu coûteuses et agrégeables."
+    },
+    {
+     "id": "sr-1-2",
+     "type": "single",
+     "prompt": "À quoi sert une trace distribuée ?",
+     "choices": [
+      "Suivre une requête à travers plusieurs services",
+      "Compter les requêtes",
+      "Stocker les mots de passe",
+      "Remplacer les tests"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Elle montre où le temps est passé."
+    },
+    {
+     "id": "sr-1-3",
+     "type": "single",
+     "prompt": "Quels sont les signaux dorés ?",
+     "choices": [
+      "Latence, trafic, erreurs, saturation",
+      "CPU, RAM, disque, réseau uniquement",
+      "Commits, PR, tickets, releases",
+      "Aucun"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Point de départ d'un tableau de bord utile."
+    },
+    {
+     "id": "sr-1-4",
+     "type": "single",
+     "prompt": "OpenTelemetry est…",
+     "choices": [
+      "Un standard ouvert pour produire métriques, journaux et traces",
+      "Une base de données",
+      "Un fournisseur cloud",
+      "Un langage"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Il évite d'être lié à un outil."
+    }
+   ]
+  },
+  {
+   "id": "prometheus",
+   "title": "Métriques avec Prometheus",
+   "minutes": 22,
+   "objectives": [
+    "Connaître les types de métriques",
+    "Écrire des requêtes PromQL simples"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Prometheus collecte (scrape) régulièrement les métriques exposées en texte par chaque service sur /metrics. Types : counter (ne fait qu'augmenter), gauge (monte et descend), histogram (répartition, ex. latences)."
+    },
+    {
+     "type": "code",
+     "body": "rate(http_requests_total[5m])\nsum by (code) (rate(http_requests_total[5m]))\nhistogram_quantile(0.95, sum by (le) (rate(http_request_duration_seconds_bucket[5m])))",
+     "caption": "Débit, débit par code, latence au 95e centile"
+    },
+    {
+     "type": "text",
+     "body": "Méthode RED pour un service : Rate (débit), Errors (erreurs), Duration (durée). Méthode USE pour une ressource : Utilisation, Saturation, Erreurs."
+    },
+    {
+     "type": "warning",
+     "body": "Un label à forte cardinalité (identifiant d'utilisateur, URL complète) multiplie les séries et peut faire tomber Prometheus."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "sr-2-1",
+     "type": "single",
+     "prompt": "Type de métrique qui ne fait qu'augmenter ?",
+     "choices": [
+      "Counter",
+      "Gauge",
+      "Histogram",
+      "Summary"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "On en calcule le taux avec rate()."
+    },
+    {
+     "id": "sr-2-2",
+     "type": "single",
+     "prompt": "Que calcule rate(x[5m]) ?",
+     "choices": [
+      "Le taux moyen par seconde sur 5 minutes",
+      "La valeur maximale",
+      "Le total depuis le démarrage",
+      "La médiane"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "À appliquer aux counters."
+    },
+    {
+     "id": "sr-2-3",
+     "type": "single",
+     "prompt": "Pourquoi éviter un label user_id ?",
+     "choices": [
+      "Il crée une série par utilisateur (cardinalité explosive)",
+      "Il est illégal",
+      "Il est lent à écrire",
+      "Aucun problème"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Les identifiants vont dans les journaux ou traces."
+    },
+    {
+     "id": "sr-2-4",
+     "type": "single",
+     "prompt": "La méthode RED mesure…",
+     "choices": [
+      "Débit, erreurs, durée",
+      "RAM, ethernet, disque",
+      "Release, environnement, déploiement",
+      "Rien"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Pour les services orientés requêtes."
+    }
+   ]
+  },
+  {
+   "id": "alertes",
+   "title": "Alerter sur les symptômes",
+   "minutes": 20,
+   "objectives": [
+    "Écrire une règle d'alerte utile",
+    "Réduire le bruit avec la durée et la sévérité"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Une bonne alerte signale un symptôme ressenti par les utilisateurs (erreurs, lenteur), est actionnable et urgente. Le reste (CPU à 80 % sans impact) va dans un tableau de bord ou un ticket."
+    },
+    {
+     "type": "code",
+     "body": "groups:\n  - name: api\n    rules:\n      - alert: ApiErreurs5xx\n        expr: sum(rate(http_requests_total{code=~\"5..\"}[5m])) / sum(rate(http_requests_total[5m])) > 0.05\n        for: 10m\n        labels:\n          severity: page\n        annotations:\n          summary: \"ApiErreurs5xx : seuil dépassé\"\n          runbook_url: https://wiki.exemple.org/runbooks/apierreurs5xx\n",
+     "caption": "Règle d'alerte Prometheus complète"
+    },
+    {
+     "type": "text",
+     "body": "for: 10m exige que la condition dure 10 minutes avant d'alerter : une pointe passagère ne réveille personne. labels.severity permet à Alertmanager de router (page la nuit, ticket le jour)."
+    },
+    {
+     "type": "warning",
+     "body": "Une équipe noyée sous les alertes finit par toutes les ignorer, y compris la bonne."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "sr-3-1",
+     "type": "single",
+     "prompt": "Une bonne alerte est…",
+     "choices": [
+      "Basée sur un symptôme, actionnable et urgente",
+      "Déclenchée à chaque pointe de CPU",
+      "Envoyée à tout le monde",
+      "Silencieuse"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Sinon, tableau de bord ou ticket."
+    },
+    {
+     "id": "sr-3-2",
+     "type": "single",
+     "prompt": "Rôle de for: 10m ?",
+     "choices": [
+      "N'alerter que si la condition dure 10 minutes",
+      "Répéter 10 fois",
+      "Attendre 10 minutes après résolution",
+      "Limiter à 10 alertes"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Filtre les faux positifs."
+    },
+    {
+     "id": "sr-3-3",
+     "type": "single",
+     "prompt": "À quoi sert labels.severity ?",
+     "choices": [
+      "Router l'alerte (astreinte, ticket…)",
+      "Chiffrer l'alerte",
+      "Changer la couleur",
+      "Rien"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Alertmanager s'appuie dessus."
+    },
+    {
+     "id": "sr-3-4",
+     "type": "single",
+     "prompt": "Risque de trop d'alertes ?",
+     "choices": [
+      "Elles finissent toutes ignorées",
+      "Aucun",
+      "Prometheus s'arrête",
+      "Les métriques disparaissent"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "La fatigue d'alerte est dangereuse."
+    }
+   ],
+   "lab": {
+    "kind": "alerts",
+    "intro": "Cette alerte se déclenche à la moindre pointe et ne peut pas être routée. Corrigez-la.",
+    "starter": "groups:\n  - name: api\n    rules:\n      - alert: ApiErreurs5xx\n        expr: sum(rate(http_requests_total{code=~\"5..\"}[5m])) / sum(rate(http_requests_total[5m])) > 0.05\n        annotations:\n          summary: \"ApiErreurs5xx : seuil dépassé\"\n          runbook_url: https://wiki.exemple.org/runbooks/apierreurs5xx\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "Durée minimale (for)",
+      "rule": "PR001"
+     },
+     {
+      "type": "noRule",
+      "label": "Sévérité définie",
+      "rule": "PR002"
+     },
+     {
+      "type": "valid",
+      "label": "Fichier valide"
+     }
+    ],
+    "hint": "Ajoutez for: 10m et labels: { severity: page }.",
+    "solution": "groups:\n  - name: api\n    rules:\n      - alert: ApiErreurs5xx\n        expr: sum(rate(http_requests_total{code=~\"5..\"}[5m])) / sum(rate(http_requests_total[5m])) > 0.05\n        for: 10m\n        labels:\n          severity: page\n        annotations:\n          summary: \"ApiErreurs5xx : seuil dépassé\"\n          runbook_url: https://wiki.exemple.org/runbooks/apierreurs5xx\n"
+   }
+  },
+  {
+   "id": "astreinte",
+   "title": "Runbooks et astreinte",
+   "minutes": 18,
+   "objectives": [
+    "Rédiger un runbook utile",
+    "Organiser une astreinte soutenable"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Un runbook dit à la personne réveillée à 3 h ce que signifie l'alerte, comment vérifier l'impact, quelles actions tenter et qui appeler. Chaque alerte pointe vers le sien (annotation runbook_url)."
+    },
+    {
+     "type": "code",
+     "body": "## ApiErreurs5xx\nImpact : les clients voient des erreurs.\nVérifier : tableau de bord API, derniers déploiements.\nActions : 1) rollback si déploiement < 1 h  2) …\nEscalade : équipe base de données si erreurs de connexion.",
+     "caption": "Squelette de runbook"
+    },
+    {
+     "type": "text",
+     "body": "Une astreinte soutenable : rotations courtes, relais clair, temps de récupération après une nuit agitée, et chaque alerte inutile supprimée ou corrigée."
+    },
+    {
+     "type": "tip",
+     "body": "Si une action du runbook est toujours la même, automatisez-la."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "sr-4-1",
+     "type": "single",
+     "prompt": "Que doit contenir un runbook ?",
+     "choices": [
+      "Signification, vérifications, actions, escalade",
+      "Le code source",
+      "Les mots de passe",
+      "L'historique Git"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Ce dont on a besoin en pleine nuit."
+    },
+    {
+     "id": "sr-4-2",
+     "type": "single",
+     "prompt": "Comment relier une alerte à son runbook ?",
+     "choices": [
+      "Annotation runbook_url",
+      "Un commentaire YAML",
+      "Le nom du fichier",
+      "Impossible"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Le lien apparaît dans la notification."
+    },
+    {
+     "id": "sr-4-3",
+     "type": "single",
+     "prompt": "Une alerte qui réveille sans action possible…",
+     "choices": [
+      "Doit être corrigée ou supprimée",
+      "Est normale",
+      "Doit être doublée",
+      "Doit être ignorée"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Une alerte inutile use l'équipe d'astreinte."
+    },
+    {
+     "id": "sr-4-4",
+     "type": "single",
+     "prompt": "Action de runbook toujours identique ?",
+     "choices": [
+      "L'automatiser",
+      "La garder manuelle",
+      "La supprimer",
+      "La cacher"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Moins d'interventions humaines."
+    }
+   ],
+   "lab": {
+    "kind": "alerts",
+    "intro": "Ces alertes ne disent rien à la personne d'astreinte. Ajoutez résumé et runbook.",
+    "starter": "groups:\n  - name: api\n    rules:\n      - alert: ApiLente\n        expr: histogram_quantile(0.95, sum by (le) (rate(http_request_duration_seconds_bucket[5m]))) > 1\n        for: 10m\n        labels:\n          severity: page\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "Résumé présent",
+      "rule": "PR003"
+     },
+     {
+      "type": "noRule",
+      "label": "Runbook lié",
+      "rule": "PR004"
+     },
+     {
+      "type": "valid",
+      "label": "Fichier valide"
+     }
+    ],
+    "hint": "Ajoutez annotations: summary et runbook_url.",
+    "solution": "groups:\n  - name: api\n    rules:\n      - alert: ApiLente\n        expr: histogram_quantile(0.95, sum by (le) (rate(http_request_duration_seconds_bucket[5m]))) > 1\n        for: 10m\n        labels:\n          severity: page\n        annotations:\n          summary: \"ApiLente : seuil dépassé\"\n          runbook_url: https://wiki.exemple.org/runbooks/apilente\n"
+   }
+  },
+  {
+   "id": "journaux-traces",
+   "title": "Journaux structurés et traces",
+   "minutes": 18,
+   "objectives": [
+    "Écrire des journaux exploitables",
+    "Relier journaux et traces"
+   ],
+   "sections": [
+    {
+     "type": "code",
+     "body": "{\"ts\":\"2026-11-13T10:42:01Z\",\"niveau\":\"error\",\"message\":\"paiement refusé\",\"commande\":\"C-1842\",\"trace_id\":\"4bf92f3577b34da6\"}",
+     "caption": "Journal structuré (JSON) avec identifiant de trace"
+    },
+    {
+     "type": "text",
+     "body": "Des journaux structurés se filtrent et s'agrègent (toutes les erreurs de paiement de la dernière heure) ; du texte libre se lit, mais se requête mal. Le trace_id relie un journal à la trace complète de la requête."
+    },
+    {
+     "type": "warning",
+     "body": "Jamais de mot de passe, jeton, numéro de carte ou donnée personnelle superflue dans les journaux : ils sont copiés, conservés et consultés largement."
+    },
+    {
+     "type": "tip",
+     "body": "Fixez une durée de conservation : des journaux gardés indéfiniment coûtent cher et augmentent le risque en cas de fuite."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "sr-5-1",
+     "type": "single",
+     "prompt": "Avantage d'un journal structuré ?",
+     "choices": [
+      "Il se filtre et s'agrège facilement",
+      "Il est plus joli",
+      "Il est chiffré",
+      "Il est plus court"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Champs nommés plutôt que phrases."
+    },
+    {
+     "id": "sr-5-2",
+     "type": "single",
+     "prompt": "À quoi sert le trace_id dans un journal ?",
+     "choices": [
+      "Relier le journal à la trace complète de la requête",
+      "Chiffrer le journal",
+      "Compter les lignes",
+      "Identifier l'utilisateur"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Corrélation des signaux."
+    },
+    {
+     "id": "sr-5-3",
+     "type": "single",
+     "prompt": "Que ne jamais écrire dans un journal ?",
+     "choices": [
+      "Mots de passe, jetons, numéros de carte",
+      "Le niveau",
+      "L'horodatage",
+      "Le nom du service"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Les journaux circulent largement."
+    },
+    {
+     "id": "sr-5-4",
+     "type": "single",
+     "prompt": "Pourquoi limiter la conservation des journaux ?",
+     "choices": [
+      "Coût et risque en cas de fuite",
+      "Obligatoire pour JSON",
+      "Accélérer l'application",
+      "Aucune raison"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Et le RGPD impose la minimisation."
+    }
+   ]
+  },
+  {
+   "id": "slo",
+   "title": "SLI, SLO et budget d'erreur",
+   "minutes": 22,
+   "objectives": [
+    "Définir un objectif de fiabilité mesurable",
+    "Utiliser le budget d'erreur pour arbitrer"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "SLI : un indicateur mesuré (part des requêtes réussies en moins de 300 ms). SLO : l'objectif (99,9 % sur 30 jours). SLA : l'engagement contractuel, plus faible que le SLO."
+    },
+    {
+     "type": "text",
+     "body": "99,9 % sur 30 jours laisse environ 43 minutes d'indisponibilité : c'est le budget d'erreur. Tant qu'il reste du budget, on livre ; s'il est épuisé, on privilégie la fiabilité."
+    },
+    {
+     "type": "code",
+     "body": "# Taux de consommation du budget sur 1 h, alerte si > 14,4 (budget mensuel épuisé en ~2 jours)\n(sum(rate(http_requests_total{code=~\"5..\"}[1h])) / sum(rate(http_requests_total[1h]))) / 0.001 > 14.4",
+     "caption": "Alerte sur le taux de consommation du budget"
+    },
+    {
+     "type": "tip",
+     "body": "100 % n'est pas un objectif : il interdit tout changement et coûte infiniment cher."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "sr-6-1",
+     "type": "single",
+     "prompt": "Différence SLO / SLA ?",
+     "choices": [
+      "Le SLO est l'objectif interne, le SLA l'engagement contractuel",
+      "Aucune",
+      "Le SLA est plus strict",
+      "Le SLO est un indicateur"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Le SLA laisse une marge."
+    },
+    {
+     "id": "sr-6-2",
+     "type": "single",
+     "prompt": "Budget d'erreur de 99,9 % sur 30 jours ?",
+     "choices": [
+      "Environ 43 minutes",
+      "Environ 4 heures",
+      "Environ 4 secondes",
+      "Aucun"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "0,1 % de 43 200 minutes."
+    },
+    {
+     "id": "sr-6-3",
+     "type": "single",
+     "prompt": "Budget épuisé : que faire ?",
+     "choices": [
+      "Prioriser la fiabilité avant les nouveautés",
+      "Livrer plus",
+      "Supprimer le SLO",
+      "Rien"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "C'est l'outil d'arbitrage."
+    },
+    {
+     "id": "sr-6-4",
+     "type": "single",
+     "prompt": "Pourquoi ne pas viser 100 % ?",
+     "choices": [
+      "Coût infini et aucun changement possible",
+      "C'est trop facile",
+      "Prometheus ne le gère pas",
+      "C'est la norme"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Les utilisateurs ne perçoivent pas la différence."
+    }
+   ],
+   "lab": {
+    "kind": "alerts",
+    "intro": "Cette alerte de SLO n'a pas d'expression. Écrivez une alerte de consommation du budget d'erreur.",
+    "starter": "groups:\n  - name: api\n    rules:\n      - alert: BudgetErreurRapide\n        expr: \"\"\n        for: 5m\n        labels:\n          severity: page\n        annotations:\n          summary: \"Le budget d'erreur se consomme trop vite\"\n          runbook_url: https://wiki.exemple.org/runbooks/budget\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "Expression présente",
+      "rule": "PR005"
+     },
+     {
+      "type": "contains",
+      "label": "Taux calculé sur les requêtes",
+      "text": "rate("
+     },
+     {
+      "type": "valid",
+      "label": "Fichier valide"
+     }
+    ],
+    "hint": "Utilisez le ratio d'erreurs sur 1 h divisé par 0.001 (SLO 99,9 %), comparé à 14.4.",
+    "solution": "groups:\n  - name: api\n    rules:\n      - alert: BudgetErreurRapide\n        expr: (sum(rate(http_requests_total{code=~\"5..\"}[1h])) / sum(rate(http_requests_total[1h]))) / 0.001 > 14.4\n        for: 5m\n        labels:\n          severity: page\n        annotations:\n          summary: \"Le budget d'erreur se consomme trop vite\"\n          runbook_url: https://wiki.exemple.org/runbooks/budget\n"
+   }
+  },
+  {
+   "id": "incidents",
+   "title": "Incidents et post-mortems sans blâme",
+   "minutes": 18,
+   "objectives": [
+    "Conduire un incident avec des rôles clairs",
+    "Apprendre d'un incident sans chercher de coupable"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Pendant un incident : un responsable coordonne (il ne débogue pas), une personne communique, les autres enquêtent. Priorité : restaurer le service (rollback, bascule), comprendre ensuite."
+    },
+    {
+     "type": "text",
+     "body": "Le post-mortem raconte la chronologie, l'impact, les causes (souvent plusieurs), ce qui a bien marché et des actions concrètes avec un responsable et une date."
+    },
+    {
+     "type": "text",
+     "body": "« Sans blâme » ne veut pas dire sans responsabilité : on cherche pourquoi le système a permis l'erreur, car une personne punie cache la prochaine erreur au lieu de la signaler."
+    },
+    {
+     "type": "tip",
+     "body": "Notez les horodatages au fil de l'eau pendant l'incident : la chronologie sera bien plus fiable."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "sr-7-1",
+     "type": "single",
+     "prompt": "Priorité pendant un incident ?",
+     "choices": [
+      "Restaurer le service",
+      "Trouver le coupable",
+      "Écrire le post-mortem",
+      "Réécrire le code"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Comprendre vient après."
+    },
+    {
+     "id": "sr-7-2",
+     "type": "single",
+     "prompt": "Rôle du responsable d'incident ?",
+     "choices": [
+      "Coordonner, pas déboguer",
+      "Corriger seul le bug",
+      "Communiquer à la presse",
+      "Attendre"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Il garde la vue d'ensemble."
+    },
+    {
+     "id": "sr-7-3",
+     "type": "single",
+     "prompt": "Pourquoi « sans blâme » ?",
+     "choices": [
+      "Pour que les erreurs soient signalées et corrigées dans le système",
+      "Pour éviter de documenter",
+      "Pour aller plus vite",
+      "Par politesse"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "La peur cache les problèmes."
+    },
+    {
+     "id": "sr-7-4",
+     "type": "single",
+     "prompt": "Une action de post-mortem doit avoir…",
+     "choices": [
+      "Un responsable et une échéance",
+      "Un coupable",
+      "Un emoji",
+      "Aucun suivi"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Sinon elle n'arrive jamais."
+    }
+   ]
+  },
+  {
+   "id": "supply-chain",
+   "title": "Chaîne d'approvisionnement logicielle",
+   "minutes": 22,
+   "objectives": [
+    "Identifier les maillons à risque",
+    "Épingler, inventorier et vérifier ses dépendances"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Votre logiciel embarque des centaines de dépendances, des images de base, des actions de CI et des outils de build. Un seul maillon compromis (paquet piégé, compte de mainteneur volé) touche tous ses utilisateurs."
+    },
+    {
+     "type": "text",
+     "body": "Défenses : épingler (fichiers de verrouillage, versions, empreintes), inventorier (SBOM CycloneDX ou SPDX), analyser (osv-scanner, trivy, Dependabot), vérifier l'origine (signatures Sigstore/cosign, attestations SLSA)."
+    },
+    {
+     "type": "code",
+     "body": "osv-scanner --lockfile=package-lock.json\ntrivy image ghcr.io/exemple/api:1.4.0\ncosign verify ghcr.io/exemple/api:1.4.0 --certificate-identity-regexp '.*' --certificate-oidc-issuer https://token.actions.githubusercontent.com",
+     "caption": "Analyser les dépendances, une image, vérifier une signature"
+    },
+    {
+     "type": "warning",
+     "body": "Une image de base non épinglée (node:latest) change sous vos pieds : vous livrez du code que vous n'avez jamais testé."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "sr-8-1",
+     "type": "single",
+     "prompt": "Qu'est-ce qu'un SBOM ?",
+     "choices": [
+      "L'inventaire des composants d'un logiciel",
+      "Un pare-feu",
+      "Un test unitaire",
+      "Un certificat TLS"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "CycloneDX et SPDX sont les formats courants."
+    },
+    {
+     "id": "sr-8-2",
+     "type": "single",
+     "prompt": "À quoi sert cosign ?",
+     "choices": [
+      "Signer et vérifier des images ou artefacts",
+      "Compresser des images",
+      "Scanner des ports",
+      "Gérer des secrets"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "cosign fait partie du projet Sigstore."
+    },
+    {
+     "id": "sr-8-3",
+     "type": "single",
+     "prompt": "Pourquoi versionner les fichiers de verrouillage ?",
+     "choices": [
+      "Installer exactement les mêmes versions partout",
+      "Pour la licence",
+      "Pour le style",
+      "Ce n'est pas utile"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Première défense contre les surprises."
+    },
+    {
+     "id": "sr-8-4",
+     "type": "single",
+     "prompt": "Un mainteneur de dépendance se fait voler son compte. Risque ?",
+     "choices": [
+      "Une version piégée touche tous les utilisateurs non épinglés",
+      "Aucun",
+      "Seulement pour lui",
+      "Le dépôt devient privé"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "D'où épinglage et vérification."
+    }
+   ],
+   "lab": {
+    "kind": "dockerfile",
+    "intro": "Cette image part d'une base mobile et tourne en root. Épinglez la base et passez en utilisateur non privilégié.",
+    "starter": "FROM node:latest\nWORKDIR /app\nCOPY package*.json ./\nRUN npm ci --omit=dev\nCOPY . .\nCMD [\"node\", \"server.js\"]\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "Image de base épinglée",
+      "rule": "DF001"
+     },
+     {
+      "type": "noRule",
+      "label": "Utilisateur non root",
+      "rule": "DF002"
+     },
+     {
+      "type": "valid",
+      "label": "Fichier valide"
+     }
+    ],
+    "hint": "Utilisez node:22.11-slim (ou un digest @sha256:… obtenu avec docker buildx imagetools inspect) et ajoutez USER node.",
+    "solution": "FROM node:22.11-slim\nWORKDIR /app\nCOPY package*.json ./\nRUN npm ci --omit=dev\nCOPY . .\nUSER node\nCMD [\"node\", \"server.js\"]\n"
+   }
+  },
+  {
+   "id": "ci-securisee",
+   "title": "Sécuriser la CI elle-même",
+   "minutes": 20,
+   "objectives": [
+    "Traiter la CI comme une cible",
+    "Ajouter une analyse de secrets à chaque PR"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "La CI détient des secrets de déploiement et peut publier des artefacts : c'est une cible de choix. Moindre privilège, actions épinglées, aucune donnée tierce injectée, secrets réservés aux environnements protégés."
+    },
+    {
+     "type": "text",
+     "body": "Une analyse de secrets (gitleaks, détection de secrets GitLab) sur chaque PR attrape un jeton avant qu'il n'atteigne la branche principale."
+    },
+    {
+     "type": "code",
+     "body": "secrets:\n  runs-on: ubuntu-24.04\n  timeout-minutes: 10\n  steps:\n    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2\n      with:\n        fetch-depth: 0\n        persist-credentials: false\n    - uses: gitleaks/gitleaks-action@83373cf2f8c4db6e24b41c1a9b086bb9619e9cd3 # v2.3.7",
+     "caption": "Job d'analyse de secrets épinglé"
+    },
+    {
+     "type": "tip",
+     "body": "Activez aussi la protection contre le push de secrets proposée par la forge (push protection)."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "sr-9-1",
+     "type": "single",
+     "prompt": "Pourquoi la CI est-elle une cible ?",
+     "choices": [
+      "Elle détient des secrets et publie des artefacts",
+      "Elle est lente",
+      "Elle est publique",
+      "Elle n'a pas de mot de passe"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "La compromettre, c'est compromettre la production."
+    },
+    {
+     "id": "sr-9-2",
+     "type": "single",
+     "prompt": "Quand analyser les secrets ?",
+     "choices": [
+      "À chaque PR, avant la fusion",
+      "Une fois par an",
+      "Après la release",
+      "Jamais"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Le plus tôt possible."
+    },
+    {
+     "id": "sr-9-3",
+     "type": "single",
+     "prompt": "Pourquoi fetch-depth: 0 pour gitleaks ?",
+     "choices": [
+      "Analyser tout l'historique, pas seulement le dernier commit",
+      "Accélérer",
+      "Réduire la taille",
+      "Obligatoire pour checkout"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Un secret peut être dans un commit antérieur."
+    },
+    {
+     "id": "sr-9-4",
+     "type": "single",
+     "prompt": "La push protection…",
+     "choices": [
+      "Bloque un push contenant un secret reconnu",
+      "Bloque tous les push",
+      "Chiffre le dépôt",
+      "Remplace la CI"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Un filet de plus côté forge."
+    }
+   ],
+   "lab": {
+    "kind": "workflow",
+    "intro": "Ce workflow d'analyse de secrets a lui-même des failles : actions mobiles et droits totaux. Corrigez-le.",
+    "starter": "name: Secrets\non:\n  pull_request:\npermissions: write-all\njobs:\n  secrets:\n    runs-on: ubuntu-24.04\n    timeout-minutes: 10\n    steps:\n      - uses: actions/checkout@v4\n        with:\n          fetch-depth: 0\n          persist-credentials: false\n      - uses: gitleaks/gitleaks-action@v2\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "Actions épinglées par empreinte",
+      "rule": "GH001"
+     },
+     {
+      "type": "noRule",
+      "label": "Plus de write-all",
+      "rule": "GH003"
+     },
+     {
+      "type": "valid",
+      "label": "Fichier valide"
+     }
+    ],
+    "hint": "permissions: contents: read ; checkout@11bd71901bbe5b1630ceea73d27597364c9af683 ; gitleaks-action@83373cf2f8c4db6e24b41c1a9b086bb9619e9cd3.",
+    "solution": "name: Secrets\non:\n  pull_request:\npermissions:\n  contents: read\njobs:\n  secrets:\n    runs-on: ubuntu-24.04\n    timeout-minutes: 10\n    steps:\n      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2\n        with:\n          fetch-depth: 0\n          persist-credentials: false\n      - uses: gitleaks/gitleaks-action@83373cf2f8c4db6e24b41c1a9b086bb9619e9cd3 # v2.3.7\n"
+   }
+  },
+  {
+   "id": "vulnerabilites",
+   "title": "Vulnérabilités et correctifs",
+   "minutes": 18,
+   "objectives": [
+    "Prioriser les vulnérabilités",
+    "Mettre à jour régulièrement et sans douleur"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Toutes les CVE ne se valent pas : regardez si le composant vulnérable est réellement utilisé, exposé, et si une exploitation est connue (catalogue KEV). Le score CVSS seul ne suffit pas."
+    },
+    {
+     "type": "text",
+     "body": "Mettre à jour souvent, par petites étapes (Dependabot, Renovate), coûte bien moins qu'un saut de trois versions majeures en urgence le jour d'une faille critique."
+    },
+    {
+     "type": "code",
+     "body": "apiVersion: apps/v1\nkind: Deployment\n…\n        image: ghcr.io/exemple/api:1.4.1   # correctif de sécurité, version explicite",
+     "caption": "Déployer un correctif par une version explicite"
+    },
+    {
+     "type": "warning",
+     "body": "Mettre à jour vers « latest » n'est pas corriger : c'est perdre la maîtrise de ce qui tourne."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "sr-10-1",
+     "type": "single",
+     "prompt": "Pour prioriser une CVE, on regarde…",
+     "choices": [
+      "Usage réel, exposition et exploitation connue",
+      "Seulement le score CVSS",
+      "La date de publication",
+      "Le nom de la faille"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Le contexte compte plus que le score seul."
+    },
+    {
+     "id": "sr-10-2",
+     "type": "single",
+     "prompt": "Pourquoi des mises à jour fréquentes ?",
+     "choices": [
+      "Petites étapes faciles plutôt qu'un saut risqué en urgence",
+      "Pour avoir plus de commits",
+      "Obligatoire",
+      "Aucun intérêt"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Renovate et Dependabot aident."
+    },
+    {
+     "id": "sr-10-3",
+     "type": "single",
+     "prompt": "Que contient le catalogue KEV ?",
+     "choices": [
+      "Les vulnérabilités activement exploitées",
+      "Toutes les licences",
+      "Les mots de passe faibles",
+      "Les images Docker"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Ce catalogue est publié par la CISA."
+    },
+    {
+     "id": "sr-10-4",
+     "type": "single",
+     "prompt": "Corriger en passant l'image à latest…",
+     "choices": [
+      "Fait perdre la maîtrise de la version déployée",
+      "Est la bonne pratique",
+      "Est obligatoire",
+      "Est plus sûr"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Utilisez une version explicite."
+    }
+   ],
+   "lab": {
+    "kind": "k8s",
+    "intro": "Pour « corriger » une faille, ce Deployment est passé à latest. Déployez plutôt le correctif par sa version.",
+    "starter": "apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: api\nspec:\n  replicas: 2\n  selector:\n    matchLabels:\n      app: api\n  template:\n    metadata:\n      labels:\n        app: api\n    spec:\n      containers:\n        - name: api\n          image: ghcr.io/exemple/api:latest\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "Version explicite",
+      "rule": "K8001"
+     },
+     {
+      "type": "contains",
+      "label": "Version corrigée 1.4.1",
+      "text": "1.4.1"
+     },
+     {
+      "type": "valid",
+      "label": "Fichier valide"
+     }
+    ],
+    "hint": "image: ghcr.io/exemple/api:1.4.1",
+    "solution": "apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: api\nspec:\n  replicas: 2\n  selector:\n    matchLabels:\n      app: api\n  template:\n    metadata:\n      labels:\n        app: api\n    spec:\n      containers:\n        - name: api\n          image: ghcr.io/exemple/api:1.4.1\n"
+   }
+  }
+ ],
+ "project": {
+  "title": "Alertes de production pour une API",
+  "brief": "Rédigez les règles d'alerte d'une API : erreurs, latence et budget d'erreur, chacune avec durée, sévérité, résumé et runbook.",
+  "lab": {
+   "kind": "alerts",
+   "intro": "Objectif : aucun problème bloquant ni avertissement, et des runbooks partout.",
+   "starter": "groups:\n  - name: api\n    rules:\n      - alert: ApiErreurs5xx\n        expr: sum(rate(http_requests_total{code=~\"5..\"}[5m])) / sum(rate(http_requests_total[5m])) > 0.05\n      - alert: ApiLente\n        expr: histogram_quantile(0.95, sum by (le) (rate(http_request_duration_seconds_bucket[5m]))) > 1\n        for: 10m\n        annotations:\n          summary: \"ApiLente : seuil dépassé\"\n      - alert: BudgetErreurRapide\n        expr: \"\"\n",
+   "goals": [
+    {
+     "type": "noSeverity",
+     "label": "Aucun problème bloquant",
+     "severity": "blocking"
+    },
+    {
+     "type": "noSeverity",
+     "label": "Aucun avertissement",
+     "severity": "warning"
+    },
+    {
+     "type": "contains",
+     "label": "Runbooks liés",
+     "text": "runbook_url"
+    },
+    {
+     "type": "noRule",
+     "label": "Résumés présents",
+     "rule": "PR003"
+    },
+    {
+     "type": "noRule",
+     "label": "Un runbook par alerte",
+     "rule": "PR004"
+    }
+   ],
+   "hint": "Reprenez les labos : expr, for, labels.severity, annotations summary et runbook_url pour chaque alerte.",
+   "solution": "groups:\n  - name: api\n    rules:\n      - alert: ApiErreurs5xx\n        expr: sum(rate(http_requests_total{code=~\"5..\"}[5m])) / sum(rate(http_requests_total[5m])) > 0.05\n        for: 10m\n        labels:\n          severity: page\n        annotations:\n          summary: \"ApiErreurs5xx : seuil dépassé\"\n          runbook_url: https://wiki.exemple.org/runbooks/apierreurs5xx\n      - alert: ApiLente\n        expr: histogram_quantile(0.95, sum by (le) (rate(http_request_duration_seconds_bucket[5m]))) > 1\n        for: 10m\n        labels:\n          severity: ticket\n        annotations:\n          summary: \"ApiLente : seuil dépassé\"\n          runbook_url: https://wiki.exemple.org/runbooks/apilente\n      - alert: BudgetErreurRapide\n        expr: (sum(rate(http_requests_total{code=~\"5..\"}[1h])) / sum(rate(http_requests_total[1h]))) / 0.001 > 14.4\n        for: 5m\n        labels:\n          severity: page\n        annotations:\n          summary: \"BudgetErreurRapide : seuil dépassé\"\n          runbook_url: https://wiki.exemple.org/runbooks/budgeterreurrapide\n"
+  },
+  "rubric": [
+   {
+    "criterion": "Pertinence",
+    "levels": [
+     "Alertes sur des causes (CPU)",
+     "Alertes sur des symptômes",
+     "Symptômes liés aux SLO, alertes de consommation du budget"
+    ]
+   },
+   {
+    "criterion": "Bruit",
+    "levels": [
+     "Pointes déclenchent des alertes",
+     "for: et sévérités",
+     "Routage par sévérité, revue régulière des alertes inutiles"
+    ]
+   },
+   {
+    "criterion": "Actionnabilité",
+    "levels": [
+     "Aucune information",
+     "Résumé",
+     "Résumé, runbook à jour et escalade"
+    ]
+   },
+   {
+    "criterion": "Chaîne logicielle",
+    "levels": [
+     "Dépendances libres",
+     "Épinglées et analysées",
+     "Épinglées, SBOM, signatures vérifiées, mises à jour régulières"
+    ]
+   },
+   {
+    "criterion": "Apprentissage",
+    "levels": [
+     "Aucun retour d'incident",
+     "Post-mortem",
+     "Post-mortems sans blâme suivis d'actions datées"
+    ]
+   }
+  ]
+ },
+ "glossary": [
+  {
+   "term": "Observabilité",
+   "definition": "Capacité à comprendre l'état d'un système à partir de ses signaux."
+  },
+  {
+   "term": "Métrique",
+   "definition": "Valeur numérique mesurée dans le temps."
+  },
+  {
+   "term": "Trace",
+   "definition": "Parcours d'une requête à travers les services."
+  },
+  {
+   "term": "OpenTelemetry",
+   "definition": "Standard ouvert de production de télémétrie."
+  },
+  {
+   "term": "PromQL",
+   "definition": "Langage de requête de Prometheus."
+  },
+  {
+   "term": "Cardinalité",
+   "definition": "Nombre de séries distinctes créées par des labels."
+  },
+  {
+   "term": "SLI",
+   "definition": "Indicateur de niveau de service mesuré."
+  },
+  {
+   "term": "SLO",
+   "definition": "Objectif chiffré pour un SLI."
+  },
+  {
+   "term": "Budget d'erreur",
+   "definition": "Marge d'indisponibilité autorisée par le SLO."
+  },
+  {
+   "term": "Runbook",
+   "definition": "Procédure d'intervention liée à une alerte."
+  },
+  {
+   "term": "Post-mortem",
+   "definition": "Analyse d'incident sans blâme suivie d'actions."
+  },
+  {
+   "term": "SBOM",
+   "definition": "Inventaire des composants d'un logiciel."
+  },
+  {
+   "term": "Sigstore / cosign",
+   "definition": "Signature et vérification d'artefacts."
+  },
+  {
+   "term": "CVE",
+   "definition": "Identifiant public d'une vulnérabilité."
+  }
+ ]
+}

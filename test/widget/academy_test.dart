@@ -56,13 +56,13 @@ Future<void> answerQuiz(WidgetTester tester, Lesson lesson, {Set<int> wrong = co
 }
 
 void main() {
-  testWidgets('carte des îles : Git disponible, autres modules annoncés honnêtement',
+  testWidgets('carte des îles : les 11 modules du parcours sont disponibles hors ligne',
       (tester) async {
     final db = await pumpApp(tester, size: desktop);
     await openAcademy(tester);
     expect(find.text('Carte des îles'), findsOneWidget);
-    expect(find.text('Disponible hors ligne'), findsNWidgets(3));
-    expect(find.textContaining('En brume — prévu en phase'), findsNWidgets(7));
+    await tester.scrollUntilVisible(find.text('Observabilité, sécurité, SRE'), 300, scrollable: find.byType(Scrollable).first);
+    expect(find.textContaining('En brume — prévu en phase'), findsNothing);
     await teardown(tester, db);
   });
 

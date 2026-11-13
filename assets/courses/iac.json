@@ -1,0 +1,1222 @@
+{
+ "id": "iac",
+ "version": 1,
+ "title": "Terraform, OpenTofu et Ansible, le chantier naval",
+ "summary": "Provisionner avec Terraform/OpenTofu (versions, variables, état, modules, CI) et configurer avec Ansible (modules, handlers, vault, exécution prudente).",
+ "objectives": [
+  "Écrire une configuration Terraform/OpenTofu reproductible",
+  "Protéger l'état et les secrets",
+  "Configurer des serveurs de façon idempotente avec Ansible",
+  "Intégrer plan et revue dans la CI"
+ ],
+ "prerequisites": [
+  "Module Kubernetes",
+  "Module DevOps"
+ ],
+ "lessons": [
+  {
+   "id": "pourquoi-iac",
+   "title": "L'infrastructure comme du code",
+   "minutes": 15,
+   "objectives": [
+    "Comprendre les bénéfices de l'IaC",
+    "Distinguer provisionnement et configuration"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Décrire l'infrastructure dans des fichiers versionnés permet de la relire en PR, de la reproduire à l'identique, de savoir qui a changé quoi et de reconstruire après un sinistre. Les clics dans une console ne laissent pas cette trace."
+    },
+    {
+     "type": "text",
+     "body": "Terraform (ou son fork libre OpenTofu, compatible) provisionne : réseaux, machines, bases, DNS. Ansible configure : paquets, fichiers, services sur des machines existantes. Les deux se complètent."
+    },
+    {
+     "type": "text",
+     "body": "Les deux sont déclaratifs et idempotents : on décrit l'état voulu, et relancer ne change rien si l'état est déjà atteint."
+    },
+    {
+     "type": "warning",
+     "body": "Mélanger modifications manuelles et IaC crée une « dérive » : le prochain apply peut écraser ou détruire ce qui a été fait à la main."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "ic-1-1",
+     "type": "single",
+     "prompt": "Avantage principal de l'IaC ?",
+     "choices": [
+      "Infrastructure relue, versionnée et reproductible",
+      "Plus de clics",
+      "Pas besoin de Git",
+      "Gratuit"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Le code d'infrastructure suit le même cycle que le code applicatif."
+    },
+    {
+     "id": "ic-1-2",
+     "type": "single",
+     "prompt": "Terraform/OpenTofu sert surtout à…",
+     "choices": [
+      "Provisionner des ressources (réseaux, machines, DNS)",
+      "Configurer des fichiers sur un serveur",
+      "Écrire des tests",
+      "Compiler du code"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Ansible prend le relais pour la configuration."
+    },
+    {
+     "id": "ic-1-3",
+     "type": "single",
+     "prompt": "Que signifie idempotent ?",
+     "choices": [
+      "Relancer ne change rien si l'état voulu est atteint",
+      "S'exécute une seule fois",
+      "Ne peut pas échouer",
+      "S'exécute en parallèle"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Propriété clé pour relancer sans crainte."
+    },
+    {
+     "id": "ic-1-4",
+     "type": "single",
+     "prompt": "Qu'est-ce que la dérive ?",
+     "choices": [
+      "Un écart entre le code et l'infrastructure réelle",
+      "Une panne réseau",
+      "Une version de Terraform",
+      "Une sauvegarde"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Souvent causée par des changements manuels."
+    }
+   ]
+  },
+  {
+   "id": "terraform-bases",
+   "title": "Terraform/OpenTofu : providers, ressources, plan",
+   "minutes": 22,
+   "objectives": [
+    "Écrire une première configuration",
+    "Lire un plan avant de l'appliquer",
+    "Épingler les versions"
+   ],
+   "sections": [
+    {
+     "type": "code",
+     "body": "terraform {\n  required_version = \">= 1.6, < 2.0\"\n  required_providers {\n    aws = {\n      source  = \"hashicorp/aws\"\n      version = \"~> 5.80\"\n    }\n  }\n}\n\nprovider \"aws\" {\n  region = \"eu-west-3\"\n}\n\nresource \"aws_instance\" \"web\" {\n  ami           = \"ami-0abcdef1234567890\"\n  instance_type = \"t3.micro\"\n}",
+     "caption": "Versions épinglées, fournisseur, ressource"
+    },
+    {
+     "type": "code",
+     "body": "tofu init     # ou terraform init\ntofu fmt -check\ntofu validate\ntofu plan -out=plan.tfplan\ntofu apply plan.tfplan",
+     "caption": "Le cycle de travail"
+    },
+    {
+     "type": "text",
+     "body": "Le plan annonce + (création), ~ (modification), - (destruction) et -/+ (remplacement). On le lit TOUJOURS, en particulier les destructions."
+    },
+    {
+     "type": "warning",
+     "body": "Sans contrainte de version, un nouveau fournisseur majeur peut changer le comportement d'une ressource. Le fichier .terraform.lock.hcl fixe les versions exactes : versionnez-le."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "ic-2-1",
+     "type": "single",
+     "prompt": "Que signifie -/+ dans un plan ?",
+     "choices": [
+      "La ressource sera détruite puis recréée",
+      "Aucun changement",
+      "Une création",
+      "Une lecture"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Attention aux données qu'elle contient."
+    },
+    {
+     "id": "ic-2-2",
+     "type": "command",
+     "prompt": "Enregistrez le plan dans plan.tfplan avec OpenTofu.",
+     "accepted": [
+      "tofu plan -out=plan.tfplan",
+      "tofu plan -out plan.tfplan",
+      "terraform plan -out=plan.tfplan"
+     ],
+     "explanation": "On applique ensuite exactement ce plan relu."
+    },
+    {
+     "id": "ic-2-3",
+     "type": "single",
+     "prompt": "Faut-il versionner .terraform.lock.hcl ?",
+     "choices": [
+      "Oui, il fixe les versions exactes des fournisseurs",
+      "Non, jamais",
+      "Seulement en local",
+      "Il contient des secrets"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Comme un fichier de verrouillage npm."
+    },
+    {
+     "id": "ic-2-4",
+     "type": "single",
+     "prompt": "OpenTofu est…",
+     "choices": [
+      "Un fork libre de Terraform, compatible",
+      "Un fournisseur cloud",
+      "Un module Ansible",
+      "Un langage différent"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Né après le changement de licence de Terraform."
+    }
+   ],
+   "lab": {
+    "kind": "terraform",
+    "intro": "Cette configuration n'épingle ni Terraform/OpenTofu ni le fournisseur. Corrigez.",
+    "starter": "provider \"aws\" {\n  region = \"eu-west-3\"\n}\n\nresource \"aws_instance\" \"web\" {\n  ami           = \"ami-0abcdef1234567890\"\n  instance_type = \"t3.micro\"\n}\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "Version de l'outil contrainte",
+      "rule": "TF001"
+     },
+     {
+      "type": "noRule",
+      "label": "Fournisseur épinglé",
+      "rule": "TF002"
+     },
+     {
+      "type": "valid",
+      "label": "Fichier valide"
+     }
+    ],
+    "hint": "Ajoutez un bloc terraform { required_version = \">= 1.6, < 2.0\" ; required_providers { aws = { source = …, version = \"~> 5.80\" } } }.",
+    "solution": "terraform {\n  required_version = \">= 1.6, < 2.0\"\n  required_providers {\n    aws = {\n      source  = \"hashicorp/aws\"\n      version = \"~> 5.80\"\n    }\n  }\n}\n\nprovider \"aws\" {\n  region = \"eu-west-3\"\n}\n\nresource \"aws_instance\" \"web\" {\n  ami           = \"ami-0abcdef1234567890\"\n  instance_type = \"t3.micro\"\n}\n"
+   }
+  },
+  {
+   "id": "variables-secrets",
+   "title": "Variables, sorties et secrets",
+   "minutes": 20,
+   "objectives": [
+    "Paramétrer une configuration",
+    "Ne jamais écrire un secret dans le code"
+   ],
+   "sections": [
+    {
+     "type": "code",
+     "body": "variable \"db_password\" {\n  type      = string\n  sensitive = true\n}\n\nresource \"aws_db_instance\" \"base\" {\n  password = var.db_password\n}",
+     "caption": "Variable sensible, fournie de l'extérieur"
+    },
+    {
+     "type": "text",
+     "body": "La valeur vient de TF_VAR_db_password, d'un fichier .tfvars non versionné ou, mieux, d'un gestionnaire de secrets (data source Vault, Secrets Manager). sensitive = true la masque dans les plans et sorties."
+    },
+    {
+     "type": "warning",
+     "body": "Un secret passé à une ressource se retrouve en clair dans le fichier d'état : protégez l'état (backend chiffré, accès restreint)."
+    },
+    {
+     "type": "tip",
+     "body": "Les outputs exposent des valeurs utiles (adresse d'un équilibreur) aux autres configurations ; marquez-les sensibles si nécessaire."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "ic-3-1",
+     "type": "single",
+     "prompt": "Effet de sensitive = true ?",
+     "choices": [
+      "La valeur est masquée dans les plans et sorties",
+      "La valeur est chiffrée dans l'état",
+      "La variable devient obligatoire",
+      "Aucun"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Elle reste présente dans l'état."
+    },
+    {
+     "id": "ic-3-2",
+     "type": "single",
+     "prompt": "Comment fournir une variable sans fichier versionné ?",
+     "choices": [
+      "Variable d'environnement TF_VAR_nom",
+      "En dur dans main.tf",
+      "Dans le README",
+      "Dans un commentaire"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Ou via un gestionnaire de secrets."
+    },
+    {
+     "id": "ic-3-3",
+     "type": "single",
+     "prompt": "Où un secret finit-il toujours ?",
+     "choices": [
+      "Dans le fichier d'état",
+      "Nulle part",
+      "Dans le plan affiché",
+      "Dans Git automatiquement"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "D'où la protection de l'état."
+    },
+    {
+     "id": "ic-3-4",
+     "type": "single",
+     "prompt": "À quoi servent les outputs ?",
+     "choices": [
+      "Exposer des valeurs utiles à d'autres",
+      "Supprimer des ressources",
+      "Installer des fournisseurs",
+      "Chiffrer l'état"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Par exemple une adresse IP ou un nom DNS."
+    }
+   ],
+   "lab": {
+    "kind": "terraform",
+    "intro": "Le mot de passe de la base est écrit en dur. Passez par une variable sensible sans valeur par défaut.",
+    "starter": "terraform {\n  required_version = \">= 1.6, < 2.0\"\n  required_providers {\n    aws = {\n      source  = \"hashicorp/aws\"\n      version = \"~> 5.80\"\n    }\n  }\n}\n\nprovider \"aws\" {\n  region = \"eu-west-3\"\n}\n\nvariable \"db_password\" {\n  type    = string\n  default = \"Sup3rSecret-prod\"\n}\n\nresource \"aws_db_instance\" \"base\" {\n  engine         = \"postgres\"\n  instance_class = \"db.t4g.micro\"\n  username       = \"app\"\n  password       = \"Sup3rSecret-prod\"\n}\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "Plus de secret en dur",
+      "rule": "TF003"
+     },
+     {
+      "type": "noRule",
+      "label": "Variable marquée sensible",
+      "rule": "TF005"
+     },
+     {
+      "type": "notContains",
+      "label": "Le mot de passe a disparu du code",
+      "text": "Sup3rSecret"
+     },
+     {
+      "type": "noSeverity",
+      "label": "Aucun problème bloquant",
+      "severity": "blocking"
+     }
+    ],
+    "hint": "Supprimez default, ajoutez sensitive = true et utilisez password = var.db_password.",
+    "solution": "terraform {\n  required_version = \">= 1.6, < 2.0\"\n  required_providers {\n    aws = {\n      source  = \"hashicorp/aws\"\n      version = \"~> 5.80\"\n    }\n  }\n}\n\nprovider \"aws\" {\n  region = \"eu-west-3\"\n}\n\nvariable \"db_password\" {\n  type      = string\n  sensitive = true\n}\n\nresource \"aws_db_instance\" \"base\" {\n  engine         = \"postgres\"\n  instance_class = \"db.t4g.micro\"\n  username       = \"app\"\n  password       = var.db_password\n}\n"
+   }
+  },
+  {
+   "id": "etat",
+   "title": "L'état et le backend distant",
+   "minutes": 20,
+   "objectives": [
+    "Comprendre le rôle du fichier d'état",
+    "Partager l'état en équipe avec verrouillage"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "L'état (terraform.tfstate) relie chaque ressource du code à l'objet réel. Sans lui, l'outil ne sait plus ce qu'il gère. Il contient des identifiants… et des secrets en clair."
+    },
+    {
+     "type": "text",
+     "body": "En local, l'état ne se partage pas et deux personnes peuvent appliquer en même temps et le corrompre. Un backend distant (S3, GCS, HTTP, Terraform Cloud…) le centralise, le chiffre et le verrouille pendant un apply."
+    },
+    {
+     "type": "code",
+     "body": "terraform {\n  backend \"s3\" {\n    bucket       = \"exemple-etat-terraform\"\n    key          = \"prod/terraform.tfstate\"\n    region       = \"eu-west-3\"\n    use_lockfile = true\n  }\n}",
+     "caption": "Backend S3 avec verrouillage natif (versions récentes ; sinon table DynamoDB)"
+    },
+    {
+     "type": "warning",
+     "body": "Ne versionnez jamais terraform.tfstate ni ses sauvegardes (*.tfstate.backup) : ajoutez-les au .gitignore."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "ic-4-1",
+     "type": "single",
+     "prompt": "Que contient l'état ?",
+     "choices": [
+      "La correspondance code ↔ ressources réelles, secrets compris",
+      "Le code source",
+      "Les journaux",
+      "Rien d'important"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "À protéger comme un secret."
+    },
+    {
+     "id": "ic-4-2",
+     "type": "single",
+     "prompt": "Pourquoi un verrou sur l'état ?",
+     "choices": [
+      "Empêcher deux apply simultanés",
+      "Accélérer le plan",
+      "Chiffrer les variables",
+      "Rendre l'état public"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Deux écritures concurrentes le corrompraient."
+    },
+    {
+     "id": "ic-4-3",
+     "type": "single",
+     "prompt": "Faut-il committer terraform.tfstate ?",
+     "choices": [
+      "Non, jamais",
+      "Oui, toujours",
+      "Seulement en production",
+      "Seulement compressé"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Il contient des secrets."
+    },
+    {
+     "id": "ic-4-4",
+     "type": "command",
+     "prompt": "Listez les ressources présentes dans l'état avec OpenTofu.",
+     "accepted": [
+      "tofu state list",
+      "terraform state list"
+     ],
+     "explanation": "Pratique pour comprendre ce qui est géré."
+    }
+   ],
+   "lab": {
+    "kind": "terraform",
+    "intro": "L'état est local : impossible de travailler en équipe en sécurité. Configurez un backend distant verrouillé.",
+    "starter": "terraform {\n  required_version = \">= 1.6, < 2.0\"\n  required_providers {\n    aws = {\n      source  = \"hashicorp/aws\"\n      version = \"~> 5.80\"\n    }\n  }\n}\n\nprovider \"aws\" {\n  region = \"eu-west-3\"\n}\n\nresource \"aws_s3_bucket\" \"site\" {\n  bucket = \"exemple-site\"\n}\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "Backend distant configuré",
+      "rule": "TF006"
+     },
+     {
+      "type": "contains",
+      "label": "Verrouillage activé",
+      "text": "use_lockfile"
+     },
+     {
+      "type": "valid",
+      "label": "Fichier valide"
+     }
+    ],
+    "hint": "Dans le bloc terraform, ajoutez backend \"s3\" { bucket, key, region, use_lockfile = true }.",
+    "solution": "terraform {\n  required_version = \">= 1.6, < 2.0\"\n  backend \"s3\" {\n    bucket       = \"exemple-etat-terraform\"\n    key          = \"prod/terraform.tfstate\"\n    region       = \"eu-west-3\"\n    use_lockfile = true\n  }\n  required_providers {\n    aws = {\n      source  = \"hashicorp/aws\"\n      version = \"~> 5.80\"\n    }\n  }\n}\n\nprovider \"aws\" {\n  region = \"eu-west-3\"\n}\n\nresource \"aws_s3_bucket\" \"site\" {\n  bucket = \"exemple-site\"\n}\n"
+   }
+  },
+  {
+   "id": "modules",
+   "title": "Modules et environnements",
+   "minutes": 18,
+   "objectives": [
+    "Factoriser avec des modules",
+    "Séparer recette et production"
+   ],
+   "sections": [
+    {
+     "type": "code",
+     "body": "module \"reseau\" {\n  source   = \"./modules/reseau\"\n  cidr     = \"10.20.0.0/16\"\n  nom      = \"prod\"\n}",
+     "caption": "Appel d'un module local"
+    },
+    {
+     "type": "text",
+     "body": "Un module regroupe des ressources réutilisables avec des variables d'entrée (typées et documentées) et des sorties. Les modules publics doivent être épinglés à une version comme les fournisseurs."
+    },
+    {
+     "type": "text",
+     "body": "Recette et production : un dossier (ou espace d'état) par environnement, chacun avec son propre état et ses propres droits. Une erreur en recette ne touche jamais la production."
+    },
+    {
+     "type": "tip",
+     "body": "Des variables typées (type = number, list(string)) et documentées (description) font de votre module une API claire."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "ic-5-1",
+     "type": "single",
+     "prompt": "Intérêt d'un module ?",
+     "choices": [
+      "Réutiliser un ensemble de ressources paramétrable",
+      "Remplacer l'état",
+      "Chiffrer les variables",
+      "Accélérer apply"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Un module joue le rôle d'une fonction réutilisable."
+    },
+    {
+     "id": "ic-5-2",
+     "type": "single",
+     "prompt": "Comment isoler recette et production ?",
+     "choices": [
+      "États et droits séparés par environnement",
+      "Un seul état partagé",
+      "Des commentaires",
+      "Des branches Git uniquement"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Un incident ne déborde pas."
+    },
+    {
+     "id": "ic-5-3",
+     "type": "single",
+     "prompt": "Un module public doit être…",
+     "choices": [
+      "Épinglé à une version",
+      "Toujours sur main",
+      "Copié sans version",
+      "Évité"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "La version épinglée garantit un résultat reproductible."
+    },
+    {
+     "id": "ic-5-4",
+     "type": "single",
+     "prompt": "Pourquoi typer les variables ?",
+     "choices": [
+      "Détecter les erreurs d'entrée tôt et documenter",
+      "Obligatoire pour l'état",
+      "Accélérer",
+      "Chiffrer"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Le plan échoue proprement sur une mauvaise valeur."
+    }
+   ],
+   "lab": {
+    "kind": "terraform",
+    "intro": "Les variables de ce module ne sont ni typées ni documentées. Faites-en une API claire.",
+    "starter": "variable \"cidr\" {\n  default = \"10.20.0.0/16\"\n}\n\nvariable \"zones\" {\n  default = [\"eu-west-3a\", \"eu-west-3b\"]\n}\n\nresource \"aws_vpc\" \"principal\" {\n  cidr_block = var.cidr\n}\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "Variables typées",
+      "rule": "TF008"
+     },
+     {
+      "type": "contains",
+      "label": "Variables documentées",
+      "text": "description"
+     },
+     {
+      "type": "valid",
+      "label": "Fichier valide"
+     }
+    ],
+    "hint": "Ajoutez type = string pour cidr, type = list(string) pour zones, et une description à chacune.",
+    "solution": "variable \"cidr\" {\n  type        = string\n  description = \"Plage d'adresses du réseau principal\"\n  default     = \"10.20.0.0/16\"\n}\n\nvariable \"zones\" {\n  type        = list(string)\n  description = \"Zones de disponibilité utilisées\"\n  default     = [\"eu-west-3a\", \"eu-west-3b\"]\n}\n\nresource \"aws_vpc\" \"principal\" {\n  cidr_block = var.cidr\n}\n"
+   }
+  },
+  {
+   "id": "iac-ci",
+   "title": "Plan en CI et revue",
+   "minutes": 18,
+   "objectives": [
+    "Automatiser fmt, validate et plan sur chaque PR",
+    "Appliquer seulement un plan relu"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Chaque PR d'infrastructure déclenche fmt -check, validate, un analyseur (tflint, checkov, trivy config) et un plan publié en commentaire. Les relecteurs voient exactement ce qui va changer."
+    },
+    {
+     "type": "text",
+     "body": "L'apply se fait depuis la branche principale, avec le plan validé, par un compte de déploiement aux droits limités et des identifiants temporaires (OIDC)."
+    },
+    {
+     "type": "code",
+     "body": "tofu fmt -check -recursive\ntofu validate\ntofu plan -out=plan.tfplan -input=false\ntofu show -no-color plan.tfplan > plan.txt",
+     "caption": "Étapes typiques en CI"
+    },
+    {
+     "type": "warning",
+     "body": "Un plan qui annonce une destruction inattendue doit bloquer la fusion jusqu'à explication."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "ic-6-1",
+     "type": "single",
+     "prompt": "Pourquoi publier le plan dans la PR ?",
+     "choices": [
+      "Les relecteurs voient précisément les changements",
+      "Pour accélérer apply",
+      "Pour chiffrer l'état",
+      "Obligatoire"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Relire un plan vaut mieux que relire du HCL seul."
+    },
+    {
+     "id": "ic-6-2",
+     "type": "single",
+     "prompt": "D'où lancer l'apply ?",
+     "choices": [
+      "De la branche principale, avec le plan relu",
+      "Du poste d'un développeur",
+      "D'une branche quelconque",
+      "Jamais"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Traçable et reproductible."
+    },
+    {
+     "id": "ic-6-3",
+     "type": "command",
+     "prompt": "Vérifiez le formatage de tous les fichiers sans les modifier (OpenTofu).",
+     "accepted": [
+      "tofu fmt -check -recursive",
+      "tofu fmt -recursive -check",
+      "terraform fmt -check -recursive"
+     ],
+     "explanation": "Échoue si un fichier n'est pas formaté."
+    },
+    {
+     "id": "ic-6-4",
+     "type": "single",
+     "prompt": "Une destruction inattendue dans le plan…",
+     "choices": [
+      "Bloque la fusion jusqu'à explication",
+      "Est normale",
+      "Se corrige après",
+      "Est ignorée"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Prudence avec les données."
+    }
+   ]
+  },
+  {
+   "id": "ansible-bases",
+   "title": "Ansible : inventaire, modules, idempotence",
+   "minutes": 20,
+   "objectives": [
+    "Décrire un inventaire",
+    "Utiliser les modules plutôt que des commandes shell"
+   ],
+   "sections": [
+    {
+     "type": "code",
+     "body": "[web]\nweb1.exemple.org\nweb2.exemple.org\n\n[web:vars]\nansible_user=deploy",
+     "caption": "Inventaire au format INI"
+    },
+    {
+     "type": "code",
+     "body": "ansible web -m ansible.builtin.ping\nansible-playbook -i inventaire.ini site.yml --check --diff",
+     "caption": "Tester la connexion, simuler un playbook"
+    },
+    {
+     "type": "text",
+     "body": "Ansible se connecte en SSH, sans agent. Un module (apt, copy, template, systemd, user) décrit un état et ne change rien s'il est déjà atteint ; shell: apt-get install … refait le travail et signale « changed » à chaque fois."
+    },
+    {
+     "type": "tip",
+     "body": "Les noms complets (ansible.builtin.apt) évitent les ambiguïtés entre collections."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "ic-7-1",
+     "type": "single",
+     "prompt": "Comment Ansible se connecte-t-il aux machines ?",
+     "choices": [
+      "En SSH, sans agent",
+      "Avec un agent installé",
+      "Par FTP",
+      "Par HTTP uniquement"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Il suffit de Python côté cible."
+    },
+    {
+     "id": "ic-7-2",
+     "type": "single",
+     "prompt": "Pourquoi préférer ansible.builtin.apt à shell: apt-get ?",
+     "choices": [
+      "Le module est idempotent et décrit un état",
+      "shell est interdit",
+      "apt est plus rapide",
+      "Aucune différence"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Relancer ne change rien si tout est en place."
+    },
+    {
+     "id": "ic-7-3",
+     "type": "command",
+     "prompt": "Testez la connexion à tous les hôtes du groupe web.",
+     "accepted": [
+      "ansible web -m ansible.builtin.ping",
+      "ansible web -m ping"
+     ],
+     "explanation": "Ce n'est pas un ping ICMP mais un test Ansible complet."
+    },
+    {
+     "id": "ic-7-4",
+     "type": "single",
+     "prompt": "Que fait --check --diff ?",
+     "choices": [
+      "Simule et montre les changements sans les appliquer",
+      "Applique deux fois",
+      "Supprime l'inventaire",
+      "Chiffre le playbook"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Idéal avant un premier passage."
+    }
+   ],
+   "lab": {
+    "kind": "ansible",
+    "intro": "Ce playbook utilise des commandes shell là où des modules existent. Rendez-le idempotent.",
+    "starter": "- hosts: web\n  become: true\n  tasks:\n    - name: Installer nginx\n      ansible.builtin.shell: apt-get install -y nginx\n    - name: Démarrer nginx\n      ansible.builtin.command: systemctl start nginx\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "Modules dédiés utilisés",
+      "rule": "AN002"
+     },
+     {
+      "type": "valid",
+      "label": "Fichier valide"
+     }
+    ],
+    "hint": "Utilisez ansible.builtin.apt (name, state: present) et ansible.builtin.systemd (name, state: started, enabled: true).",
+    "solution": "- hosts: web\n  become: true\n  tasks:\n    - name: Installer nginx\n      ansible.builtin.apt:\n        name: nginx\n        state: present\n        update_cache: true\n    - name: Démarrer nginx\n      ansible.builtin.systemd:\n        name: nginx\n        state: started\n        enabled: true\n"
+   }
+  },
+  {
+   "id": "playbooks",
+   "title": "Playbooks, handlers et rôles",
+   "minutes": 20,
+   "objectives": [
+    "Structurer un playbook lisible",
+    "Redémarrer un service seulement si nécessaire"
+   ],
+   "sections": [
+    {
+     "type": "code",
+     "body": "tasks:\n  - name: Déployer la configuration nginx\n    ansible.builtin.template:\n      src: nginx.conf.j2\n      dest: /etc/nginx/nginx.conf\n    notify: Recharger nginx\nhandlers:\n  - name: Recharger nginx\n    ansible.builtin.service:\n      name: nginx\n      state: reloaded",
+     "caption": "Le handler ne s'exécute que si la configuration a changé"
+    },
+    {
+     "type": "text",
+     "body": "Chaque tâche porte un nom explicite : le journal d'exécution devient un compte rendu lisible."
+    },
+    {
+     "type": "text",
+     "body": "state: latest met à jour le paquet à chaque passage, sans contrôle : préférez present (et une version précise si besoin), et planifiez les mises à jour."
+    },
+    {
+     "type": "tip",
+     "body": "Les rôles (roles/nginx/tasks, templates, handlers, defaults) rendent la configuration réutilisable entre projets."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "ic-8-1",
+     "type": "single",
+     "prompt": "Quand un handler s'exécute-t-il ?",
+     "choices": [
+      "Quand une tâche qui le notifie a changé quelque chose",
+      "À chaque tâche",
+      "Jamais",
+      "Au début du playbook"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Et une seule fois en fin de play."
+    },
+    {
+     "id": "ic-8-2",
+     "type": "single",
+     "prompt": "Pourquoi nommer chaque tâche ?",
+     "choices": [
+      "Rendre le journal d'exécution lisible",
+      "Obligatoire pour SSH",
+      "Accélérer",
+      "Chiffrer"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Le nom apparaît dans la sortie."
+    },
+    {
+     "id": "ic-8-3",
+     "type": "single",
+     "prompt": "Problème de state: latest ?",
+     "choices": [
+      "Mise à jour non contrôlée à chaque exécution",
+      "Le paquet est supprimé",
+      "Plus lent",
+      "Aucun"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Les mises à jour se planifient."
+    },
+    {
+     "id": "ic-8-4",
+     "type": "single",
+     "prompt": "Intérêt des rôles ?",
+     "choices": [
+      "Réutiliser une configuration structurée",
+      "Remplacer l'inventaire",
+      "Chiffrer les variables",
+      "Supprimer SSH"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Partageables via Ansible Galaxy."
+    }
+   ],
+   "lab": {
+    "kind": "ansible",
+    "intro": "Ces tâches sont anonymes et mettent à jour sans contrôle. Corrigez.",
+    "starter": "- hosts: web\n  become: true\n  tasks:\n    - ansible.builtin.apt:\n        name: nginx\n        state: latest\n    - ansible.builtin.template:\n        src: nginx.conf.j2\n        dest: /etc/nginx/nginx.conf\n      notify: Recharger nginx\n  handlers:\n    - name: Recharger nginx\n      ansible.builtin.service:\n        name: nginx\n        state: reloaded\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "Toutes les tâches sont nommées",
+      "rule": "AN001"
+     },
+     {
+      "type": "noRule",
+      "label": "Plus de state: latest",
+      "rule": "AN005"
+     },
+     {
+      "type": "valid",
+      "label": "Fichier valide"
+     }
+    ],
+    "hint": "Ajoutez name: à chaque tâche et remplacez latest par present.",
+    "solution": "- hosts: web\n  become: true\n  tasks:\n    - name: Installer nginx\n      ansible.builtin.apt:\n        name: nginx\n        state: present\n    - name: Déployer la configuration nginx\n      ansible.builtin.template:\n        src: nginx.conf.j2\n        dest: /etc/nginx/nginx.conf\n      notify: Recharger nginx\n  handlers:\n    - name: Recharger nginx\n      ansible.builtin.service:\n        name: nginx\n        state: reloaded\n"
+   }
+  },
+  {
+   "id": "vault",
+   "title": "Secrets avec ansible-vault et no_log",
+   "minutes": 20,
+   "objectives": [
+    "Chiffrer les variables sensibles",
+    "Empêcher l'affichage des secrets dans les journaux"
+   ],
+   "sections": [
+    {
+     "type": "code",
+     "body": "ansible-vault create group_vars/prod/secrets.yml\nansible-vault edit group_vars/prod/secrets.yml\nansible-playbook site.yml --ask-vault-pass",
+     "caption": "Créer, modifier, utiliser un fichier chiffré"
+    },
+    {
+     "type": "text",
+     "body": "Le fichier chiffré peut être versionné ; le mot de passe du coffre, lui, reste hors du dépôt (gestionnaire de mots de passe, variable de la CI)."
+    },
+    {
+     "type": "code",
+     "body": "- name: Créer l'utilisateur applicatif\n  ansible.builtin.user:\n    name: app\n    password: \"{{ app_password | password_hash('sha512') }}\"\n  no_log: true",
+     "caption": "no_log empêche l'affichage des arguments"
+    },
+    {
+     "type": "warning",
+     "body": "Sans no_log, un échec ou le mode -v affiche les arguments de la tâche, mot de passe compris."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "ic-9-1",
+     "type": "single",
+     "prompt": "Peut-on versionner un fichier chiffré par ansible-vault ?",
+     "choices": [
+      "Oui, mais pas le mot de passe du coffre",
+      "Non, jamais",
+      "Oui, avec son mot de passe",
+      "Seulement en privé"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Le mot de passe reste hors du dépôt."
+    },
+    {
+     "id": "ic-9-2",
+     "type": "single",
+     "prompt": "Rôle de no_log: true ?",
+     "choices": [
+      "Empêcher l'affichage des arguments de la tâche",
+      "Désactiver la tâche",
+      "Chiffrer le fichier",
+      "Accélérer"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Indispensable pour les secrets."
+    },
+    {
+     "id": "ic-9-3",
+     "type": "command",
+     "prompt": "Créez un fichier chiffré group_vars/prod/secrets.yml.",
+     "accepted": [
+      "ansible-vault create group_vars/prod/secrets.yml"
+     ],
+     "explanation": "L'éditeur s'ouvre et le fichier est chiffré à l'enregistrement."
+    },
+    {
+     "id": "ic-9-4",
+     "type": "single",
+     "prompt": "Où ranger le mot de passe du coffre ?",
+     "choices": [
+      "Gestionnaire de mots de passe ou variable protégée de la CI",
+      "Dans le dépôt",
+      "Dans le playbook",
+      "Dans le README"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Jamais avec le fichier chiffré."
+    }
+   ],
+   "lab": {
+    "kind": "ansible",
+    "intro": "Le mot de passe est en clair dans le playbook et la tâche l'afficherait dans les journaux. Corrigez.",
+    "starter": "- hosts: web\n  become: true\n  vars:\n    app_password: \"Sup3rSecret-prod\"\n  tasks:\n    - name: Créer l'utilisateur applicatif\n      ansible.builtin.user:\n        name: app\n        password: \"{{ app_password | password_hash('sha512') }}\"\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "Plus de secret en clair",
+      "rule": "AN003"
+     },
+     {
+      "type": "noRule",
+      "label": "no_log activé",
+      "rule": "AN004"
+     },
+     {
+      "type": "noSeverity",
+      "label": "Aucun problème bloquant",
+      "severity": "blocking"
+     }
+    ],
+    "hint": "Déplacez app_password dans un fichier chiffré (vars_files) et ajoutez no_log: true à la tâche.",
+    "solution": "- hosts: web\n  become: true\n  vars_files:\n    - group_vars/prod/secrets.yml\n  tasks:\n    - name: Créer l'utilisateur applicatif\n      ansible.builtin.user:\n        name: app\n        password: \"{{ app_password | password_hash('sha512') }}\"\n      no_log: true\n"
+   }
+  },
+  {
+   "id": "executer-sans-casser",
+   "title": "Exécuter sans casser",
+   "minutes": 18,
+   "objectives": [
+    "Limiter la portée d'une exécution",
+    "Traiter les erreurs au lieu de les ignorer"
+   ],
+   "sections": [
+    {
+     "type": "code",
+     "body": "ansible-playbook site.yml --check --diff\nansible-playbook site.yml --limit web1.exemple.org\nansible-playbook site.yml --tags nginx",
+     "caption": "Simuler, cibler une machine, cibler des tâches"
+    },
+    {
+     "type": "text",
+     "body": "serial: 1 applique un play machine par machine : si la première échoue, les autres restent intactes."
+    },
+    {
+     "type": "text",
+     "body": "ignore_errors: true masque tous les échecs. Pour une commande dont certains codes de retour sont normaux, décrivez-les avec failed_when et changed_when."
+    },
+    {
+     "type": "code",
+     "body": "- name: Appliquer les migrations\n  ansible.builtin.command: /srv/app/bin/migrer\n  register: migration\n  changed_when: \"'appliquée' in migration.stdout\"",
+     "caption": "La tâche ne signale « changed » que si une migration a eu lieu"
+    }
+   ],
+   "quiz": [
+    {
+     "id": "ic-10-1",
+     "type": "single",
+     "prompt": "Que fait --limit web1 ?",
+     "choices": [
+      "Restreint l'exécution à cette machine",
+      "Limite la durée",
+      "Limite la mémoire",
+      "Rien"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Idéal pour un premier essai."
+    },
+    {
+     "id": "ic-10-2",
+     "type": "single",
+     "prompt": "Intérêt de serial: 1 ?",
+     "choices": [
+      "Appliquer machine par machine pour limiter les dégâts",
+      "Accélérer",
+      "Chiffrer",
+      "Paralléliser"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Déploiement progressif."
+    },
+    {
+     "id": "ic-10-3",
+     "type": "single",
+     "prompt": "Alternative à ignore_errors ?",
+     "choices": [
+      "failed_when / changed_when ou block/rescue",
+      "Supprimer la tâche",
+      "Mode verbeux",
+      "Aucune"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "On décrit précisément ce qui est normal."
+    },
+    {
+     "id": "ic-10-4",
+     "type": "single",
+     "prompt": "Pourquoi changed_when sur une commande ?",
+     "choices": [
+      "Qu'elle ne signale un changement que lorsqu'il a eu lieu",
+      "Pour l'accélérer",
+      "Pour la chiffrer",
+      "Pour la rendre obligatoire"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Le compte rendu reste fiable."
+    }
+   ],
+   "lab": {
+    "kind": "ansible",
+    "intro": "Cette tâche ignore tous ses échecs et se dit toujours « changed ». Rendez-la honnête.",
+    "starter": "- hosts: web\n  tasks:\n    - name: Appliquer les migrations\n      ansible.builtin.command: /srv/app/bin/migrer\n      ignore_errors: true\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "Plus d'ignore_errors",
+      "rule": "AN006"
+     },
+     {
+      "type": "noRule",
+      "label": "Changement détecté honnêtement",
+      "rule": "AN007"
+     },
+     {
+      "type": "valid",
+      "label": "Fichier valide"
+     }
+    ],
+    "hint": "Retirez ignore_errors, ajoutez register: migration et changed_when: \"'appliquée' in migration.stdout\".",
+    "solution": "- hosts: web\n  tasks:\n    - name: Appliquer les migrations\n      ansible.builtin.command: /srv/app/bin/migrer\n      register: migration\n      changed_when: \"'appliquée' in migration.stdout\"\n"
+   }
+  }
+ ],
+ "project": {
+  "title": "Infrastructure d'un service web avec OpenTofu",
+  "brief": "Écrivez la configuration d'un service web : versions épinglées, état partagé et verrouillé, aucun secret dans le code, réseau minimal, stockage privé.",
+  "lab": {
+   "kind": "terraform",
+   "intro": "Objectif : aucun problème bloquant ni avertissement, backend distant et variable sensible.",
+   "starter": "provider \"aws\" {\n  region = \"eu-west-3\"\n}\n\nvariable \"api_token\" {\n  default = \"tok-prod-123456\"\n}\n\nresource \"aws_security_group\" \"web\" {\n  ingress {\n    from_port   = 22\n    to_port     = 22\n    protocol    = \"tcp\"\n    cidr_blocks = [\"0.0.0.0/0\"]\n  }\n}\n\nresource \"aws_s3_bucket_acl\" \"medias\" {\n  bucket = \"exemple-medias\"\n  acl    = \"public-read\"\n}\n\nresource \"aws_db_instance\" \"base\" {\n  engine   = \"postgres\"\n  password = \"Sup3rSecret-prod\"\n}\n",
+   "goals": [
+    {
+     "type": "noSeverity",
+     "label": "Aucun problème bloquant",
+     "severity": "blocking"
+    },
+    {
+     "type": "noSeverity",
+     "label": "Aucun avertissement",
+     "severity": "warning"
+    },
+    {
+     "type": "contains",
+     "label": "Backend distant",
+     "text": "backend \"s3\""
+    },
+    {
+     "type": "contains",
+     "label": "Variables sensibles",
+     "text": "sensitive"
+    },
+    {
+     "type": "notContains",
+     "label": "Rien d'ouvert à tout Internet",
+     "text": "0.0.0.0/0"
+    }
+   ],
+   "hint": "Reprenez les labos : bloc terraform complet avec backend, variables typées et sensibles, SSH restreint, ACL privée, mot de passe en variable.",
+   "solution": "terraform {\n  required_version = \">= 1.6, < 2.0\"\n  backend \"s3\" {\n    bucket       = \"exemple-etat-terraform\"\n    key          = \"prod/terraform.tfstate\"\n    region       = \"eu-west-3\"\n    use_lockfile = true\n  }\n  required_providers {\n    aws = {\n      source  = \"hashicorp/aws\"\n      version = \"~> 5.80\"\n    }\n  }\n}\n\nprovider \"aws\" {\n  region = \"eu-west-3\"\n}\n\nvariable \"api_token\" {\n  type        = string\n  description = \"Jeton de l'API, fourni par TF_VAR_api_token\"\n  sensitive   = true\n}\n\nvariable \"db_password\" {\n  type        = string\n  description = \"Mot de passe de la base\"\n  sensitive   = true\n}\n\nresource \"aws_security_group\" \"web\" {\n  ingress {\n    from_port   = 22\n    to_port     = 22\n    protocol    = \"tcp\"\n    cidr_blocks = [\"203.0.113.10/32\"]\n  }\n}\n\nresource \"aws_s3_bucket_acl\" \"medias\" {\n  bucket = \"exemple-medias\"\n  acl    = \"private\"\n}\n\nresource \"aws_db_instance\" \"base\" {\n  engine   = \"postgres\"\n  password = var.db_password\n}\n"
+  },
+  "rubric": [
+   {
+    "criterion": "Reproductibilité",
+    "levels": [
+     "Versions libres",
+     "Outil et fournisseurs épinglés",
+     "Épinglage, fichier de verrouillage versionné, modules versionnés"
+    ]
+   },
+   {
+    "criterion": "État",
+    "levels": [
+     "Local",
+     "Backend distant",
+     "Backend chiffré, verrouillé, accès restreint, un état par environnement"
+    ]
+   },
+   {
+    "criterion": "Secrets",
+    "levels": [
+     "En dur dans le code",
+     "Variables sensibles",
+     "Gestionnaire de secrets, rien dans le code ni les journaux"
+    ]
+   },
+   {
+    "criterion": "Exposition",
+    "levels": [
+     "0.0.0.0/0, stockage public",
+     "Accès restreints",
+     "Moindre exposition vérifiée par un analyseur en CI"
+    ]
+   },
+   {
+    "criterion": "Processus",
+    "levels": [
+     "Apply depuis un poste",
+     "Plan relu en PR",
+     "Plan en PR, apply depuis main avec identités temporaires"
+    ]
+   }
+  ]
+ },
+ "glossary": [
+  {
+   "term": "IaC",
+   "definition": "Infrastructure décrite dans du code versionné."
+  },
+  {
+   "term": "OpenTofu",
+   "definition": "Fork libre de Terraform, compatible."
+  },
+  {
+   "term": "Provider",
+   "definition": "Extension qui sait piloter une plateforme (aws, google, kubernetes)."
+  },
+  {
+   "term": "Plan",
+   "definition": "Aperçu des changements avant application."
+  },
+  {
+   "term": "État (state)",
+   "definition": "Correspondance entre le code et les ressources réelles."
+  },
+  {
+   "term": "Backend",
+   "definition": "Lieu de stockage partagé et verrouillé de l'état."
+  },
+  {
+   "term": "Module",
+   "definition": "Ensemble réutilisable de ressources paramétrées."
+  },
+  {
+   "term": "Dérive",
+   "definition": "Écart entre le code et la réalité."
+  },
+  {
+   "term": "Inventaire",
+   "definition": "Liste des machines gérées par Ansible."
+  },
+  {
+   "term": "Module Ansible",
+   "definition": "Unité idempotente décrivant un état (apt, copy, user…)."
+  },
+  {
+   "term": "Playbook",
+   "definition": "Fichier YAML décrivant des plays et des tâches."
+  },
+  {
+   "term": "Handler",
+   "definition": "Tâche exécutée seulement si une autre a changé quelque chose."
+  },
+  {
+   "term": "ansible-vault",
+   "definition": "Chiffrement de fichiers de variables."
+  },
+  {
+   "term": "Idempotence",
+   "definition": "Relancer ne change rien si l'état est déjà atteint."
+  }
+ ]
+}

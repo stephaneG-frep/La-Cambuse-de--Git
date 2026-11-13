@@ -23,7 +23,7 @@ Dernière mise à jour : 2026-11-12 (fin de phase 7)
 | 6 | GitHub / GitLab (dépôt privé, push avec consentement) | 🟨 | GitHub ✅ réel (push, PR #1, ticket #2) ; GitLab testé sur serveur simulé seulement — [PHASE6_BILAN.md](PHASE6_BILAN.md) |
 | 7 | Docker et Compose | ✅ | modules Docker + Compose (13 labos), analyseurs, inspection lecture seule, génération ; essai réel Honor — [PHASE7_BILAN.md](PHASE7_BILAN.md) |
 | 8 | CI/CD générée, APK debug, .deb, checksums | ✅ | CI générée et builds approuvés depuis le Honor, cale « DEBUG », `.deb` construit et vérifié sans installation ; CI du dépôt non encore exécutée sur GitHub — [PHASE8_BILAN.md](PHASE8_BILAN.md) |
-| 9 | Académie avancée | ⬜ | |
+| 9 | Académie avancée | ✅ | 8 modules (79 leçons, 316 questions, 48 labos réalisables, 8 projets), 9 analyseurs ; essai réel Honor ; contenu non relu par un expert humain — [PHASE9_BILAN.md](PHASE9_BILAN.md) |
 | 10 | Capitaine automatique | ⬜ | |
 | 11 | Stabilisation et livraison | ⬜ | |
 

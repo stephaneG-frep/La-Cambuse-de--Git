@@ -2,7 +2,7 @@
 
 Application Flutter **Android** et **Linux** : académie Git / GitHub / GitLab / Docker / DevOps de zéro à expert, atelier d'opérations réelles sur projets et capitaine automatique supervisé.
 
-> État actuel : **fin de phase 8** (Académie Git/Docker/Compose, professeur IA facultatif, compagnon Linux sécurisé, Atelier, publication GitHub/GitLab, inspection Docker, CI générée, builds approuvés, cale des artefacts, paquet `.deb`). Voir [docs/ACCEPTANCE_MATRIX.md](docs/ACCEPTANCE_MATRIX.md) pour l'état réel de chaque fonctionnalité. Le Capitaine affiche honnêtement la phase où il sera livré. Le bac à sable de l'Académie est un **simulateur pédagogique** clairement signalé : il n'exécute aucune commande réelle.
+> État actuel : **fin de phase 9** (Académie complète en 11 modules, du terminal Linux au SRE, professeur IA facultatif, compagnon Linux sécurisé, Atelier, publication GitHub/GitLab, inspection Docker, CI générée, builds approuvés, cale des artefacts, paquet `.deb`). Voir [docs/ACCEPTANCE_MATRIX.md](docs/ACCEPTANCE_MATRIX.md) pour l'état réel de chaque fonctionnalité. Le Capitaine affiche honnêtement la phase où il sera livré. Le bac à sable de l'Académie est un **simulateur pédagogique** clairement signalé : il n'exécute aucune commande réelle.
 
 ## Documents de référence
 
@@ -18,6 +18,7 @@ Application Flutter **Android** et **Linux** : académie Git / GitHub / GitLab /
 - [docs/PHASE6_BILAN.md](docs/PHASE6_BILAN.md) — bilan de la phase 6
 - [docs/PHASE7_BILAN.md](docs/PHASE7_BILAN.md) — bilan de la phase 7
 - [docs/PHASE8_BILAN.md](docs/PHASE8_BILAN.md) — bilan de la phase 8
+- [docs/PHASE9_BILAN.md](docs/PHASE9_BILAN.md) — bilan de la phase 9
 - [companion/README.md](companion/README.md) — compagnon Linux (installation, sécurité)
 - [CHANGELOG.md](CHANGELOG.md)
 
@@ -33,6 +34,7 @@ Application Flutter **Android** et **Linux** : académie Git / GitHub / GitLab /
 flutter pub get
 python3 tool/content/git_module.py                          # régénère assets/courses/git.json
 python3 tool/content/docker_modules.py                       # régénère docker.json et compose.json
+for f in tool/content/*_module.py tool/content/forges_modules.py; do python3 "$f"; done   # modules avancés
 dart run build_runner build --delete-conflicting-outputs   # code Drift
 flutter analyze --fatal-infos
 flutter test

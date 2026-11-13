@@ -1,0 +1,1163 @@
+{
+ "id": "reseaux",
+ "version": 1,
+ "title": "Réseaux, serveurs et cloud, la haute mer",
+ "summary": "Adresses, ports, DNS, HTTP, TLS, reverse proxy, pare-feu, cloud et coûts, et une démarche de diagnostic réseau.",
+ "objectives": [
+  "Comprendre adresses, ports, DNS et HTTP",
+  "Servir un site en HTTPS moderne derrière un reverse proxy",
+  "Limiter l'exposition réseau",
+  "Maîtriser les risques et les coûts du cloud",
+  "Diagnostiquer couche par couche"
+ ],
+ "prerequisites": [
+  "Module Terminal Linux"
+ ],
+ "lessons": [
+  {
+   "id": "bases-reseau",
+   "title": "Adresses, ports et protocoles",
+   "minutes": 18,
+   "objectives": [
+    "Lire une adresse IP et un port",
+    "Distinguer TCP et UDP",
+    "Voir quels services écoutent sur une machine"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Une adresse IP identifie une machine sur un réseau (IPv4 : 192.0.2.10 ; IPv6 : 2001:db8::10). Un port (0–65535) identifie un service sur cette machine : 22 pour SSH, 80 pour HTTP, 443 pour HTTPS, 5432 pour PostgreSQL."
+    },
+    {
+     "type": "text",
+     "body": "TCP établit une connexion fiable et ordonnée (web, SSH, bases de données). UDP envoie des messages sans garantie, plus léger (DNS, visioconférence, jeux)."
+    },
+    {
+     "type": "code",
+     "body": "ip a\nss -tlnp\nping -c 3 exemple.org\ntraceroute exemple.org",
+     "caption": "Mes adresses, services en écoute, joignabilité, chemin réseau"
+    },
+    {
+     "type": "warning",
+     "body": "Un service qui écoute sur 0.0.0.0 accepte les connexions de toutes les interfaces ; sur 127.0.0.1, seulement de la machine elle-même."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "rs-1-1",
+     "type": "single",
+     "prompt": "Port standard de HTTPS ?",
+     "choices": [
+      "443",
+      "80",
+      "22",
+      "8080"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "80 est HTTP en clair, 443 HTTPS chiffré."
+    },
+    {
+     "id": "rs-1-2",
+     "type": "single",
+     "prompt": "Protocole sans connexion ni garantie de livraison ?",
+     "choices": [
+      "UDP",
+      "TCP",
+      "HTTP",
+      "SSH"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "UDP est utilisé par DNS et la voix sur IP."
+    },
+    {
+     "id": "rs-1-3",
+     "type": "single",
+     "prompt": "Un service écoute sur 127.0.0.1:5432. Qui peut s'y connecter ?",
+     "choices": [
+      "Seulement la machine elle-même",
+      "Tout Internet",
+      "Le réseau local",
+      "Personne"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "C'est l'interface de bouclage locale."
+    },
+    {
+     "id": "rs-1-4",
+     "type": "command",
+     "prompt": "Listez les ports TCP en écoute avec les processus associés.",
+     "accepted": [
+      "ss -tlnp",
+      "sudo ss -tlnp",
+      "ss -ltnp"
+     ],
+     "explanation": "t = TCP, l = écoute, n = numérique, p = processus."
+    }
+   ]
+  },
+  {
+   "id": "sous-reseaux",
+   "title": "Sous-réseaux, NAT et adresses privées",
+   "minutes": 18,
+   "objectives": [
+    "Lire une notation CIDR",
+    "Reconnaître les plages privées et le rôle du NAT"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "La notation CIDR 10.0.1.0/24 signifie : les 24 premiers bits désignent le réseau, il reste 8 bits pour les machines (256 adresses, dont 254 utilisables). /16 = 65 536 adresses, /32 = une seule adresse."
+    },
+    {
+     "type": "text",
+     "body": "Plages privées (non routées sur Internet) : 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16. Votre box traduit ces adresses vers son adresse publique : c'est le NAT."
+    },
+    {
+     "type": "code",
+     "body": "ip route\nip -4 addr show",
+     "caption": "Table de routage (passerelle par défaut) et adresses IPv4"
+    },
+    {
+     "type": "tip",
+     "body": "0.0.0.0/0 signifie « toutes les adresses » : dans une règle de pare-feu, c'est tout Internet."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "rs-2-1",
+     "type": "single",
+     "prompt": "Combien d'adresses dans un /24 ?",
+     "choices": [
+      "256",
+      "24",
+      "65 536",
+      "1"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "2 puissance 8 = 256 (254 utilisables pour des machines)."
+    },
+    {
+     "id": "rs-2-2",
+     "type": "single",
+     "prompt": "Laquelle est une adresse privée ?",
+     "choices": [
+      "192.168.1.20",
+      "8.8.8.8",
+      "203.0.113.5",
+      "1.1.1.1"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "192.168.0.0/16 est une plage privée."
+    },
+    {
+     "id": "rs-2-3",
+     "type": "single",
+     "prompt": "Que représente 0.0.0.0/0 dans une règle d'accès ?",
+     "choices": [
+      "Toutes les adresses",
+      "Aucune adresse",
+      "La machine locale",
+      "Le réseau privé"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Ouvrir à 0.0.0.0/0, c'est ouvrir à tout Internet."
+    },
+    {
+     "id": "rs-2-4",
+     "type": "single",
+     "prompt": "Rôle du NAT de votre box ?",
+     "choices": [
+      "Traduire les adresses privées vers l'adresse publique",
+      "Chiffrer le trafic",
+      "Résoudre les noms",
+      "Bloquer les virus"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Plusieurs machines partagent une adresse publique."
+    }
+   ]
+  },
+  {
+   "id": "dns",
+   "title": "DNS : l'annuaire d'Internet",
+   "minutes": 18,
+   "objectives": [
+    "Comprendre la résolution de noms",
+    "Lire les enregistrements A, AAAA, CNAME, MX et TXT"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Le DNS traduit exemple.org en adresse IP. Un résolveur interroge la racine, puis le serveur de .org, puis le serveur faisant autorité pour exemple.org. Les réponses sont mises en cache pendant leur TTL."
+    },
+    {
+     "type": "code",
+     "body": "dig exemple.org A +short\ndig exemple.org MX\ndig www.exemple.org CNAME\ndig exemple.org TXT",
+     "caption": "Interroger différents types d'enregistrements"
+    },
+    {
+     "type": "text",
+     "body": "A = IPv4, AAAA = IPv6, CNAME = alias vers un autre nom, MX = serveurs de courrier, TXT = texte libre (vérifications, SPF)."
+    },
+    {
+     "type": "warning",
+     "body": "Avant une migration, baissez le TTL quelques jours à l'avance : sinon les anciens résultats restent en cache des heures."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "rs-3-1",
+     "type": "single",
+     "prompt": "Enregistrement qui donne une adresse IPv4 ?",
+     "choices": [
+      "A",
+      "AAAA",
+      "MX",
+      "TXT"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "AAAA est son équivalent IPv6."
+    },
+    {
+     "id": "rs-3-2",
+     "type": "single",
+     "prompt": "Que contrôle le TTL ?",
+     "choices": [
+      "La durée de mise en cache d'une réponse",
+      "La vitesse du réseau",
+      "Le chiffrement",
+      "Le nombre de serveurs"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Un TTL court accélère la propagation des changements."
+    },
+    {
+     "id": "rs-3-3",
+     "type": "command",
+     "prompt": "Affichez seulement l'adresse IPv4 de exemple.org avec dig.",
+     "accepted": [
+      "dig exemple.org A +short",
+      "dig +short exemple.org A",
+      "dig +short exemple.org"
+     ],
+     "explanation": "+short n'affiche que la réponse."
+    },
+    {
+     "id": "rs-3-4",
+     "type": "single",
+     "prompt": "Un CNAME est…",
+     "choices": [
+      "Un alias vers un autre nom",
+      "Une adresse IPv6",
+      "Un serveur de courrier",
+      "Un certificat"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "www.exemple.org peut pointer vers exemple.org."
+    }
+   ]
+  },
+  {
+   "id": "http",
+   "title": "HTTP : requêtes, réponses et en-têtes",
+   "minutes": 20,
+   "objectives": [
+    "Lire une requête et une réponse HTTP",
+    "Interpréter les codes de statut",
+    "Poser des en-têtes de sécurité de base"
+   ],
+   "sections": [
+    {
+     "type": "code",
+     "body": "curl -I https://exemple.org\ncurl -sS -X POST -H 'Content-Type: application/json' -d '{\"nom\":\"Ana\"}' https://api.exemple.org/clients",
+     "caption": "En-têtes d'une réponse, requête POST JSON"
+    },
+    {
+     "type": "text",
+     "body": "Méthodes : GET (lire), POST (créer), PUT/PATCH (modifier), DELETE (supprimer). Codes : 2xx succès, 3xx redirection, 4xx erreur du client (404 introuvable, 401 non authentifié, 403 interdit), 5xx erreur du serveur."
+    },
+    {
+     "type": "text",
+     "body": "Quelques en-têtes de sécurité simples : ne pas annoncer la version du serveur, X-Content-Type-Options: nosniff (le navigateur respecte le type annoncé), Content-Security-Policy (sources autorisées)."
+    },
+    {
+     "type": "tip",
+     "body": "Un 502 Bad Gateway vient souvent du proxy qui n'arrive pas à joindre l'application derrière lui."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "rs-4-1",
+     "type": "single",
+     "prompt": "Un code 503 indique…",
+     "choices": [
+      "Une erreur côté serveur (service indisponible)",
+      "Une page introuvable",
+      "Une redirection",
+      "Un succès"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Les 5xx sont des erreurs du serveur."
+    },
+    {
+     "id": "rs-4-2",
+     "type": "single",
+     "prompt": "Différence entre 401 et 403 ?",
+     "choices": [
+      "401 : non authentifié ; 403 : authentifié mais interdit",
+      "Aucune",
+      "401 : interdit ; 403 : introuvable",
+      "403 : succès"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "On se connecte pour un 401, pas pour un 403."
+    },
+    {
+     "id": "rs-4-3",
+     "type": "command",
+     "prompt": "Affichez uniquement les en-têtes de la réponse de https://exemple.org.",
+     "accepted": [
+      "curl -I https://exemple.org",
+      "curl --head https://exemple.org"
+     ],
+     "explanation": "-I envoie une requête HEAD."
+    },
+    {
+     "id": "rs-4-4",
+     "type": "single",
+     "prompt": "Pourquoi masquer la version du serveur ?",
+     "choices": [
+      "Ne pas aider un attaquant à cibler une faille connue",
+      "Accélérer les pages",
+      "Économiser de la bande passante",
+      "Obligation légale"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "C'est une réduction d'exposition, pas une protection suffisante."
+    }
+   ],
+   "lab": {
+    "kind": "nginx",
+    "intro": "Ce serveur annonce sa version et n'envoie aucun en-tête de sécurité. Corrigez sa configuration.",
+    "starter": "server {\n    listen 80;\n    server_name exemple.org;\n    root /var/www/site;\n}\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "Version masquée",
+      "rule": "NG001"
+     },
+     {
+      "type": "noRule",
+      "label": "En-tête X-Content-Type-Options",
+      "rule": "NG005"
+     },
+     {
+      "type": "valid",
+      "label": "Fichier valide"
+     }
+    ],
+    "hint": "Ajoutez server_tokens off; et add_header X-Content-Type-Options nosniff always; dans le bloc server.",
+    "solution": "server {\n    listen 80;\n    server_name exemple.org;\n    server_tokens off;\n    add_header X-Content-Type-Options nosniff always;\n    root /var/www/site;\n}\n"
+   }
+  },
+  {
+   "id": "tls",
+   "title": "TLS et certificats",
+   "minutes": 22,
+   "objectives": [
+    "Comprendre ce que garantit HTTPS",
+    "Obtenir et renouveler un certificat",
+    "Refuser les protocoles obsolètes"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "TLS chiffre la connexion et prouve l'identité du serveur grâce à un certificat signé par une autorité reconnue. Il ne garantit pas que le site est honnête, seulement que vous parlez bien au détenteur du nom."
+    },
+    {
+     "type": "code",
+     "body": "sudo certbot --nginx -d exemple.org -d www.exemple.org\nsudo certbot renew --dry-run\nopenssl s_client -connect exemple.org:443 -servername exemple.org </dev/null | openssl x509 -noout -dates",
+     "caption": "Let's Encrypt avec certbot, test du renouvellement, dates d'expiration"
+    },
+    {
+     "type": "text",
+     "body": "SSLv3, TLS 1.0 et 1.1 sont obsolètes et vulnérables : n'autorisez que TLS 1.2 et 1.3."
+    },
+    {
+     "type": "warning",
+     "body": "La clé privée du certificat (privkey.pem) ne sort jamais du serveur et n'entre jamais dans Git."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "rs-5-1",
+     "type": "single",
+     "prompt": "Que garantit un certificat valide ?",
+     "choices": [
+      "Que vous parlez au détenteur du nom de domaine",
+      "Que le site est honnête",
+      "Que le site est rapide",
+      "Que le site n'a pas de bug"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Identité et chiffrement, pas honnêteté."
+    },
+    {
+     "id": "rs-5-2",
+     "type": "single",
+     "prompt": "Versions de TLS à autoriser aujourd'hui ?",
+     "choices": [
+      "TLS 1.2 et 1.3",
+      "SSLv3 et TLS 1.0",
+      "Toutes",
+      "Aucune"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Les versions antérieures sont obsolètes."
+    },
+    {
+     "id": "rs-5-3",
+     "type": "command",
+     "prompt": "Testez le renouvellement des certificats certbot sans rien changer.",
+     "accepted": [
+      "sudo certbot renew --dry-run",
+      "certbot renew --dry-run"
+     ],
+     "explanation": "Le renouvellement automatique doit être vérifié."
+    },
+    {
+     "id": "rs-5-4",
+     "type": "single",
+     "prompt": "Où doit rester la clé privée du certificat ?",
+     "choices": [
+      "Sur le serveur, jamais dans Git",
+      "Dans le dépôt",
+      "Dans le README",
+      "Chez tous les développeurs"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Sa fuite permet d'usurper le site."
+    }
+   ],
+   "lab": {
+    "kind": "nginx",
+    "intro": "Ce serveur HTTPS accepte encore TLS 1.0 et 1.1. N'autorisez que les versions sûres.",
+    "starter": "server {\n    listen 443 ssl;\n    server_name exemple.org;\n    server_tokens off;\n    ssl_certificate /etc/letsencrypt/live/exemple.org/fullchain.pem;\n    ssl_certificate_key /etc/letsencrypt/live/exemple.org/privkey.pem;\n    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;\n    root /var/www/site;\n}\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "Protocoles obsolètes refusés",
+      "rule": "NG002"
+     },
+     {
+      "type": "valid",
+      "label": "Fichier valide"
+     }
+    ],
+    "hint": "ssl_protocols TLSv1.2 TLSv1.3;",
+    "solution": "server {\n    listen 443 ssl;\n    server_name exemple.org;\n    server_tokens off;\n    ssl_certificate /etc/letsencrypt/live/exemple.org/fullchain.pem;\n    ssl_certificate_key /etc/letsencrypt/live/exemple.org/privkey.pem;\n    ssl_protocols TLSv1.2 TLSv1.3;\n    root /var/www/site;\n}\n"
+   }
+  },
+  {
+   "id": "reverse-proxy",
+   "title": "Reverse proxy et HTTPS partout",
+   "minutes": 22,
+   "objectives": [
+    "Placer un reverse proxy devant une application",
+    "Rediriger HTTP vers HTTPS et activer HSTS"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Un reverse proxy (nginx, Caddy, Traefik) reçoit les requêtes, termine TLS et les transmet à l'application qui écoute en local (127.0.0.1:3000). L'application n'est jamais exposée directement."
+    },
+    {
+     "type": "code",
+     "body": "location / {\n    proxy_pass http://127.0.0.1:3000;\n    proxy_set_header Host $host;\n    proxy_set_header X-Forwarded-Proto $scheme;\n}",
+     "caption": "Transmission vers l'application locale"
+    },
+    {
+     "type": "text",
+     "body": "Le port 80 ne doit servir qu'à rediriger vers HTTPS (return 301). HSTS indique ensuite au navigateur de ne plus jamais tenter HTTP pour ce domaine."
+    },
+    {
+     "type": "warning",
+     "body": "Activez HSTS seulement quand HTTPS fonctionne pour tous les sous-domaines concernés : le navigateur s'en souviendra des mois."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "rs-6-1",
+     "type": "single",
+     "prompt": "Rôle d'un reverse proxy ?",
+     "choices": [
+      "Recevoir les requêtes et les transmettre à l'application locale",
+      "Résoudre les noms",
+      "Remplacer la base de données",
+      "Compiler l'application"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Il termine aussi souvent TLS."
+    },
+    {
+     "id": "rs-6-2",
+     "type": "single",
+     "prompt": "Que doit faire le serveur sur le port 80 ?",
+     "choices": [
+      "Rediriger vers HTTPS",
+      "Servir le site",
+      "Rien",
+      "Servir l'API"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "return 301 https://$host$request_uri;"
+    },
+    {
+     "id": "rs-6-3",
+     "type": "single",
+     "prompt": "Effet de HSTS ?",
+     "choices": [
+      "Le navigateur n'utilise plus que HTTPS pour ce domaine",
+      "Accélère HTTP",
+      "Chiffre la base",
+      "Masque la version"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Empêche le déclassement vers HTTP."
+    },
+    {
+     "id": "rs-6-4",
+     "type": "single",
+     "prompt": "Sur quelle interface l'application derrière le proxy doit-elle écouter ?",
+     "choices": [
+      "127.0.0.1",
+      "0.0.0.0",
+      "L'IP publique",
+      "Peu importe"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Seul le proxy doit pouvoir la joindre."
+    }
+   ],
+   "lab": {
+    "kind": "nginx",
+    "intro": "Le port 80 sert le site en clair et HTTPS n'a pas de HSTS. Corrigez les deux.",
+    "starter": "server {\n    listen 80;\n    server_name exemple.org;\n    server_tokens off;\n    root /var/www/site;\n}\nserver {\n    listen 443 ssl;\n    server_name exemple.org;\n    server_tokens off;\n    ssl_protocols TLSv1.2 TLSv1.3;\n    location / {\n        proxy_pass http://127.0.0.1:3000;\n    }\n}\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "HSTS activé",
+      "rule": "NG003"
+     },
+     {
+      "type": "noRule",
+      "label": "Le port 80 redirige vers HTTPS",
+      "rule": "NG004"
+     },
+     {
+      "type": "valid",
+      "label": "Fichier valide"
+     }
+    ],
+    "hint": "Dans le server du port 80 : return 301 https://$host$request_uri; ; dans celui du 443 : add_header Strict-Transport-Security \"max-age=31536000\" always;",
+    "solution": "server {\n    listen 80;\n    server_name exemple.org;\n    server_tokens off;\n    return 301 https://$host$request_uri;\n}\nserver {\n    listen 443 ssl;\n    server_name exemple.org;\n    server_tokens off;\n    ssl_protocols TLSv1.2 TLSv1.3;\n    add_header Strict-Transport-Security \"max-age=31536000\" always;\n    location / {\n        proxy_pass http://127.0.0.1:3000;\n    }\n}\n"
+   }
+  },
+  {
+   "id": "fichiers-statiques",
+   "title": "Servir des fichiers sans tout exposer",
+   "minutes": 15,
+   "objectives": [
+    "Servir des fichiers statiques proprement",
+    "Éviter les fuites par listage de dossiers et fichiers cachés"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "autoindex on transforme un dossier en page listant tous ses fichiers : sauvegardes, exports et fichiers oubliés deviennent visibles de tous."
+    },
+    {
+     "type": "code",
+     "body": "location ~ /\\. {\n    deny all;\n}\nlocation /telechargements/ {\n    autoindex off;\n}",
+     "caption": "Refuser les fichiers cachés (.git, .env) et désactiver le listage"
+    },
+    {
+     "type": "text",
+     "body": "Un dossier .git servi par erreur permet de reconstituer tout le code source, secrets compris."
+    },
+    {
+     "type": "tip",
+     "body": "Placez la racine du site (root) sur un dossier de publication dédié, jamais à la racine du projet."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "rs-7-1",
+     "type": "single",
+     "prompt": "Risque de autoindex on ?",
+     "choices": [
+      "Tous les fichiers du dossier deviennent listés publiquement",
+      "Le site est plus lent",
+      "TLS est désactivé",
+      "Aucun"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Des fichiers oubliés peuvent fuiter."
+    },
+    {
+     "id": "rs-7-2",
+     "type": "single",
+     "prompt": "Pourquoi bloquer les chemins commençant par un point ?",
+     "choices": [
+      "Protéger .git, .env et autres fichiers cachés",
+      "Accélérer le cache",
+      "Bloquer les images",
+      "Bloquer HTTPS"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Un .git exposé révèle le code."
+    },
+    {
+     "id": "rs-7-3",
+     "type": "single",
+     "prompt": "Où pointer root ?",
+     "choices": [
+      "Un dossier de publication dédié",
+      "La racine du projet",
+      "Le dossier personnel",
+      "/"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Seuls les fichiers à publier y figurent."
+    },
+    {
+     "id": "rs-7-4",
+     "type": "single",
+     "prompt": "Un .git exposé permet…",
+     "choices": [
+      "De reconstituer le code source et son historique",
+      "Rien",
+      "D'accélérer le site",
+      "De changer le DNS"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Des outils automatisent cette extraction."
+    }
+   ],
+   "lab": {
+    "kind": "nginx",
+    "intro": "Ce dossier de téléchargements liste son contenu publiquement. Corrigez-le.",
+    "starter": "server {\n    listen 80;\n    server_name fichiers.exemple.org;\n    server_tokens off;\n    root /var/www/fichiers;\n    location /telechargements/ {\n        autoindex on;\n    }\n}\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "Plus de listage de dossier",
+      "rule": "NG006"
+     },
+     {
+      "type": "valid",
+      "label": "Fichier valide"
+     }
+    ],
+    "hint": "Passez autoindex à off (et ajoutez un refus des fichiers cachés).",
+    "solution": "server {\n    listen 80;\n    server_name fichiers.exemple.org;\n    server_tokens off;\n    root /var/www/fichiers;\n    location ~ /\\. {\n        deny all;\n    }\n    location /telechargements/ {\n        autoindex off;\n    }\n}\n"
+   }
+  },
+  {
+   "id": "pare-feu",
+   "title": "Pare-feu et exposition minimale",
+   "minutes": 20,
+   "objectives": [
+    "N'ouvrir que les ports nécessaires",
+    "Restreindre l'administration à des adresses connues"
+   ],
+   "sections": [
+    {
+     "type": "code",
+     "body": "sudo ufw default deny incoming\nsudo ufw allow from 203.0.113.10 to any port 22 proto tcp\nsudo ufw allow 443/tcp\nsudo ufw enable\nsudo ufw status verbose",
+     "caption": "Tout refuser, puis ouvrir SSH à une adresse et HTTPS à tous"
+    },
+    {
+     "type": "text",
+     "body": "Dans le cloud, les groupes de sécurité jouent le même rôle. SSH (22) ou RDP (3389) ouverts à 0.0.0.0/0 sont scannés en permanence par des robots."
+    },
+    {
+     "type": "warning",
+     "body": "Ajoutez la règle SSH AVANT d'activer le pare-feu, sinon vous coupez votre propre session."
+    },
+    {
+     "type": "tip",
+     "body": "Un bastion ou un VPN (WireGuard) évite d'exposer SSH sur Internet."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "rs-8-1",
+     "type": "single",
+     "prompt": "Politique par défaut recommandée pour les connexions entrantes ?",
+     "choices": [
+      "Tout refuser, ouvrir au cas par cas",
+      "Tout accepter",
+      "Refuser seulement le 80",
+      "Aucune"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Liste blanche explicite."
+    },
+    {
+     "id": "rs-8-2",
+     "type": "single",
+     "prompt": "Pourquoi éviter SSH ouvert à 0.0.0.0/0 ?",
+     "choices": [
+      "Des robots le scannent et l'attaquent en permanence",
+      "SSH est lent",
+      "C'est interdit par la loi",
+      "Cela casse HTTPS"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Restreignez à vos adresses ou passez par un VPN."
+    },
+    {
+     "id": "rs-8-3",
+     "type": "command",
+     "prompt": "Autorisez HTTPS entrant avec ufw.",
+     "accepted": [
+      "sudo ufw allow 443/tcp",
+      "ufw allow 443/tcp",
+      "sudo ufw allow https"
+     ],
+     "explanation": "443/tcp suffit pour HTTPS."
+    },
+    {
+     "id": "rs-8-4",
+     "type": "single",
+     "prompt": "Avant ufw enable sur un serveur distant…",
+     "choices": [
+      "Autoriser SSH pour ne pas se couper",
+      "Redémarrer",
+      "Supprimer les clés",
+      "Désactiver le DNS"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Sinon la session tombe."
+    }
+   ],
+   "lab": {
+    "kind": "terraform",
+    "intro": "Ce groupe de sécurité ouvre SSH à tout Internet. Restreignez-le à une adresse d'administration.",
+    "starter": "resource \"aws_security_group\" \"web\" {\n  name = \"web\"\n\n  ingress {\n    from_port   = 22\n    to_port     = 22\n    protocol    = \"tcp\"\n    cidr_blocks = [\"0.0.0.0/0\"]\n  }\n\n  ingress {\n    from_port   = 443\n    to_port     = 443\n    protocol    = \"tcp\"\n    cidr_blocks = [\"0.0.0.0/0\"]\n  }\n}\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "SSH n'est plus ouvert à tout Internet",
+      "rule": "TF004"
+     },
+     {
+      "type": "contains",
+      "label": "HTTPS reste public",
+      "text": "443"
+     },
+     {
+      "type": "valid",
+      "label": "Fichier valide"
+     }
+    ],
+    "hint": "Remplacez le cidr_blocks de la règle 22 par votre adresse, ex. [\"203.0.113.10/32\"].",
+    "solution": "resource \"aws_security_group\" \"web\" {\n  name = \"web\"\n\n  ingress {\n    from_port   = 22\n    to_port     = 22\n    protocol    = \"tcp\"\n    cidr_blocks = [\"203.0.113.10/32\"]\n  }\n\n  ingress {\n    from_port   = 443\n    to_port     = 443\n    protocol    = \"tcp\"\n    cidr_blocks = [\"0.0.0.0/0\"]\n  }\n}\n"
+   }
+  },
+  {
+   "id": "cloud-couts",
+   "title": "Serveurs, cloud et coûts",
+   "minutes": 20,
+   "objectives": [
+    "Distinguer IaaS, PaaS et SaaS",
+    "Connaître la responsabilité partagée",
+    "Éviter les mauvaises surprises de facture"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "IaaS : vous louez des machines virtuelles et gérez le système. PaaS : vous déployez votre application, le fournisseur gère le reste. SaaS : vous utilisez un logiciel prêt. Plus on monte, moins on administre… et moins on contrôle."
+    },
+    {
+     "type": "text",
+     "body": "Responsabilité partagée : le fournisseur sécurise l'infrastructure physique ; vous restez responsable de vos données, accès, configurations et mises à jour."
+    },
+    {
+     "type": "text",
+     "body": "Coûts typiques oubliés : trafic sortant (egress), disques et instantanés orphelins, adresses IP réservées, journaux conservés indéfiniment, machines de test jamais éteintes."
+    },
+    {
+     "type": "warning",
+     "body": "Un stockage objet public expose les données à tous — et la bande passante consommée par d'autres vous est facturée."
+    },
+    {
+     "type": "tip",
+     "body": "Activez des alertes de budget dès le premier jour et étiquetez chaque ressource (projet, environnement, responsable)."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "rs-9-1",
+     "type": "single",
+     "prompt": "Dans un IaaS, qui met à jour le système d'exploitation ?",
+     "choices": [
+      "Vous",
+      "Le fournisseur",
+      "Personne",
+      "Le navigateur"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Vous gérez tout au-dessus de la machine virtuelle."
+    },
+    {
+     "id": "rs-9-2",
+     "type": "single",
+     "prompt": "Coût souvent oublié ?",
+     "choices": [
+      "Le trafic sortant (egress)",
+      "Le trafic entrant",
+      "Le nom de domaine en .fr",
+      "Les commits"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Le trafic sortant est généralement facturé."
+    },
+    {
+     "id": "rs-9-3",
+     "type": "single",
+     "prompt": "Première précaution financière ?",
+     "choices": [
+      "Alertes de budget et étiquettes sur les ressources",
+      "Aucune",
+      "Désactiver la facturation",
+      "Tout supprimer chaque soir"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "On voit vite ce qui coûte."
+    },
+    {
+     "id": "rs-9-4",
+     "type": "single",
+     "prompt": "Un bucket public peut coûter cher car…",
+     "choices": [
+      "La bande passante utilisée par d'autres vous est facturée",
+      "Il est chiffré",
+      "Il est lent",
+      "Il est gratuit"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Et les données fuient."
+    }
+   ],
+   "lab": {
+    "kind": "terraform",
+    "intro": "Ce stockage d'exports clients est lisible publiquement. Rendez-le privé.",
+    "starter": "resource \"aws_s3_bucket\" \"exports\" {\n  bucket = \"exemple-exports-clients\"\n}\n\nresource \"aws_s3_bucket_acl\" \"exports\" {\n  bucket = aws_s3_bucket.exports.id\n  acl    = \"public-read\"\n}\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "Stockage privé",
+      "rule": "TF007"
+     },
+     {
+      "type": "contains",
+      "label": "Accès public bloqué",
+      "text": "block_public_acls"
+     },
+     {
+      "type": "valid",
+      "label": "Fichier valide"
+     }
+    ],
+    "hint": "Passez l'ACL à private et ajoutez une ressource aws_s3_bucket_public_access_block avec les quatre options à true.",
+    "solution": "resource \"aws_s3_bucket\" \"exports\" {\n  bucket = \"exemple-exports-clients\"\n}\n\nresource \"aws_s3_bucket_acl\" \"exports\" {\n  bucket = aws_s3_bucket.exports.id\n  acl    = \"private\"\n}\n\nresource \"aws_s3_bucket_public_access_block\" \"exports\" {\n  bucket                  = aws_s3_bucket.exports.id\n  block_public_acls       = true\n  block_public_policy     = true\n  ignore_public_acls      = true\n  restrict_public_buckets = true\n}\n"
+   }
+  },
+  {
+   "id": "diagnostic",
+   "title": "Diagnostiquer un problème réseau",
+   "minutes": 18,
+   "objectives": [
+    "Suivre une démarche couche par couche",
+    "Lire les journaux d'accès et d'erreurs"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Démarche : le nom se résout-il (dig) ? La machine répond-elle (ping, traceroute) ? Le port est-il ouvert (nc -zv, ss) ? Le service répond-il (curl -v) ? Que disent les journaux ?"
+    },
+    {
+     "type": "code",
+     "body": "dig +short api.exemple.org\nnc -zv api.exemple.org 443\ncurl -v https://api.exemple.org/sante\nsudo tail -f /var/log/nginx/error.log",
+     "caption": "Du nom jusqu'aux journaux"
+    },
+    {
+     "type": "text",
+     "body": "Les journaux d'accès donnent statut, durée et taille de chaque requête : une hausse des 5xx ou de la latence est souvent le premier signal d'un incident."
+    },
+    {
+     "type": "tip",
+     "body": "Changez une seule chose à la fois et notez ce que vous observez : le diagnostic devient reproductible."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "rs-10-1",
+     "type": "single",
+     "prompt": "Premier contrôle si « le site ne marche pas » ?",
+     "choices": [
+      "Le nom se résout-il ?",
+      "Réinstaller le serveur",
+      "Changer de fournisseur",
+      "Supprimer le cache navigateur uniquement"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "On remonte les couches dans l'ordre."
+    },
+    {
+     "id": "rs-10-2",
+     "type": "command",
+     "prompt": "Testez si le port 443 de api.exemple.org est joignable avec nc.",
+     "accepted": [
+      "nc -zv api.exemple.org 443"
+     ],
+     "explanation": "-z teste sans envoyer de données, -v affiche le résultat."
+    },
+    {
+     "id": "rs-10-3",
+     "type": "single",
+     "prompt": "Que montre curl -v ?",
+     "choices": [
+      "Le détail de la connexion, de TLS et des en-têtes",
+      "Seulement le corps",
+      "Le DNS uniquement",
+      "Rien de plus"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Idéal pour voir où ça coince."
+    },
+    {
+     "id": "rs-10-4",
+     "type": "single",
+     "prompt": "Signal précoce d'incident dans les journaux d'accès ?",
+     "choices": [
+      "Hausse des 5xx ou de la latence",
+      "Hausse des 200",
+      "Moins de 404",
+      "Aucun"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "À surveiller avec des alertes."
+    }
+   ]
+  }
+ ],
+ "project": {
+  "title": "Mise en production d'un site sous nginx",
+  "brief": "Écrivez la configuration nginx d'un site en production : HTTP redirigé, TLS moderne, HSTS, en-têtes de sécurité, aucune fuite de fichiers.",
+  "lab": {
+   "kind": "nginx",
+   "intro": "Objectif : aucun problème bloquant ni avertissement.",
+   "starter": "server {\n    listen 80;\n    server_name exemple.org;\n    root /srv/projet;\n    autoindex on;\n}\nserver {\n    listen 443 ssl;\n    server_name exemple.org;\n    ssl_protocols SSLv3 TLSv1 TLSv1.2;\n    root /srv/projet;\n}\n",
+   "goals": [
+    {
+     "type": "noSeverity",
+     "label": "Aucun problème bloquant",
+     "severity": "blocking"
+    },
+    {
+     "type": "noSeverity",
+     "label": "Aucun avertissement",
+     "severity": "warning"
+    },
+    {
+     "type": "contains",
+     "label": "HTTP redirigé",
+     "text": "return 301 https"
+    },
+    {
+     "type": "contains",
+     "label": "HSTS",
+     "text": "Strict-Transport-Security"
+    },
+    {
+     "type": "contains",
+     "label": "En-tête nosniff",
+     "text": "X-Content-Type-Options"
+    }
+   ],
+   "hint": "Reprenez les labos : redirection 301, TLS 1.2/1.3, HSTS, server_tokens off, autoindex off, refus des fichiers cachés.",
+   "solution": "server {\n    listen 80;\n    server_name exemple.org;\n    server_tokens off;\n    return 301 https://$host$request_uri;\n}\nserver {\n    listen 443 ssl;\n    server_name exemple.org;\n    server_tokens off;\n    ssl_protocols TLSv1.2 TLSv1.3;\n    add_header Strict-Transport-Security \"max-age=31536000\" always;\n    add_header X-Content-Type-Options nosniff always;\n    root /srv/publication;\n    location ~ /\\. {\n        deny all;\n    }\n}\n"
+  },
+  "rubric": [
+   {
+    "criterion": "Chiffrement",
+    "levels": [
+     "HTTP ou protocoles obsolètes",
+     "TLS 1.2+",
+     "TLS 1.2/1.3, HSTS, renouvellement automatique vérifié"
+    ]
+   },
+   {
+    "criterion": "Exposition",
+    "levels": [
+     "Tout ouvert",
+     "Ports utiles seulement",
+     "Pare-feu en liste blanche, administration via VPN ou adresses fixes"
+    ]
+   },
+   {
+    "criterion": "Fuites",
+    "levels": [
+     "Listage, .git servi",
+     "Listage désactivé",
+     "Racine dédiée, fichiers cachés refusés, version masquée"
+    ]
+   },
+   {
+    "criterion": "Diagnostic",
+    "levels": [
+     "Aucun journal exploité",
+     "Journaux consultés",
+     "Démarche couche par couche, alertes sur 5xx et latence"
+    ]
+   },
+   {
+    "criterion": "Coûts",
+    "levels": [
+     "Ressources publiques et non étiquetées",
+     "Ressources privées",
+     "Étiquettes, alertes de budget, rien d'orphelin"
+    ]
+   }
+  ]
+ },
+ "glossary": [
+  {
+   "term": "Adresse IP",
+   "definition": "Identifiant d'une machine sur un réseau (IPv4, IPv6)."
+  },
+  {
+   "term": "Port",
+   "definition": "Numéro identifiant un service sur une machine."
+  },
+  {
+   "term": "CIDR",
+   "definition": "Notation d'une plage d'adresses (10.0.0.0/24)."
+  },
+  {
+   "term": "NAT",
+   "definition": "Traduction d'adresses privées vers une adresse publique."
+  },
+  {
+   "term": "DNS",
+   "definition": "Système qui traduit les noms en adresses."
+  },
+  {
+   "term": "TTL",
+   "definition": "Durée de mise en cache d'une réponse DNS."
+  },
+  {
+   "term": "HTTP",
+   "definition": "Protocole du web (méthodes, codes, en-têtes)."
+  },
+  {
+   "term": "TLS",
+   "definition": "Chiffrement et authentification des connexions."
+  },
+  {
+   "term": "Certificat",
+   "definition": "Preuve signée qu'une clé appartient à un nom de domaine."
+  },
+  {
+   "term": "HSTS",
+   "definition": "En-tête imposant HTTPS au navigateur."
+  },
+  {
+   "term": "Reverse proxy",
+   "definition": "Serveur frontal qui transmet les requêtes à l'application."
+  },
+  {
+   "term": "Pare-feu",
+   "definition": "Filtre des connexions réseau."
+  },
+  {
+   "term": "Egress",
+   "definition": "Trafic sortant, généralement facturé dans le cloud."
+  },
+  {
+   "term": "Responsabilité partagée",
+   "definition": "Répartition de la sécurité entre fournisseur et client."
+  }
+ ]
+}

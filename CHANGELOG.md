@@ -2,7 +2,18 @@
 
 Format inspiré de « Keep a Changelog ». Versions non publiées.
 
-## [Non publié] — Phase 8 : CI/CD, APK de test, .deb (2026-11-13)
+## [Non publié] — Phase 9 : Académie avancée (2026-11-13)
+
+### Ajouté
+- Modules Terminal Linux, GitHub, GitLab, DevOps et CI/CD, Réseaux/serveurs/cloud, Kubernetes, Terraform/OpenTofu/Ansible, Observabilité/sécurité/SRE : 79 leçons, 316 questions, 48 labos, 8 projets avec grille.
+- Analyseurs hors ligne : Bash, sshd_config, nginx, GitHub Actions, GitLab CI, Kubernetes, Terraform/OpenTofu, Ansible, alertes Prometheus.
+- Les 11 îles du parcours sont disponibles ; nouvelle île « Observabilité, sécurité, SRE ».
+
+### Corrigé
+- Îles GitHub/GitLab/DevOps annoncées pour des phases déjà passées ; sous-titre de la carte obsolète.
+- Analyseurs : directives sshd avec chiffres, TF004 par règle d'entrée, GL003 limité à la production, lignes Kubernetes par conteneur.
+
+## Phase 8 : CI/CD, APK de test, .deb (2026-11-13)
 
 ### Ajouté
 - Modèles de CI (Flutter, Node, Python × GitHub Actions, GitLab CI) : actions épinglées par empreinte, permissions minimales, analyse des secrets, artefacts avec SHA-256.

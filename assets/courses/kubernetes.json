@@ -1,0 +1,1255 @@
+{
+ "id": "kubernetes",
+ "version": 1,
+ "title": "Kubernetes, l'armada",
+ "summary": "Pods, Deployments, Services, Ingress, configuration et secrets, ressources, sondes, sécurité des pods, RBAC et Helm.",
+ "objectives": [
+  "Décrire et déployer une application de façon déclarative",
+  "Exposer des services proprement",
+  "Garantir disponibilité et maîtrise des ressources",
+  "Appliquer le moindre privilège (pods, RBAC, secrets)"
+ ],
+ "prerequisites": [
+  "Module Docker Compose",
+  "Module Réseaux"
+ ],
+ "lessons": [
+  {
+   "id": "pourquoi-k8s",
+   "title": "Pourquoi (et quand) Kubernetes ?",
+   "minutes": 15,
+   "objectives": [
+    "Comprendre ce qu'apporte un orchestrateur",
+    "Savoir quand Kubernetes est disproportionné"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Kubernetes fait tourner des conteneurs sur un ensemble de machines (nœuds) : il les place, les redémarre s'ils tombent, les répartit, les met à jour progressivement et les relie entre eux. Vous décrivez l'état voulu ; il le maintient."
+    },
+    {
+     "type": "text",
+     "body": "Ce modèle déclaratif est central : on n'exécute pas « démarre 3 conteneurs », on déclare « je veux 3 répliques » et les contrôleurs corrigent sans cesse l'écart entre l'état réel et l'état voulu."
+    },
+    {
+     "type": "warning",
+     "body": "Kubernetes a un coût d'apprentissage et d'exploitation élevé. Pour une petite application, un serveur avec Docker Compose ou une plateforme gérée (PaaS) est souvent plus raisonnable."
+    },
+    {
+     "type": "code",
+     "body": "kubectl version\nkubectl get nodes\nkubectl get pods -A",
+     "caption": "Premiers contacts avec un cluster (kind, minikube ou k3d en local)"
+    }
+   ],
+   "quiz": [
+    {
+     "id": "k8-1-1",
+     "type": "single",
+     "prompt": "Que signifie « déclaratif » dans Kubernetes ?",
+     "choices": [
+      "On décrit l'état voulu, le système le maintient",
+      "On écrit des scripts impératifs",
+      "On déclare des variables",
+      "On déclare des pare-feu"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Les contrôleurs réconcilient en continu."
+    },
+    {
+     "id": "k8-1-2",
+     "type": "single",
+     "prompt": "Quand Kubernetes est-il souvent disproportionné ?",
+     "choices": [
+      "Pour une petite application sur un seul serveur",
+      "Pour des centaines de services",
+      "Pour une forte disponibilité",
+      "Jamais"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Compose ou un PaaS suffisent souvent."
+    },
+    {
+     "id": "k8-1-3",
+     "type": "single",
+     "prompt": "Qu'est-ce qu'un nœud ?",
+     "choices": [
+      "Une machine qui exécute des pods",
+      "Un conteneur",
+      "Un fichier YAML",
+      "Un namespace"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Le cluster est un ensemble de nœuds."
+    },
+    {
+     "id": "k8-1-4",
+     "type": "command",
+     "prompt": "Listez les nœuds du cluster.",
+     "accepted": [
+      "kubectl get nodes"
+     ],
+     "explanation": "Affiche leur état (Ready) et leur version."
+    }
+   ]
+  },
+  {
+   "id": "pods",
+   "title": "Pods et kubectl",
+   "minutes": 20,
+   "objectives": [
+    "Décrire un pod",
+    "Inspecter un pod avec kubectl"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Un pod est la plus petite unité déployable : un ou plusieurs conteneurs qui partagent réseau et volumes. On ne crée presque jamais de pod à la main : un Deployment s'en charge."
+    },
+    {
+     "type": "code",
+     "body": "kubectl apply -f pod.yaml\nkubectl get pods -o wide\nkubectl describe pod web\nkubectl logs web\nkubectl exec -it web -- sh",
+     "caption": "Créer, lister, détailler, journaux, shell"
+    },
+    {
+     "type": "text",
+     "body": "describe montre les événements : ImagePullBackOff (image introuvable), CrashLoopBackOff (le conteneur plante en boucle), Pending (pas de nœud capable de l'accueillir)."
+    },
+    {
+     "type": "warning",
+     "body": "image: nginx (donc latest) ne garantit pas que deux nœuds exécutent la même version : épinglez toujours."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "k8-2-1",
+     "type": "single",
+     "prompt": "Un pod est…",
+     "choices": [
+      "Un ou plusieurs conteneurs partageant réseau et volumes",
+      "Un nœud",
+      "Un cluster",
+      "Une image"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "La plus petite unité déployable."
+    },
+    {
+     "id": "k8-2-2",
+     "type": "single",
+     "prompt": "Que signifie CrashLoopBackOff ?",
+     "choices": [
+      "Le conteneur plante et redémarre en boucle",
+      "L'image est introuvable",
+      "Pas de nœud disponible",
+      "Tout va bien"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Regardez kubectl logs --previous."
+    },
+    {
+     "id": "k8-2-3",
+     "type": "command",
+     "prompt": "Affichez les journaux du pod web.",
+     "accepted": [
+      "kubectl logs web"
+     ],
+     "explanation": "--previous montre ceux du conteneur précédent après un plantage."
+    },
+    {
+     "id": "k8-2-4",
+     "type": "command",
+     "prompt": "Affichez le détail et les événements du pod web.",
+     "accepted": [
+      "kubectl describe pod web",
+      "kubectl describe pods web"
+     ],
+     "explanation": "Les événements en bas expliquent souvent le problème."
+    }
+   ],
+   "lab": {
+    "kind": "k8s",
+    "intro": "Ce pod utilise une image non épinglée. Fixez sa version.",
+    "starter": "apiVersion: v1\nkind: Pod\nmetadata:\n  name: web\nspec:\n  containers:\n    - name: web\n      image: nginx\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "Image épinglée",
+      "rule": "K8001"
+     },
+     {
+      "type": "valid",
+      "label": "Fichier valide"
+     }
+    ],
+    "hint": "Utilisez une version précise, ex. nginx:1.27.3.",
+    "solution": "apiVersion: v1\nkind: Pod\nmetadata:\n  name: web\nspec:\n  containers:\n    - name: web\n      image: nginx:1.27.3\n"
+   }
+  },
+  {
+   "id": "deployments",
+   "title": "Deployments et mises à jour progressives",
+   "minutes": 22,
+   "objectives": [
+    "Déclarer un Deployment",
+    "Mettre à jour puis revenir en arrière"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Un Deployment gère des répliques identiques via un ReplicaSet. Changer l'image déclenche une mise à jour progressive (rolling update) : les nouveaux pods remplacent les anciens petit à petit, sans interruption."
+    },
+    {
+     "type": "code",
+     "body": "kubectl apply -f deployment.yaml\nkubectl rollout status deployment/api\nkubectl rollout history deployment/api\nkubectl rollout undo deployment/api",
+     "caption": "Appliquer, suivre, historique, retour arrière"
+    },
+    {
+     "type": "text",
+     "body": "Une seule réplique signifie une interruption à chaque mise à jour ou panne de nœud : visez au moins deux répliques pour un service important."
+    },
+    {
+     "type": "tip",
+     "body": "Le selector doit correspondre aux labels du template : c'est ainsi que le Deployment retrouve ses pods."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "k8-3-1",
+     "type": "single",
+     "prompt": "Que fait un rolling update ?",
+     "choices": [
+      "Remplace les pods progressivement sans interruption",
+      "Supprime tout puis recrée",
+      "Redémarre le cluster",
+      "Change de namespace"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Paramétrable par maxSurge et maxUnavailable."
+    },
+    {
+     "id": "k8-3-2",
+     "type": "command",
+     "prompt": "Annulez la dernière mise à jour du Deployment api.",
+     "accepted": [
+      "kubectl rollout undo deployment/api",
+      "kubectl rollout undo deploy/api"
+     ],
+     "explanation": "Revient à la révision précédente."
+    },
+    {
+     "id": "k8-3-3",
+     "type": "single",
+     "prompt": "Pourquoi au moins deux répliques ?",
+     "choices": [
+      "Tolérer une panne ou une mise à jour sans interruption",
+      "Obligatoire",
+      "Moins de mémoire",
+      "Plus de logs"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Une réplique unique est un point de défaillance."
+    },
+    {
+     "id": "k8-3-4",
+     "type": "single",
+     "prompt": "Comment le Deployment retrouve-t-il ses pods ?",
+     "choices": [
+      "Par son selector et les labels du template",
+      "Par leur nom",
+      "Par leur IP",
+      "Par hasard"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Les labels sont le lien."
+    }
+   ],
+   "lab": {
+    "kind": "k8s",
+    "intro": "Ce Deployment n'a qu'une réplique et une image mobile. Corrigez.",
+    "starter": "apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: api\nspec:\n  replicas: 1\n  selector:\n    matchLabels:\n      app: api\n  template:\n    metadata:\n      labels:\n        app: api\n    spec:\n      securityContext:\n        runAsNonRoot: true\n        runAsUser: 10001\n      containers:\n        - name: api\n          image: ghcr.io/exemple/api:latest\n          ports:\n            - containerPort: 8080\n          resources:\n            requests:\n              cpu: 100m\n              memory: 128Mi\n            limits:\n              memory: 256Mi\n          securityContext:\n            allowPrivilegeEscalation: false\n            readOnlyRootFilesystem: true\n          readinessProbe:\n            httpGet:\n              path: /sante\n              port: 8080\n          livenessProbe:\n            httpGet:\n              path: /sante\n              port: 8080\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "Image épinglée",
+      "rule": "K8001"
+     },
+     {
+      "type": "noRule",
+      "label": "Au moins deux répliques",
+      "rule": "K8013"
+     },
+     {
+      "type": "valid",
+      "label": "Fichier valide"
+     }
+    ],
+    "hint": "Passez replicas à 2 et l'image à ghcr.io/exemple/api:1.4.0.",
+    "solution": "apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: api\nspec:\n  replicas: 2\n  selector:\n    matchLabels:\n      app: api\n  template:\n    metadata:\n      labels:\n        app: api\n    spec:\n      securityContext:\n        runAsNonRoot: true\n        runAsUser: 10001\n      containers:\n        - name: api\n          image: ghcr.io/exemple/api:1.4.0\n          ports:\n            - containerPort: 8080\n          resources:\n            requests:\n              cpu: 100m\n              memory: 128Mi\n            limits:\n              memory: 256Mi\n          securityContext:\n            allowPrivilegeEscalation: false\n            readOnlyRootFilesystem: true\n          readinessProbe:\n            httpGet:\n              path: /sante\n              port: 8080\n          livenessProbe:\n            httpGet:\n              path: /sante\n              port: 8080\n"
+   }
+  },
+  {
+   "id": "services",
+   "title": "Services et découverte",
+   "minutes": 20,
+   "objectives": [
+    "Exposer des pods avec un Service",
+    "Choisir entre ClusterIP, NodePort et LoadBalancer"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Les pods sont éphémères et changent d'adresse. Un Service fournit une adresse et un nom DNS stables (api.default.svc) et répartit le trafic entre les pods qui portent les bons labels."
+    },
+    {
+     "type": "text",
+     "body": "ClusterIP (par défaut) : joignable seulement depuis le cluster. NodePort : ouvert sur un port de chaque nœud. LoadBalancer : demande un répartiteur public au fournisseur cloud (et une facture)."
+    },
+    {
+     "type": "code",
+     "body": "apiVersion: v1\nkind: Service\nmetadata:\n  name: api\nspec:\n  selector:\n    app: api\n  ports:\n    - port: 80\n      targetPort: 8080\n",
+     "caption": "Service ClusterIP devant les pods app: api"
+    },
+    {
+     "type": "tip",
+     "body": "Pour exposer du HTTP, un seul Ingress (ou Gateway) devant des Services ClusterIP vaut mieux qu'un LoadBalancer par service."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "k8-4-1",
+     "type": "single",
+     "prompt": "Type de Service par défaut ?",
+     "choices": [
+      "ClusterIP",
+      "NodePort",
+      "LoadBalancer",
+      "ExternalName"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Accessible uniquement depuis le cluster."
+    },
+    {
+     "id": "k8-4-2",
+     "type": "single",
+     "prompt": "Pourquoi un Service plutôt que l'IP d'un pod ?",
+     "choices": [
+      "Les pods changent d'adresse, le Service reste stable",
+      "Les pods n'ont pas d'IP",
+      "Pour le chiffrement",
+      "Obligatoire pour les logs"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Nom DNS et IP stables."
+    },
+    {
+     "id": "k8-4-3",
+     "type": "single",
+     "prompt": "Inconvénient d'un LoadBalancer par service ?",
+     "choices": [
+      "Exposition publique et coût pour chacun",
+      "Aucun",
+      "Pas de DNS",
+      "Plus lent que ClusterIP"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Un Ingress mutualise l'entrée HTTP."
+    },
+    {
+     "id": "k8-4-4",
+     "type": "command",
+     "prompt": "Listez les Services du namespace courant.",
+     "accepted": [
+      "kubectl get services",
+      "kubectl get svc"
+     ],
+     "explanation": "svc est l'abréviation."
+    }
+   ],
+   "lab": {
+    "kind": "k8s",
+    "intro": "Ce Service interne est exposé publiquement par un LoadBalancer. Ramenez-le dans le cluster.",
+    "starter": "apiVersion: v1\nkind: Service\nmetadata:\n  name: base-interne\nspec:\n  type: LoadBalancer\n  selector:\n    app: base\n  ports:\n    - port: 5432\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "Service non exposé hors du cluster",
+      "rule": "K8012"
+     },
+     {
+      "type": "valid",
+      "label": "Fichier valide"
+     }
+    ],
+    "hint": "Retirez type: LoadBalancer (ClusterIP par défaut).",
+    "solution": "apiVersion: v1\nkind: Service\nmetadata:\n  name: base-interne\nspec:\n  type: ClusterIP\n  selector:\n    app: base\n  ports:\n    - port: 5432\n"
+   }
+  },
+  {
+   "id": "ingress",
+   "title": "Ingress, TLS et Gateway",
+   "minutes": 18,
+   "objectives": [
+    "Router le trafic HTTP vers des Services",
+    "Automatiser les certificats"
+   ],
+   "sections": [
+    {
+     "type": "code",
+     "body": "apiVersion: networking.k8s.io/v1\nkind: Ingress\nmetadata:\n  name: site\n  annotations:\n    cert-manager.io/cluster-issuer: letsencrypt\nspec:\n  tls:\n    - hosts: [exemple.org]\n      secretName: site-tls\n  rules:\n    - host: exemple.org\n      http:\n        paths:\n          - path: /\n            pathType: Prefix\n            backend:\n              service:\n                name: api\n                port:\n                  number: 80",
+     "caption": "Ingress avec TLS géré par cert-manager"
+    },
+    {
+     "type": "text",
+     "body": "Un Ingress ne fait rien seul : il faut un contrôleur (ingress-nginx, Traefik…) installé dans le cluster. L'API Gateway, plus récente, sépare mieux les rôles (équipe plateforme / équipe applicative)."
+    },
+    {
+     "type": "text",
+     "body": "cert-manager obtient et renouvelle les certificats Let's Encrypt et les range dans un Secret de type TLS."
+    },
+    {
+     "type": "tip",
+     "body": "kubectl describe ingress site montre les règles reconnues et les adresses attribuées."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "k8-5-1",
+     "type": "single",
+     "prompt": "Que faut-il pour qu'un Ingress fonctionne ?",
+     "choices": [
+      "Un contrôleur d'Ingress installé",
+      "Rien de plus",
+      "Un LoadBalancer par service",
+      "Un nœud par domaine"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "L'Ingress n'est qu'une description."
+    },
+    {
+     "id": "k8-5-2",
+     "type": "single",
+     "prompt": "Rôle de cert-manager ?",
+     "choices": [
+      "Obtenir et renouveler les certificats",
+      "Gérer les nœuds",
+      "Remplacer DNS",
+      "Chiffrer etcd"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Les certificats sont stockés en Secret TLS."
+    },
+    {
+     "id": "k8-5-3",
+     "type": "single",
+     "prompt": "Vers quoi un Ingress route-t-il le trafic ?",
+     "choices": [
+      "Des Services",
+      "Des nœuds",
+      "Des images",
+      "Des namespaces"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Le Service répartit ensuite vers les pods."
+    },
+    {
+     "id": "k8-5-4",
+     "type": "single",
+     "prompt": "Atout de l'API Gateway ?",
+     "choices": [
+      "Meilleure séparation des rôles et plus d'expressivité",
+      "Supprime TLS",
+      "Pas besoin de Services",
+      "Moins sûr"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Successeur progressif d'Ingress."
+    }
+   ]
+  },
+  {
+   "id": "config-secrets",
+   "title": "ConfigMaps et Secrets",
+   "minutes": 20,
+   "objectives": [
+    "Sortir la configuration de l'image",
+    "Injecter un secret sans l'écrire dans le manifeste"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Une ConfigMap contient de la configuration non sensible ; un Secret, des données sensibles. Les deux s'injectent en variables d'environnement ou en fichiers montés."
+    },
+    {
+     "type": "code",
+     "body": "env:\n  - name: DB_PASSWORD\n    valueFrom:\n      secretKeyRef:\n        name: api-secrets\n        key: db-password",
+     "caption": "Lire une variable depuis un Secret"
+    },
+    {
+     "type": "warning",
+     "body": "Les Secrets sont seulement encodés en base64, pas chiffrés : un manifeste de Secret versionné dans Git est une fuite. Créez-les hors Git (kubectl create secret) ou utilisez Sealed Secrets / External Secrets, et activez le chiffrement d'etcd."
+    },
+    {
+     "type": "code",
+     "body": "kubectl create secret generic api-secrets --from-literal=db-password=\"$DB_PASSWORD\"",
+     "caption": "Créer le Secret depuis une variable locale, sans fichier"
+    }
+   ],
+   "quiz": [
+    {
+     "id": "k8-6-1",
+     "type": "single",
+     "prompt": "Un Secret Kubernetes est-il chiffré par défaut ?",
+     "choices": [
+      "Non, seulement encodé en base64",
+      "Oui, en AES",
+      "Oui, par Git",
+      "Seulement sur GitHub"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Le chiffrement au repos d'etcd doit être activé."
+    },
+    {
+     "id": "k8-6-2",
+     "type": "single",
+     "prompt": "Comment injecter un mot de passe dans un conteneur ?",
+     "choices": [
+      "valueFrom.secretKeyRef",
+      "value: en clair",
+      "Dans l'image",
+      "Dans le nom du pod"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Le manifeste ne contient que la référence."
+    },
+    {
+     "id": "k8-6-3",
+     "type": "single",
+     "prompt": "Différence ConfigMap / Secret ?",
+     "choices": [
+      "La ConfigMap est pour le non-sensible",
+      "Aucune",
+      "La ConfigMap est chiffrée",
+      "Le Secret est public"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Et des droits RBAC distincts."
+    },
+    {
+     "id": "k8-6-4",
+     "type": "command",
+     "prompt": "Créez le Secret générique api-secrets avec la clé db-password tirée de $DB_PASSWORD.",
+     "accepted": [
+      "kubectl create secret generic api-secrets --from-literal=db-password=\"$DB_PASSWORD\"",
+      "kubectl create secret generic api-secrets --from-literal=db-password=$DB_PASSWORD"
+     ],
+     "explanation": "La valeur vient de votre environnement, pas d'un fichier versionné."
+    }
+   ],
+   "lab": {
+    "kind": "k8s",
+    "intro": "Le mot de passe de la base est écrit en clair dans le manifeste. Lisez-le depuis un Secret.",
+    "starter": "apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: api\nspec:\n  replicas: 2\n  selector:\n    matchLabels:\n      app: api\n  template:\n    metadata:\n      labels:\n        app: api\n    spec:\n      securityContext:\n        runAsNonRoot: true\n        runAsUser: 10001\n      containers:\n        - name: api\n          image: ghcr.io/exemple/api:1.4.0\n          ports:\n            - containerPort: 8080\n          env:\n            - name: DB_PASSWORD\n              value: \"motdepasse-prod-42\"\n          resources:\n            requests:\n              cpu: 100m\n              memory: 128Mi\n            limits:\n              memory: 256Mi\n          securityContext:\n            allowPrivilegeEscalation: false\n            readOnlyRootFilesystem: true\n          readinessProbe:\n            httpGet:\n              path: /sante\n              port: 8080\n          livenessProbe:\n            httpGet:\n              path: /sante\n              port: 8080\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "Plus de secret en clair",
+      "rule": "K8008"
+     },
+     {
+      "type": "contains",
+      "label": "Lecture depuis un Secret",
+      "text": "secretKeyRef"
+     },
+     {
+      "type": "valid",
+      "label": "Fichier valide"
+     }
+    ],
+    "hint": "Remplacez value: par valueFrom: { secretKeyRef: { name: api-secrets, key: db-password } }.",
+    "solution": "apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: api\nspec:\n  replicas: 2\n  selector:\n    matchLabels:\n      app: api\n  template:\n    metadata:\n      labels:\n        app: api\n    spec:\n      securityContext:\n        runAsNonRoot: true\n        runAsUser: 10001\n      containers:\n        - name: api\n          image: ghcr.io/exemple/api:1.4.0\n          ports:\n            - containerPort: 8080\n          env:\n            - name: DB_PASSWORD\n              valueFrom:\n                secretKeyRef:\n                  name: api-secrets\n                  key: db-password\n          resources:\n            requests:\n              cpu: 100m\n              memory: 128Mi\n            limits:\n              memory: 256Mi\n          securityContext:\n            allowPrivilegeEscalation: false\n            readOnlyRootFilesystem: true\n          readinessProbe:\n            httpGet:\n              path: /sante\n              port: 8080\n          livenessProbe:\n            httpGet:\n              path: /sante\n              port: 8080\n"
+   }
+  },
+  {
+   "id": "ressources",
+   "title": "Ressources : requests et limits",
+   "minutes": 20,
+   "objectives": [
+    "Réserver ce dont un conteneur a besoin",
+    "Empêcher un conteneur d'affamer le nœud"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "requests = ce qui est réservé et sert au placement des pods ; limits = le maximum autorisé. Au-delà de sa limite mémoire, un conteneur est tué (OOMKilled) ; au-delà de sa limite CPU, il est ralenti."
+    },
+    {
+     "type": "code",
+     "body": "resources:\n  requests:\n    cpu: 100m\n    memory: 128Mi\n  limits:\n    memory: 256Mi",
+     "caption": "100m = un dixième de cœur"
+    },
+    {
+     "type": "text",
+     "body": "Sans requests, l'ordonnanceur entasse les pods ; sans limite mémoire, une fuite peut faire tomber tout le nœud."
+    },
+    {
+     "type": "tip",
+     "body": "Mesurez la consommation réelle (kubectl top pod) avant de fixer des valeurs, puis ajustez."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "k8-7-1",
+     "type": "single",
+     "prompt": "À quoi servent les requests ?",
+     "choices": [
+      "Réserver des ressources et placer les pods",
+      "Limiter au maximum",
+      "Chiffrer",
+      "Exposer"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "L'ordonnanceur les utilise."
+    },
+    {
+     "id": "k8-7-2",
+     "type": "single",
+     "prompt": "Que se passe-t-il au-delà de la limite mémoire ?",
+     "choices": [
+      "Le conteneur est tué (OOMKilled)",
+      "Il est ralenti",
+      "Rien",
+      "Il change de nœud"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "La mémoire ne se « ralentit » pas."
+    },
+    {
+     "id": "k8-7-3",
+     "type": "single",
+     "prompt": "Que signifie cpu: 250m ?",
+     "choices": [
+      "Un quart de cœur",
+      "250 cœurs",
+      "250 Mo",
+      "250 ms"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "m signifie millicœur : 1000m = un cœur."
+    },
+    {
+     "id": "k8-7-4",
+     "type": "command",
+     "prompt": "Affichez la consommation des pods.",
+     "accepted": [
+      "kubectl top pod",
+      "kubectl top pods"
+     ],
+     "explanation": "Nécessite metrics-server."
+    }
+   ],
+   "lab": {
+    "kind": "k8s",
+    "intro": "Ce conteneur n'a ni réservation ni limite. Ajoutez-les.",
+    "starter": "apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: api\nspec:\n  replicas: 2\n  selector:\n    matchLabels:\n      app: api\n  template:\n    metadata:\n      labels:\n        app: api\n    spec:\n      securityContext:\n        runAsNonRoot: true\n        runAsUser: 10001\n      containers:\n        - name: api\n          image: ghcr.io/exemple/api:1.4.0\n          ports:\n            - containerPort: 8080\n          securityContext:\n            allowPrivilegeEscalation: false\n            readOnlyRootFilesystem: true\n          readinessProbe:\n            httpGet:\n              path: /sante\n              port: 8080\n          livenessProbe:\n            httpGet:\n              path: /sante\n              port: 8080\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "requests et limits définis",
+      "rule": "K8002"
+     },
+     {
+      "type": "valid",
+      "label": "Fichier valide"
+     }
+    ],
+    "hint": "Ajoutez resources: requests (cpu, memory) et limits (memory).",
+    "solution": "apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: api\nspec:\n  replicas: 2\n  selector:\n    matchLabels:\n      app: api\n  template:\n    metadata:\n      labels:\n        app: api\n    spec:\n      securityContext:\n        runAsNonRoot: true\n        runAsUser: 10001\n      containers:\n        - name: api\n          image: ghcr.io/exemple/api:1.4.0\n          ports:\n            - containerPort: 8080\n          resources:\n            requests:\n              cpu: 100m\n              memory: 128Mi\n            limits:\n              memory: 256Mi\n          securityContext:\n            allowPrivilegeEscalation: false\n            readOnlyRootFilesystem: true\n          readinessProbe:\n            httpGet:\n              path: /sante\n              port: 8080\n          livenessProbe:\n            httpGet:\n              path: /sante\n              port: 8080\n"
+   }
+  },
+  {
+   "id": "sondes",
+   "title": "Sondes de santé",
+   "minutes": 18,
+   "objectives": [
+    "Distinguer readiness, liveness et startup",
+    "Éviter d'envoyer du trafic à un pod qui n'est pas prêt"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "readinessProbe : le pod est-il prêt à recevoir du trafic ? S'il échoue, il est retiré du Service sans être redémarré. livenessProbe : le processus est-il bloqué ? S'il échoue, le conteneur est redémarré."
+    },
+    {
+     "type": "text",
+     "body": "startupProbe laisse le temps à une application lente de démarrer avant que la liveness ne s'en mêle."
+    },
+    {
+     "type": "code",
+     "body": "readinessProbe:\n  httpGet:\n    path: /sante\n    port: 8080\n  periodSeconds: 5\nlivenessProbe:\n  httpGet:\n    path: /sante\n    port: 8080\n  failureThreshold: 3",
+     "caption": "Deux sondes HTTP"
+    },
+    {
+     "type": "warning",
+     "body": "Une liveness qui dépend de la base de données redémarre tous les pods quand la base tombe : gardez-la sur l'état du processus lui-même."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "k8-8-1",
+     "type": "single",
+     "prompt": "Si la readinessProbe échoue…",
+     "choices": [
+      "Le pod est retiré du Service, sans redémarrage",
+      "Le pod est supprimé",
+      "Le nœud redémarre",
+      "Rien"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Il revient dès qu'il est prêt."
+    },
+    {
+     "id": "k8-8-2",
+     "type": "single",
+     "prompt": "Si la livenessProbe échoue…",
+     "choices": [
+      "Le conteneur est redémarré",
+      "Le pod est seulement retiré du Service",
+      "Le Service est supprimé",
+      "Rien"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Pour débloquer un processus figé."
+    },
+    {
+     "id": "k8-8-3",
+     "type": "single",
+     "prompt": "Rôle de la startupProbe ?",
+     "choices": [
+      "Laisser démarrer une application lente",
+      "Démarrer le cluster",
+      "Remplacer la readiness",
+      "Créer le pod"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "La liveness attend sa réussite."
+    },
+    {
+     "id": "k8-8-4",
+     "type": "single",
+     "prompt": "Pourquoi une liveness ne doit pas dépendre de la base ?",
+     "choices": [
+      "Une panne de base redémarrerait tous les pods inutilement",
+      "C'est plus lent",
+      "C'est interdit",
+      "La base n'a pas d'API"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Ce serait une panne en cascade."
+    }
+   ],
+   "lab": {
+    "kind": "k8s",
+    "intro": "Ce Deployment n'a aucune sonde : du trafic arrive avant que l'application soit prête. Ajoutez-les.",
+    "starter": "apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: api\nspec:\n  replicas: 2\n  selector:\n    matchLabels:\n      app: api\n  template:\n    metadata:\n      labels:\n        app: api\n    spec:\n      securityContext:\n        runAsNonRoot: true\n        runAsUser: 10001\n      containers:\n        - name: api\n          image: ghcr.io/exemple/api:1.4.0\n          ports:\n            - containerPort: 8080\n          resources:\n            requests:\n              cpu: 100m\n              memory: 128Mi\n            limits:\n              memory: 256Mi\n          securityContext:\n            allowPrivilegeEscalation: false\n            readOnlyRootFilesystem: true\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "readinessProbe",
+      "rule": "K8006"
+     },
+     {
+      "type": "noRule",
+      "label": "livenessProbe",
+      "rule": "K8007"
+     },
+     {
+      "type": "valid",
+      "label": "Fichier valide"
+     }
+    ],
+    "hint": "Ajoutez readinessProbe et livenessProbe HTTP sur /sante, port 8080.",
+    "solution": "apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: api\nspec:\n  replicas: 2\n  selector:\n    matchLabels:\n      app: api\n  template:\n    metadata:\n      labels:\n        app: api\n    spec:\n      securityContext:\n        runAsNonRoot: true\n        runAsUser: 10001\n      containers:\n        - name: api\n          image: ghcr.io/exemple/api:1.4.0\n          ports:\n            - containerPort: 8080\n          resources:\n            requests:\n              cpu: 100m\n              memory: 128Mi\n            limits:\n              memory: 256Mi\n          securityContext:\n            allowPrivilegeEscalation: false\n            readOnlyRootFilesystem: true\n          readinessProbe:\n            httpGet:\n              path: /sante\n              port: 8080\n          livenessProbe:\n            httpGet:\n              path: /sante\n              port: 8080\n"
+   }
+  },
+  {
+   "id": "securite-pods",
+   "title": "Sécurité des pods",
+   "minutes": 22,
+   "objectives": [
+    "Faire tourner les conteneurs sans privilèges",
+    "Appliquer les Pod Security Standards"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Par défaut, un conteneur peut tourner en root et élever ses privilèges. Le securityContext impose : utilisateur non root, pas d'élévation, système de fichiers en lecture seule, capacités retirées."
+    },
+    {
+     "type": "code",
+     "body": "securityContext:\n  runAsNonRoot: true\n  runAsUser: 10001\ncontainers:\n  - securityContext:\n      allowPrivilegeEscalation: false\n      readOnlyRootFilesystem: true\n      capabilities:\n        drop: [ALL]",
+     "caption": "Profil « restricted »"
+    },
+    {
+     "type": "text",
+     "body": "Pod Security Admission applique des niveaux par namespace : privileged, baseline, restricted. Visez restricted pour les applications."
+    },
+    {
+     "type": "warning",
+     "body": "privileged: true, hostNetwork, hostPID ou un volume hostPath donnent un accès au nœud lui-même : à réserver aux composants système audités."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "k8-9-1",
+     "type": "single",
+     "prompt": "Que fait runAsNonRoot: true ?",
+     "choices": [
+      "Refuse de démarrer un conteneur qui tournerait en root",
+      "Supprime root du nœud",
+      "Chiffre le pod",
+      "Ralentit le pod"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "L'image doit définir un utilisateur non root."
+    },
+    {
+     "id": "k8-9-2",
+     "type": "single",
+     "prompt": "Niveau Pod Security visé pour une application ?",
+     "choices": [
+      "restricted",
+      "privileged",
+      "baseline uniquement",
+      "aucun"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "C'est le niveau le plus strict."
+    },
+    {
+     "id": "k8-9-3",
+     "type": "single",
+     "prompt": "Risque de privileged: true ?",
+     "choices": [
+      "Accès quasi total au nœud",
+      "Plus de mémoire",
+      "Pas de réseau",
+      "Aucun"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Une évasion du conteneur devient triviale."
+    },
+    {
+     "id": "k8-9-4",
+     "type": "single",
+     "prompt": "readOnlyRootFilesystem: true…",
+     "choices": [
+      "Empêche d'écrire dans le système de fichiers du conteneur",
+      "Empêche de lire les fichiers",
+      "Rend le pod privé",
+      "Supprime les volumes"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Un attaquant ne peut pas déposer d'outils."
+    }
+   ],
+   "lab": {
+    "kind": "k8s",
+    "intro": "Ce conteneur est privilégié et peut tourner en root. Appliquez un profil restreint.",
+    "starter": "apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: api\nspec:\n  replicas: 2\n  selector:\n    matchLabels:\n      app: api\n  template:\n    metadata:\n      labels:\n        app: api\n    spec:\n      containers:\n        - name: api\n          image: ghcr.io/exemple/api:1.4.0\n          ports:\n            - containerPort: 8080\n          resources:\n            requests:\n              cpu: 100m\n              memory: 128Mi\n            limits:\n              memory: 256Mi\n          securityContext:\n            privileged: true\n          readinessProbe:\n            httpGet:\n              path: /sante\n              port: 8080\n          livenessProbe:\n            httpGet:\n              path: /sante\n              port: 8080\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "Plus de conteneur privilégié",
+      "rule": "K8004"
+     },
+     {
+      "type": "noRule",
+      "label": "Non root",
+      "rule": "K8003"
+     },
+     {
+      "type": "noRule",
+      "label": "Pas d'élévation de privilèges",
+      "rule": "K8005"
+     },
+     {
+      "type": "noRule",
+      "label": "Racine en lecture seule",
+      "rule": "K8011"
+     },
+     {
+      "type": "noSeverity",
+      "label": "Aucun problème bloquant",
+      "severity": "blocking"
+     }
+    ],
+    "hint": "Retirez privileged, ajoutez runAsNonRoot au pod, puis allowPrivilegeEscalation: false et readOnlyRootFilesystem: true au conteneur.",
+    "solution": "apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: api\nspec:\n  replicas: 2\n  selector:\n    matchLabels:\n      app: api\n  template:\n    metadata:\n      labels:\n        app: api\n    spec:\n      securityContext:\n        runAsNonRoot: true\n        runAsUser: 10001\n      containers:\n        - name: api\n          image: ghcr.io/exemple/api:1.4.0\n          ports:\n            - containerPort: 8080\n          resources:\n            requests:\n              cpu: 100m\n              memory: 128Mi\n            limits:\n              memory: 256Mi\n          securityContext:\n            allowPrivilegeEscalation: false\n            readOnlyRootFilesystem: true\n          readinessProbe:\n            httpGet:\n              path: /sante\n              port: 8080\n          livenessProbe:\n            httpGet:\n              path: /sante\n              port: 8080\n"
+   }
+  },
+  {
+   "id": "rbac",
+   "title": "RBAC et comptes de service",
+   "minutes": 18,
+   "objectives": [
+    "Donner à chacun les seuls droits nécessaires",
+    "Comprendre les comptes de service des pods"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "RBAC : un Role (dans un namespace) ou ClusterRole (tout le cluster) liste des verbes autorisés sur des ressources ; un RoleBinding l'attribue à un utilisateur, un groupe ou un ServiceAccount."
+    },
+    {
+     "type": "code",
+     "body": "apiVersion: rbac.authorization.k8s.io/v1\nkind: Role\nmetadata:\n  name: lecture-pods\n  namespace: equipe-a\nrules:\n  - apiGroups: [\"\"]\n    resources: [pods, pods/log]\n    verbs: [get, list, watch]",
+     "caption": "Rôle en lecture seule sur les pods d'un namespace"
+    },
+    {
+     "type": "text",
+     "body": "Chaque pod reçoit un jeton de ServiceAccount. Une application qui n'appelle pas l'API Kubernetes n'en a pas besoin : automountServiceAccountToken: false."
+    },
+    {
+     "type": "warning",
+     "body": "cluster-admin pour « débloquer » une CI donne à quiconque contrôle la CI les clés de tout le cluster."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "k8-10-1",
+     "type": "single",
+     "prompt": "Différence Role / ClusterRole ?",
+     "choices": [
+      "Le Role est limité à un namespace",
+      "Aucune",
+      "Le ClusterRole est en lecture seule",
+      "Le Role est global"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Le ClusterRole couvre tout le cluster."
+    },
+    {
+     "id": "k8-10-2",
+     "type": "single",
+     "prompt": "Que lie un RoleBinding ?",
+     "choices": [
+      "Un rôle à un utilisateur, groupe ou ServiceAccount",
+      "Deux pods",
+      "Un Service à un Ingress",
+      "Un nœud à un namespace"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "C'est l'attribution des droits."
+    },
+    {
+     "id": "k8-10-3",
+     "type": "command",
+     "prompt": "Vérifiez si vous pouvez supprimer des pods dans le namespace courant.",
+     "accepted": [
+      "kubectl auth can-i delete pods"
+     ],
+     "explanation": "Pratique pour tester des droits."
+    },
+    {
+     "id": "k8-10-4",
+     "type": "single",
+     "prompt": "Pod qui n'appelle jamais l'API Kubernetes ?",
+     "choices": [
+      "automountServiceAccountToken: false",
+      "Lui donner cluster-admin",
+      "Rien à faire",
+      "Supprimer son namespace"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Pas de jeton inutile à voler."
+    }
+   ]
+  },
+  {
+   "id": "helm",
+   "title": "Helm et empaquetage",
+   "minutes": 18,
+   "objectives": [
+    "Comprendre charts, valeurs et releases",
+    "Installer et mettre à jour une application avec Helm"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Helm empaquette des manifestes paramétrables (un chart) : values.yaml contient les réglages, chaque installation est une release versionnée qu'on peut mettre à jour ou annuler."
+    },
+    {
+     "type": "code",
+     "body": "helm repo add bitnami https://charts.bitnami.com/bitnami\nhelm install cache bitnami/redis --version 20.6.0 -f valeurs.yaml\nhelm upgrade cache bitnami/redis --version 20.6.1 -f valeurs.yaml\nhelm rollback cache 1\nhelm template . | less",
+     "caption": "Ajouter un dépôt, installer une version précise, mettre à jour, annuler, prévisualiser"
+    },
+    {
+     "type": "text",
+     "body": "helm template rend les manifestes sans rien installer : idéal pour les relire ou les analyser en CI."
+    },
+    {
+     "type": "warning",
+     "body": "Épinglez la version du chart (--version) : sinon une mise à jour du dépôt change ce qui est installé."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "k8-11-1",
+     "type": "single",
+     "prompt": "Qu'est-ce qu'un chart Helm ?",
+     "choices": [
+      "Un paquet de manifestes paramétrables",
+      "Un nœud",
+      "Une image",
+      "Un namespace"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Avec un fichier values.yaml."
+    },
+    {
+     "id": "k8-11-2",
+     "type": "command",
+     "prompt": "Revenez à la révision 1 de la release cache.",
+     "accepted": [
+      "helm rollback cache 1"
+     ],
+     "explanation": "Helm garde l'historique des révisions."
+    },
+    {
+     "id": "k8-11-3",
+     "type": "single",
+     "prompt": "Intérêt de helm template ?",
+     "choices": [
+      "Voir les manifestes produits sans rien installer",
+      "Créer un cluster",
+      "Chiffrer les valeurs",
+      "Accélérer kubectl"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Relecture et analyse en CI."
+    },
+    {
+     "id": "k8-11-4",
+     "type": "single",
+     "prompt": "Pourquoi --version à l'installation ?",
+     "choices": [
+      "Installer une version précise et reproductible",
+      "Afficher la version de Helm",
+      "Obligatoire",
+      "Pour le DNS"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Comme pour les images."
+    }
+   ]
+  }
+ ],
+ "project": {
+  "title": "Déployer une API proprement sur Kubernetes",
+  "brief": "Rédigez le Deployment et le Service d'une API : image épinglée, répliques, ressources, sondes, secret externe, profil de sécurité restreint, exposition interne.",
+  "lab": {
+   "kind": "k8s",
+   "intro": "Objectif : aucun problème bloquant ni avertissement, sondes et secret externe.",
+   "starter": "apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: api\nspec:\n  replicas: 1\n  selector:\n    matchLabels:\n      app: api\n  template:\n    metadata:\n      labels:\n        app: api\n    spec:\n      containers:\n        - name: api\n          image: ghcr.io/exemple/api\n          ports:\n            - containerPort: 8080\n          env:\n            - name: API_KEY\n              value: \"cle-prod-123456\"\n          securityContext:\n            privileged: true\n---\napiVersion: v1\nkind: Service\nmetadata:\n  name: api\nspec:\n  type: LoadBalancer\n  selector:\n    app: api\n  ports:\n    - port: 80\n      targetPort: 8080\n",
+   "goals": [
+    {
+     "type": "noSeverity",
+     "label": "Aucun problème bloquant",
+     "severity": "blocking"
+    },
+    {
+     "type": "noSeverity",
+     "label": "Aucun avertissement",
+     "severity": "warning"
+    },
+    {
+     "type": "contains",
+     "label": "Sonde de disponibilité",
+     "text": "readinessProbe"
+    },
+    {
+     "type": "contains",
+     "label": "Secret externe",
+     "text": "secretKeyRef"
+    },
+    {
+     "type": "noRule",
+     "label": "Service interne",
+     "rule": "K8012"
+    }
+   ],
+   "hint": "Reprenez chaque labo du module : version, répliques, ressources, sondes, secretKeyRef, securityContext, ClusterIP.",
+   "solution": "apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: api\nspec:\n  replicas: 2\n  selector:\n    matchLabels:\n      app: api\n  template:\n    metadata:\n      labels:\n        app: api\n    spec:\n      securityContext:\n        runAsNonRoot: true\n        runAsUser: 10001\n      containers:\n        - name: api\n          image: ghcr.io/exemple/api:1.4.0\n          ports:\n            - containerPort: 8080\n          env:\n            - name: API_KEY\n              valueFrom:\n                secretKeyRef:\n                  name: api-secrets\n                  key: api-key\n          resources:\n            requests:\n              cpu: 100m\n              memory: 128Mi\n            limits:\n              memory: 256Mi\n          securityContext:\n            allowPrivilegeEscalation: false\n            readOnlyRootFilesystem: true\n          readinessProbe:\n            httpGet:\n              path: /sante\n              port: 8080\n          livenessProbe:\n            httpGet:\n              path: /sante\n              port: 8080\n---\napiVersion: v1\nkind: Service\nmetadata:\n  name: api\nspec:\n  selector:\n    app: api\n  ports:\n    - port: 80\n      targetPort: 8080\n"
+  },
+  "rubric": [
+   {
+    "criterion": "Reproductibilité",
+    "levels": [
+     "Images latest",
+     "Images épinglées",
+     "Images épinglées par digest, charts versionnés"
+    ]
+   },
+   {
+    "criterion": "Disponibilité",
+    "levels": [
+     "Une réplique, sans sondes",
+     "Répliques et sondes",
+     "Répliques, sondes adaptées, PodDisruptionBudget, mise à jour progressive"
+    ]
+   },
+   {
+    "criterion": "Ressources",
+    "levels": [
+     "Aucune limite",
+     "requests et limits",
+     "Valeurs mesurées et revues, quotas par namespace"
+    ]
+   },
+   {
+    "criterion": "Sécurité",
+    "levels": [
+     "Privilégié, root",
+     "Non root, sans élévation",
+     "Profil restricted, capacités retirées, RBAC minimal, pas de jeton inutile"
+    ]
+   },
+   {
+    "criterion": "Secrets et exposition",
+    "levels": [
+     "Secrets en clair, LoadBalancer",
+     "secretKeyRef, ClusterIP",
+     "Secrets externes chiffrés, Ingress TLS unique"
+    ]
+   }
+  ]
+ },
+ "glossary": [
+  {
+   "term": "Cluster",
+   "definition": "Ensemble de nœuds pilotés par Kubernetes."
+  },
+  {
+   "term": "Nœud",
+   "definition": "Machine qui exécute des pods."
+  },
+  {
+   "term": "Pod",
+   "definition": "Un ou plusieurs conteneurs partageant réseau et volumes."
+  },
+  {
+   "term": "Deployment",
+   "definition": "Gère des répliques et leurs mises à jour."
+  },
+  {
+   "term": "Service",
+   "definition": "Adresse et nom stables devant un ensemble de pods."
+  },
+  {
+   "term": "Ingress",
+   "definition": "Règles de routage HTTP vers des Services."
+  },
+  {
+   "term": "ConfigMap",
+   "definition": "Configuration non sensible injectée dans les pods."
+  },
+  {
+   "term": "Secret",
+   "definition": "Donnée sensible, encodée en base64 (non chiffrée par défaut)."
+  },
+  {
+   "term": "requests / limits",
+   "definition": "Ressources réservées / maximum autorisé."
+  },
+  {
+   "term": "Sonde",
+   "definition": "Vérification de santé (readiness, liveness, startup)."
+  },
+  {
+   "term": "securityContext",
+   "definition": "Réglages de sécurité d'un pod ou conteneur."
+  },
+  {
+   "term": "RBAC",
+   "definition": "Contrôle d'accès par rôles."
+  },
+  {
+   "term": "ServiceAccount",
+   "definition": "Identité d'un pod auprès de l'API Kubernetes."
+  },
+  {
+   "term": "Helm",
+   "definition": "Gestionnaire de paquets (charts) pour Kubernetes."
+  }
+ ]
+}

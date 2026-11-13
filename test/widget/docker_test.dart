@@ -73,7 +73,7 @@ void main() {
     await tapVisible(tester, find.text(lesson.title));
     await tester.tap(find.text('Exercice'));
     await tester.pumpAndSettle();
-    expect(find.textContaining('aucun conteneur n\'est lancé'), findsOneWidget);
+    expect(find.textContaining('rien n\'est exécuté'), findsOneWidget);
     await tapVisible(tester, find.text('Analyser'));
     expect(find.textContaining('DF002'), findsOneWidget);
     expect(find.textContaining('DF015'), findsOneWidget);

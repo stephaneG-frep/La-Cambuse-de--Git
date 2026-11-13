@@ -1,0 +1,1036 @@
+{
+ "id": "gitlab",
+ "version": 1,
+ "title": "GitLab, l'arsenal intégré",
+ "summary": "Organiser projets et accès, collaborer par merge requests, et écrire des pipelines GitLab CI sûres jusqu'au déploiement.",
+ "objectives": [
+  "Attribuer des accès minimaux",
+  "Collaborer par MR sur des branches protégées",
+  "Écrire des pipelines reproductibles sans secret",
+  "Maîtriser runners et déploiements"
+ ],
+ "prerequisites": [
+  "Module Git"
+ ],
+ "lessons": [
+  {
+   "id": "projets-groupes",
+   "title": "Projets, groupes et accès",
+   "minutes": 15,
+   "objectives": [
+    "Organiser projets et groupes",
+    "Attribuer le bon rôle à chacun"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "GitLab range les projets dans des groupes et sous-groupes : membres, variables CI et règles se définissent une fois au niveau du groupe et s'héritent."
+    },
+    {
+     "type": "text",
+     "body": "Rôles : Guest, Reporter (lecture), Developer (pousser sur des branches non protégées), Maintainer (gérer le projet), Owner. Donnez le rôle minimal nécessaire, avec une date d'expiration pour les prestataires."
+    },
+    {
+     "type": "code",
+     "body": "glab auth login\nglab repo create mon-projet --private\nglab repo clone groupe/mon-projet",
+     "caption": "CLI officielle de GitLab"
+    },
+    {
+     "type": "warning",
+     "body": "Jeton d'accès personnel : portées minimales (read_repository plutôt que api) et date d'expiration courte. Les deploy tokens et deploy keys servent aux machines, pas aux humains."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "gl-1-1",
+     "type": "single",
+     "prompt": "Rôle minimal pour pousser sur une branche non protégée ?",
+     "choices": [
+      "Developer",
+      "Guest",
+      "Reporter",
+      "Owner"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Reporter ne fait que lire."
+    },
+    {
+     "id": "gl-1-2",
+     "type": "single",
+     "prompt": "Avantage des groupes GitLab ?",
+     "choices": [
+      "Membres et variables hérités par les projets",
+      "Plus de stockage",
+      "Pas besoin de Git",
+      "Projets publics forcés"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Une configuration, plusieurs projets."
+    },
+    {
+     "id": "gl-1-3",
+     "type": "command",
+     "prompt": "Connectez la CLI GitLab à votre compte.",
+     "accepted": [
+      "glab auth login"
+     ],
+     "explanation": "glab fonctionne avec gitlab.com et les instances auto-hébergées."
+    },
+    {
+     "id": "gl-1-4",
+     "type": "single",
+     "prompt": "Pour qu'un serveur clone un dépôt en lecture seule, on utilise…",
+     "choices": [
+      "Une deploy key ou un deploy token",
+      "Le mot de passe d'un développeur",
+      "Un jeton api de l'Owner",
+      "Un compte partagé"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Accès machine, limité et révocable."
+    }
+   ]
+  },
+  {
+   "id": "merge-requests",
+   "title": "Merge requests et approbations",
+   "minutes": 18,
+   "objectives": [
+    "Ouvrir une MR claire",
+    "Exiger des approbations et une pipeline réussie"
+   ],
+   "sections": [
+    {
+     "type": "code",
+     "body": "git switch -c feat/export-csv\ngit push -u origin feat/export-csv\nglab mr create --fill --draft",
+     "caption": "Branche, push, MR en brouillon"
+    },
+    {
+     "type": "text",
+     "body": "Une MR « Draft » ne peut pas être fusionnée par erreur. « Closes #7 » dans la description fermera le ticket à la fusion."
+    },
+    {
+     "type": "text",
+     "body": "Réglages du projet → Merge requests : « Pipelines must succeed », nombre d'approbations requis, règles d'approbation par fichier via CODEOWNERS."
+    },
+    {
+     "type": "tip",
+     "body": "Les suggestions de code dans les commentaires s'appliquent en un clic par l'auteur."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "gl-2-1",
+     "type": "single",
+     "prompt": "Intérêt d'une MR en Draft ?",
+     "choices": [
+      "Elle ne peut pas être fusionnée tant qu'elle est en brouillon",
+      "Elle est privée",
+      "Elle saute la CI",
+      "Elle supprime la branche"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "On la passe en prête quand elle l'est."
+    },
+    {
+     "id": "gl-2-2",
+     "type": "single",
+     "prompt": "Que garantit « Pipelines must succeed » ?",
+     "choices": [
+      "Pas de fusion si la pipeline échoue",
+      "Pipeline plus rapide",
+      "Fusion automatique",
+      "Aucun test"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "La CI devient bloquante."
+    },
+    {
+     "id": "gl-2-3",
+     "type": "command",
+     "prompt": "Créez une MR en brouillon avec glab, contenu tiré des commits.",
+     "accepted": [
+      "glab mr create --fill --draft",
+      "glab mr create --draft --fill"
+     ],
+     "explanation": "Équivalent de gh pr create."
+    },
+    {
+     "id": "gl-2-4",
+     "type": "single",
+     "prompt": "Que ferme « Closes #7 » à la fusion ?",
+     "choices": [
+      "Le ticket 7",
+      "La MR 7",
+      "La pipeline 7",
+      "Rien"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Mot-clé de fermeture automatique."
+    }
+   ]
+  },
+  {
+   "id": "tickets-tableaux",
+   "title": "Issues, tableaux et jalons",
+   "minutes": 12,
+   "objectives": [
+    "Suivre le travail avec issues et labels",
+    "Visualiser l'avancement sur un tableau"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Les issues GitLab portent labels, poids, échéance et jalon. Les labels « scopés » (statut::en-cours) s'excluent mutuellement."
+    },
+    {
+     "type": "code",
+     "body": "glab issue create --title \"Export CSV vide\" --label bug\nglab issue list --label bug",
+     "caption": "Créer et filtrer"
+    },
+    {
+     "type": "text",
+     "body": "Le tableau (Issue board) affiche une colonne par label : déplacer une carte change son label."
+    },
+    {
+     "type": "warning",
+     "body": "Les issues confidentielles existent pour les failles de sécurité : ne décrivez jamais une vulnérabilité dans un ticket public."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "gl-3-1",
+     "type": "single",
+     "prompt": "Particularité d'un label scopé statut::fait ?",
+     "choices": [
+      "Il remplace les autres labels statut::",
+      "Il est privé",
+      "Il ferme le ticket",
+      "Il lance la CI"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Un seul statut à la fois."
+    },
+    {
+     "id": "gl-3-2",
+     "type": "single",
+     "prompt": "Où signaler une faille de sécurité ?",
+     "choices": [
+      "Issue confidentielle ou canal privé du projet",
+      "Ticket public",
+      "Commentaire de MR",
+      "README"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "La divulgation responsable protège les utilisateurs."
+    },
+    {
+     "id": "gl-3-3",
+     "type": "command",
+     "prompt": "Listez les tickets portant le label bug avec glab.",
+     "accepted": [
+      "glab issue list --label bug"
+     ],
+     "explanation": "Même logique que gh."
+    },
+    {
+     "id": "gl-3-4",
+     "type": "single",
+     "prompt": "Déplacer une carte sur un tableau…",
+     "choices": [
+      "Change son label",
+      "Supprime le ticket",
+      "Crée une MR",
+      "N'a aucun effet"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Les colonnes sont des labels."
+    }
+   ]
+  },
+  {
+   "id": "protections",
+   "title": "Branches et tags protégés",
+   "minutes": 12,
+   "objectives": [
+    "Protéger main et les tags de version",
+    "Comprendre le lien avec les variables protégées"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Paramètres → Dépôt → Branches protégées : qui peut pousser (souvent « personne », tout passe par MR), qui peut fusionner, push forcé interdit."
+    },
+    {
+     "type": "text",
+     "body": "Les tags protégés (v*) empêchent quiconque de créer ou déplacer une version publiée."
+    },
+    {
+     "type": "text",
+     "body": "Une variable CI « protégée » n'est fournie qu'aux pipelines des branches et tags protégés : une branche de test ne reçoit pas les secrets de production."
+    },
+    {
+     "type": "tip",
+     "body": "Protégez aussi les branches release/* si vous en utilisez."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "gl-4-1",
+     "type": "single",
+     "prompt": "Réglage courant pour main ?",
+     "choices": [
+      "Personne ne pousse directement, fusion par MR",
+      "Tout le monde pousse",
+      "Push forcé autorisé",
+      "Lecture seule pour tous"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Toute modification est relue."
+    },
+    {
+     "id": "gl-4-2",
+     "type": "single",
+     "prompt": "Pourquoi protéger les tags v* ?",
+     "choices": [
+      "Empêcher de créer ou déplacer une version publiée",
+      "Accélérer git",
+      "Supprimer les anciennes versions",
+      "Obligatoire"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Une version publiée doit rester stable."
+    },
+    {
+     "id": "gl-4-3",
+     "type": "single",
+     "prompt": "Une variable protégée est disponible…",
+     "choices": [
+      "Seulement sur branches et tags protégés",
+      "Partout",
+      "Jamais",
+      "Seulement dans les MR de forks"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Isolation des secrets."
+    },
+    {
+     "id": "gl-4-4",
+     "type": "single",
+     "prompt": "Le push forcé sur main protégée est…",
+     "choices": [
+      "Interdit par défaut",
+      "Recommandé",
+      "Obligatoire",
+      "Sans effet"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Il réécrirait l'historique partagé."
+    }
+   ]
+  },
+  {
+   "id": "pipelines",
+   "title": "Pipelines GitLab CI : les bases",
+   "minutes": 20,
+   "objectives": [
+    "Lire stages, jobs et image",
+    "Épingler l'image d'exécution"
+   ],
+   "sections": [
+    {
+     "type": "code",
+     "body": "stages: [test, build]\n\ntests:\n  stage: test\n  image: node:22.11-slim\n  script:\n    - npm ci\n    - npm test",
+     "caption": "Un .gitlab-ci.yml minimal"
+    },
+    {
+     "type": "text",
+     "body": "Les jobs d'un même stage tournent en parallèle ; le stage suivant attend. needs: permet de casser cet ordre pour gagner du temps."
+    },
+    {
+     "type": "text",
+     "body": "image: node (donc node:latest) change sans prévenir : un build vert hier peut casser demain. Épinglez la version."
+    },
+    {
+     "type": "tip",
+     "body": "CI Lint (Build → Pipeline editor) valide la syntaxe avant de committer."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "gl-5-1",
+     "type": "single",
+     "prompt": "Les jobs d'un même stage…",
+     "choices": [
+      "S'exécutent en parallèle",
+      "S'exécutent l'un après l'autre",
+      "Ne s'exécutent jamais",
+      "Partagent le même conteneur"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Le stage suivant attend leur fin."
+    },
+    {
+     "id": "gl-5-2",
+     "type": "single",
+     "prompt": "Pourquoi éviter image: node ?",
+     "choices": [
+      "latest change sans prévenir",
+      "node n'existe pas",
+      "C'est plus lent",
+      "Obligatoire de mettre alpine"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Une image épinglée rend le build reproductible."
+    },
+    {
+     "id": "gl-5-3",
+     "type": "single",
+     "prompt": "Rôle de needs: ?",
+     "choices": [
+      "Démarrer un job dès que ses dépendances sont finies",
+      "Installer des paquets",
+      "Définir des secrets",
+      "Bloquer la pipeline"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Graphe acyclique plutôt que stages stricts."
+    },
+    {
+     "id": "gl-5-4",
+     "type": "single",
+     "prompt": "Où valider la syntaxe d'une pipeline ?",
+     "choices": [
+      "Pipeline editor / CI Lint",
+      "Wiki",
+      "Issues",
+      "Registre"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Il valide la syntaxe avant de committer."
+    }
+   ],
+   "lab": {
+    "kind": "gitlabci",
+    "intro": "Cette pipeline dépend d'images mobiles. Épinglez-les.",
+    "starter": "stages: [test]\n\ntests:\n  stage: test\n  image: node\n  script:\n    - npm ci\n    - npm test\n\nlint:\n  stage: test\n  image: node:latest\n  script:\n    - npm run lint\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "Images épinglées",
+      "rule": "GL001"
+     },
+     {
+      "type": "valid",
+      "label": "Fichier valide"
+     }
+    ],
+    "hint": "Utilisez par exemple node:22.11-slim pour les deux jobs.",
+    "solution": "stages: [test]\n\ntests:\n  stage: test\n  image: node:22.11-slim\n  script:\n    - npm ci\n    - npm test\n\nlint:\n  stage: test\n  image: node:22.11-slim\n  script:\n    - npm run lint\n"
+   }
+  },
+  {
+   "id": "variables",
+   "title": "Variables CI/CD, masquées et protégées",
+   "minutes": 18,
+   "objectives": [
+    "Sortir les secrets du fichier de pipeline",
+    "Choisir masquée, protégée, fichier"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Tout ce qui est dans .gitlab-ci.yml est versionné et lisible par quiconque lit le dépôt. Les secrets vont dans Paramètres → CI/CD → Variables."
+    },
+    {
+     "type": "text",
+     "body": "« Masquée » cache la valeur dans les journaux ; « protégée » la réserve aux branches et tags protégés ; le type « Fichier » écrit la valeur dans un fichier temporaire dont le chemin est fourni (idéal pour un kubeconfig)."
+    },
+    {
+     "type": "code",
+     "body": "deploy:\n  script:\n    - ./deploy.sh --token \"$DEPLOY_TOKEN\"",
+     "caption": "La variable est fournie par GitLab, pas écrite dans le fichier"
+    },
+    {
+     "type": "warning",
+     "body": "Une variable non protégée est lisible par une MR qui modifie la pipeline : n'y mettez pas de secret de production."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "gl-6-1",
+     "type": "single",
+     "prompt": "Où mettre un jeton de déploiement ?",
+     "choices": [
+      "Paramètres → CI/CD → Variables",
+      "variables: dans .gitlab-ci.yml",
+      "Le README",
+      "Un commentaire"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Le secret reste hors du dépôt versionné."
+    },
+    {
+     "id": "gl-6-2",
+     "type": "single",
+     "prompt": "« Protégée » signifie…",
+     "choices": [
+      "Disponible uniquement sur branches/tags protégés",
+      "Masquée dans les journaux",
+      "Chiffrée en base64",
+      "Lisible par tous"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Ne pas confondre avec « masquée »."
+    },
+    {
+     "id": "gl-6-3",
+     "type": "single",
+     "prompt": "Type de variable adapté à un kubeconfig ?",
+     "choices": [
+      "Fichier",
+      "Variable simple",
+      "Label",
+      "Tag"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Son chemin est fourni dans la variable."
+    },
+    {
+     "id": "gl-6-4",
+     "type": "single",
+     "prompt": "Masquer une variable suffit-il à la protéger d'une MR malveillante ?",
+     "choices": [
+      "Non, il faut aussi la protéger",
+      "Oui",
+      "Seulement sur gitlab.com",
+      "Seulement en privé"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Une MR peut l'envoyer ailleurs."
+    }
+   ],
+   "lab": {
+    "kind": "gitlabci",
+    "intro": "Le mot de passe de la base est écrit dans la pipeline. Sortez-le.",
+    "starter": "variables:\n  DB_PASSWORD: \"motdepasse-prod-42\"\n\ntests:\n  image: python:3.12.7-slim\n  script:\n    - pytest\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "Plus de secret dans le fichier",
+      "rule": "GL002"
+     },
+     {
+      "type": "noSeverity",
+      "label": "Aucun problème bloquant",
+      "severity": "blocking"
+     }
+    ],
+    "hint": "Supprimez la variable du fichier : elle sera définie dans Paramètres → CI/CD → Variables (masquée et protégée).",
+    "solution": "tests:\n  image: python:3.12.7-slim\n  script:\n    - pytest\n"
+   }
+  },
+  {
+   "id": "artefacts-cache",
+   "title": "Artefacts, cache et règles",
+   "minutes": 18,
+   "objectives": [
+    "Distinguer cache et artefact",
+    "Limiter la durée de conservation",
+    "Déclencher un job selon des règles"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Le cache accélère (dépendances réutilisées d'une pipeline à l'autre, sans garantie). Un artefact transmet un résultat (build, rapport) aux jobs suivants et peut se télécharger."
+    },
+    {
+     "type": "code",
+     "body": "build:\n  script: [npm ci, npm run build]\n  artifacts:\n    paths: [dist/]\n    expire_in: 1 week\n  cache:\n    key:\n      files: [package-lock.json]\n    paths: [node_modules/]",
+     "caption": "Artefact à durée limitée, cache indexé sur le fichier de verrouillage"
+    },
+    {
+     "type": "code",
+     "body": "rules:\n  - if: $CI_PIPELINE_SOURCE == \"merge_request_event\"\n  - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH",
+     "caption": "Exécuter seulement pour les MR et la branche par défaut"
+    },
+    {
+     "type": "tip",
+     "body": "Sans expire_in, les artefacts s'accumulent et remplissent le stockage du projet."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "gl-7-1",
+     "type": "single",
+     "prompt": "Différence cache / artefact ?",
+     "choices": [
+      "Cache = accélérer ; artefact = transmettre un résultat",
+      "Aucune",
+      "Artefact = accélérer",
+      "Cache = publier"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Ne comptez pas sur le cache pour la justesse."
+    },
+    {
+     "id": "gl-7-2",
+     "type": "single",
+     "prompt": "Pourquoi expire_in ?",
+     "choices": [
+      "Limiter la conservation des artefacts",
+      "Accélérer le job",
+      "Chiffrer",
+      "Publier"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Le stockage n'est pas infini."
+    },
+    {
+     "id": "gl-7-3",
+     "type": "single",
+     "prompt": "Clé de cache recommandée ?",
+     "choices": [
+      "Le fichier de verrouillage des dépendances",
+      "La date du jour",
+      "Le nom du développeur",
+      "Aucune"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Le cache change quand les dépendances changent."
+    },
+    {
+     "id": "gl-7-4",
+     "type": "single",
+     "prompt": "rules: sert à…",
+     "choices": [
+      "Décider quand un job s'exécute",
+      "Définir l'image",
+      "Stocker des secrets",
+      "Créer un runner"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Remplace only/except."
+    }
+   ],
+   "lab": {
+    "kind": "gitlabci",
+    "intro": "Les artefacts de ce build sont conservés indéfiniment. Limitez leur durée.",
+    "starter": "build:\n  image: node:22.11-slim\n  script:\n    - npm ci\n    - npm run build\n  artifacts:\n    paths: [dist/]\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "Durée de conservation fixée",
+      "rule": "GL004"
+     },
+     {
+      "type": "valid",
+      "label": "Fichier valide"
+     }
+    ],
+    "hint": "Ajoutez expire_in: 1 week dans artifacts.",
+    "solution": "build:\n  image: node:22.11-slim\n  script:\n    - npm ci\n    - npm run build\n  artifacts:\n    paths: [dist/]\n    expire_in: 1 week\n"
+   }
+  },
+  {
+   "id": "runners",
+   "title": "Runners : qui exécute vos jobs ?",
+   "minutes": 18,
+   "objectives": [
+    "Distinguer runners partagés et dédiés",
+    "Évaluer le risque d'un runner et de ses scripts"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Un runner est la machine qui exécute les jobs. Runners partagés (fournis par gitlab.com), de groupe ou de projet ; exécuteurs docker (conteneur jetable par job), shell (directement sur la machine), kubernetes."
+    },
+    {
+     "type": "warning",
+     "body": "Un runner « shell » exécute les scripts de la pipeline avec les droits du compte gitlab-runner, sur une machine persistante : une MR malveillante peut y laisser une porte dérobée. Préférez docker et des runners dédiés aux projets de confiance."
+    },
+    {
+     "type": "text",
+     "body": "Un script de pipeline qui fait curl … | sh exécute du code distant non vérifié sur le runner, avec les variables CI."
+    },
+    {
+     "type": "code",
+     "body": "gitlab-runner register --url https://gitlab.com --executor docker --docker-image alpine:3.20",
+     "caption": "Enregistrer un runner docker (auto-hébergé)"
+    }
+   ],
+   "quiz": [
+    {
+     "id": "gl-8-1",
+     "type": "single",
+     "prompt": "Risque principal d'un exécuteur shell ?",
+     "choices": [
+      "Les jobs tournent directement sur une machine persistante",
+      "Il est lent",
+      "Il ne supporte pas Git",
+      "Il est payant"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Pas d'isolation entre jobs."
+    },
+    {
+     "id": "gl-8-2",
+     "type": "single",
+     "prompt": "Exécuteur qui donne un conteneur jetable par job ?",
+     "choices": [
+      "docker",
+      "shell",
+      "ssh",
+      "parallels"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Chaque job repart d'une image propre."
+    },
+    {
+     "id": "gl-8-3",
+     "type": "single",
+     "prompt": "Que fait curl … | sh dans un job ?",
+     "choices": [
+      "Exécute un script distant non vérifié avec les variables CI",
+      "Accélère la pipeline",
+      "Rien de grave",
+      "Met en cache"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Téléchargez, vérifiez, exécutez."
+    },
+    {
+     "id": "gl-8-4",
+     "type": "command",
+     "prompt": "Listez les runners enregistrés sur la machine.",
+     "accepted": [
+      "gitlab-runner list",
+      "sudo gitlab-runner list"
+     ],
+     "explanation": "Affiche nom, exécuteur et URL."
+    }
+   ],
+   "lab": {
+    "kind": "gitlabci",
+    "intro": "Ce job installe un outil en exécutant un script distant. Vérifiez-le avant de l'exécuter.",
+    "starter": "scan:\n  image: alpine:3.20\n  script:\n    - apk add --no-cache curl\n    - curl -sSL https://exemple.org/install.sh | sh\n    - outil scan .\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "Plus de curl | sh",
+      "rule": "GL005"
+     },
+     {
+      "type": "contains",
+      "label": "Empreinte vérifiée",
+      "text": "sha256sum -c"
+     },
+     {
+      "type": "noSeverity",
+      "label": "Aucun problème bloquant",
+      "severity": "blocking"
+     }
+    ],
+    "hint": "Téléchargez dans un fichier (curl -o), vérifiez avec sha256sum -c, puis lancez sh install.sh.",
+    "solution": "scan:\n  image: alpine:3.20\n  script:\n    - apk add --no-cache curl\n    - curl -sSLo install.sh https://exemple.org/install.sh\n    - echo \"$INSTALL_SHA256  install.sh\" | sha256sum -c -\n    - sh install.sh\n    - outil scan .\n"
+   }
+  },
+  {
+   "id": "environnements",
+   "title": "Environnements et déploiements maîtrisés",
+   "minutes": 18,
+   "objectives": [
+    "Déclarer un environnement",
+    "Exiger une action humaine avant la production"
+   ],
+   "sections": [
+    {
+     "type": "code",
+     "body": "deploy_prod:\n  stage: deploy\n  environment:\n    name: production\n    url: https://exemple.org\n  rules:\n    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH\n      when: manual\n  script:\n    - ./deploy.sh",
+     "caption": "Déploiement manuel en production depuis la branche par défaut"
+    },
+    {
+     "type": "text",
+     "body": "Un environnement garde l'historique des déploiements et permet de revenir à une version précédente (« Rollback »)."
+    },
+    {
+     "type": "text",
+     "body": "Les environnements protégés restreignent qui peut déployer ; when: manual demande un clic explicite, journalisé."
+    },
+    {
+     "type": "tip",
+     "body": "Déployer automatiquement en recette (staging) et manuellement en production est un bon compromis."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "gl-9-1",
+     "type": "single",
+     "prompt": "Effet de when: manual ?",
+     "choices": [
+      "Le job attend un déclenchement humain",
+      "Le job est supprimé",
+      "Le job tourne deux fois",
+      "Le job ignore les erreurs"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Un clic explicite et tracé."
+    },
+    {
+     "id": "gl-9-2",
+     "type": "single",
+     "prompt": "Intérêt de déclarer environment: ?",
+     "choices": [
+      "Historique des déploiements et retour arrière",
+      "Plus de mémoire",
+      "Variables publiques",
+      "Aucun"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Visible dans Operate → Environments."
+    },
+    {
+     "id": "gl-9-3",
+     "type": "single",
+     "prompt": "Un environnement protégé…",
+     "choices": [
+      "Restreint qui peut y déployer",
+      "Est invisible",
+      "Bloque la CI",
+      "Supprime les variables"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Contrôle d'accès au déploiement."
+    },
+    {
+     "id": "gl-9-4",
+     "type": "single",
+     "prompt": "Compromis courant ?",
+     "choices": [
+      "Recette automatique, production manuelle",
+      "Tout manuel",
+      "Tout automatique sans tests",
+      "Pas d'environnement"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Rapide en recette, maîtrisé en production."
+    }
+   ],
+   "lab": {
+    "kind": "gitlabci",
+    "intro": "Ce job déploie en production à chaque push, sans validation. Ajoutez une garde humaine.",
+    "starter": "deploy_prod:\n  image: alpine:3.20\n  environment:\n    name: production\n  script:\n    - ./deploy.sh\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "Déploiement validé manuellement",
+      "rule": "GL003"
+     },
+     {
+      "type": "valid",
+      "label": "Fichier valide"
+     }
+    ],
+    "hint": "Ajoutez when: manual (ou une règle rules: avec when: manual).",
+    "solution": "deploy_prod:\n  image: alpine:3.20\n  environment:\n    name: production\n  rules:\n    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH\n      when: manual\n  script:\n    - ./deploy.sh\n"
+   }
+  }
+ ],
+ "project": {
+  "title": "Pipeline GitLab de bout en bout",
+  "brief": "Rédigez la pipeline d'une API : tests, build avec artefact, déploiement en production sous contrôle humain, sans secret dans le fichier.",
+  "lab": {
+   "kind": "gitlabci",
+   "intro": "Objectif : aucun problème bloquant ni avertissement.",
+   "starter": "variables:\n  API_TOKEN: \"tok-prod-123456\"\n\nstages: [test, build, deploy]\n\ntests:\n  stage: test\n  image: python\n  script:\n    - pytest\n\nbuild:\n  stage: build\n  image: python:latest\n  script:\n    - python -m build\n  artifacts:\n    paths: [dist/]\n\ndeploy_prod:\n  stage: deploy\n  image: alpine:3.20\n  environment:\n    name: production\n  script:\n    - curl -sSL https://exemple.org/deploy.sh | sh\n",
+   "goals": [
+    {
+     "type": "noSeverity",
+     "label": "Aucun problème bloquant",
+     "severity": "blocking"
+    },
+    {
+     "type": "noSeverity",
+     "label": "Aucun avertissement",
+     "severity": "warning"
+    },
+    {
+     "type": "noRule",
+     "label": "Production validée à la main",
+     "rule": "GL003"
+    },
+    {
+     "type": "noRule",
+     "label": "Artefacts à durée limitée",
+     "rule": "GL004"
+    }
+   ],
+   "hint": "Reprenez les labos : secret dans les variables du projet, images épinglées, expire_in, script vérifié, when: manual.",
+   "solution": "stages: [test, build, deploy]\n\ntests:\n  stage: test\n  image: python:3.12.7-slim\n  script:\n    - pytest\n\nbuild:\n  stage: build\n  image: python:3.12.7-slim\n  script:\n    - python -m build\n  artifacts:\n    paths: [dist/]\n    expire_in: 1 week\n\ndeploy_prod:\n  stage: deploy\n  image: alpine:3.20\n  environment:\n    name: production\n  rules:\n    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH\n      when: manual\n  script:\n    - ./deploy.sh\n"
+  },
+  "rubric": [
+   {
+    "criterion": "Secrets",
+    "levels": [
+     "Dans le fichier",
+     "Variables CI/CD",
+     "Variables masquées et protégées, environnement protégé"
+    ]
+   },
+   {
+    "criterion": "Reproductibilité",
+    "levels": [
+     "Images latest",
+     "Images épinglées",
+     "Images épinglées et cache indexé sur le fichier de verrouillage"
+    ]
+   },
+   {
+    "criterion": "Déploiement",
+    "levels": [
+     "Automatique en production",
+     "when: manual",
+     "Recette automatique, production manuelle protégée, rollback documenté"
+    ]
+   },
+   {
+    "criterion": "Exécution",
+    "levels": [
+     "Scripts distants non vérifiés",
+     "Empreintes vérifiées",
+     "Runner docker dédié, scripts versionnés"
+    ]
+   },
+   {
+    "criterion": "Sobriété",
+    "levels": [
+     "Artefacts conservés indéfiniment",
+     "expire_in",
+     "expire_in, needs: et interruptible pour économiser les minutes"
+    ]
+   }
+  ]
+ },
+ "glossary": [
+  {
+   "term": "Groupe",
+   "definition": "Ensemble de projets partageant membres et réglages."
+  },
+  {
+   "term": "Merge request",
+   "definition": "Demande de fusion relue (équivalent d'une PR)."
+  },
+  {
+   "term": "Draft",
+   "definition": "MR en brouillon, non fusionnable."
+  },
+  {
+   "term": "Pipeline",
+   "definition": "Ensemble des jobs déclenchés par un commit ou une MR."
+  },
+  {
+   "term": "Stage",
+   "definition": "Étape d'une pipeline regroupant des jobs parallèles."
+  },
+  {
+   "term": "Job",
+   "definition": "Unité de travail exécutée par un runner."
+  },
+  {
+   "term": "Runner",
+   "definition": "Machine ou service qui exécute les jobs."
+  },
+  {
+   "term": "Exécuteur",
+   "definition": "Mode d'exécution d'un runner (docker, shell, kubernetes)."
+  },
+  {
+   "term": "Variable protégée",
+   "definition": "Variable fournie uniquement aux branches et tags protégés."
+  },
+  {
+   "term": "Variable masquée",
+   "definition": "Variable cachée dans les journaux."
+  },
+  {
+   "term": "Artefact",
+   "definition": "Fichier produit par un job et transmis ou téléchargeable."
+  },
+  {
+   "term": "Cache",
+   "definition": "Fichiers réutilisés entre pipelines pour accélérer."
+  },
+  {
+   "term": "Environment",
+   "definition": "Cible de déploiement avec historique et retour arrière."
+  },
+  {
+   "term": "Deploy token",
+   "definition": "Jeton machine à accès limité à un projet."
+  }
+ ]
+}

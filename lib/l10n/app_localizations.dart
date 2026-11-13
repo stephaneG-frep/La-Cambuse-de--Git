@@ -395,7 +395,7 @@ abstract class AppLocalizations {
   /// No description provided for @academySubtitle.
   ///
   /// In fr, this message translates to:
-  /// **'Chaque île est un module. Les îles en brume arriveront dans une phase ultérieure.'**
+  /// **'Chaque île est un module, du terminal Linux jusqu\'au SRE. Tout est disponible hors ligne ; les prérequis sont des conseils, pas des verrous.'**
   String get academySubtitle;
 
   /// No description provided for @academySearch.
@@ -2057,7 +2057,7 @@ abstract class AppLocalizations {
   /// No description provided for @labStatic.
   ///
   /// In fr, this message translates to:
-  /// **'Labo hors ligne : le fichier est analysé, aucun conteneur n\'est lancé.'**
+  /// **'Labo hors ligne : le fichier est analysé, rien n\'est exécuté (aucun conteneur, script ni cluster).'**
   String get labStatic;
 
   /// No description provided for @labAnalyze.

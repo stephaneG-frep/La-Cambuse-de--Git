@@ -4,6 +4,8 @@
 /// explicite plutôt que d'afficher une leçon tronquée.
 library;
 
+import 'package:cambuse_protocol/cambuse_protocol.dart';
+
 T _req<T>(Map<String, dynamic> j, String key, String ctx) {
   final v = j[key];
   if (v is! T) throw FormatException('$ctx : champ « $key » manquant ou invalide');
@@ -175,7 +177,7 @@ class Exercise {
   final List<ExerciseStep> steps;
 }
 
-/// Objectif d'un labo fichier, évalué par l'analyseur Docker/Compose.
+/// Objectif d'un labo fichier, évalué par l'analyseur du type de fichier.
 class LabGoal {
   const LabGoal(this.type, this.params, this.label);
 
@@ -194,8 +196,8 @@ class LabGoal {
   final String label;
 }
 
-/// Labo « fichier » : corriger un Dockerfile ou un compose.yaml. Aucun
-/// conteneur n'est lancé : l'analyse est statique, hors ligne.
+/// Labo « fichier » : corriger un Dockerfile, un compose.yaml, un script, un
+/// manifeste… Rien n'est exécuté : l'analyse est statique, hors ligne.
 class FileLab {
   const FileLab({
     required this.kind,
@@ -208,7 +210,7 @@ class FileLab {
 
   factory FileLab.fromJson(Map<String, dynamic> j, String ctx) {
     final kind = _req<String>(j, 'kind', ctx);
-    if (kind != 'dockerfile' && kind != 'compose') throw FormatException('$ctx : type de labo inconnu $kind');
+    if (!labFileNames.containsKey(kind)) throw FormatException('$ctx : type de labo inconnu $kind');
     final goals = [for (final g in _maps(j, 'goals', ctx)) LabGoal.fromJson(g, ctx)];
     if (goals.isEmpty) throw FormatException('$ctx : labo sans objectif');
     return FileLab(
@@ -228,7 +230,7 @@ class FileLab {
   final String hint;
   final String solution;
 
-  String get fileName => kind == 'dockerfile' ? 'Dockerfile' : 'compose.yaml';
+  String get fileName => labFileNames[kind]!;
 }
 
 class Lesson {

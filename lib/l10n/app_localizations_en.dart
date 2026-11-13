@@ -186,7 +186,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get academySubtitle =>
-      'Each island is a module. Islands in the mist will arrive in a later phase.';
+      'Each island is a module, from the Linux terminal to SRE. Everything is available offline; prerequisites are advice, not locks.';
 
   @override
   String get academySearch => 'Search';
@@ -1162,7 +1162,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get labStatic =>
-      'Offline lab: the file is analysed, no container is started.';
+      'Offline lab: the file is analysed, nothing is executed (no container, script or cluster).';
 
   @override
   String get labAnalyze => 'Analyse';

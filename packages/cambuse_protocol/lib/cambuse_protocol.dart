@@ -7,6 +7,7 @@ library;
 export 'ci_templates.dart';
 export 'docker_lint.dart';
 export 'docker_templates.dart';
+export 'infra_lint.dart';
 export 'secret_scan.dart';
 
 const apiVersion = 1;
