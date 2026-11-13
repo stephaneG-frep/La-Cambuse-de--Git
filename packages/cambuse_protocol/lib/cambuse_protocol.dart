@@ -4,6 +4,8 @@
 /// formats JSON : l'application et le compagnon l'importent tous les deux.
 library;
 
+export 'docker_lint.dart';
+export 'docker_templates.dart';
 export 'secret_scan.dart';
 
 const apiVersion = 1;
@@ -19,7 +21,11 @@ enum Scope {
   gitWrite('git-write'),
 
   /// Échanges réseau avec un dépôt distant (push, pull). Accordée à part.
-  remote('remote');
+  remote('remote'),
+
+  /// Inspection du démon Docker de l'hôte (lecture seule). Accordée à part :
+  /// l'accès au socket Docker équivaut à des droits root.
+  docker('docker');
 
   const Scope(this.code);
   final String code;
@@ -39,6 +45,11 @@ enum OpType {
   backupList('backup.list', Scope.read, mutating: false),
   gitRemoteList('git.remote.list', Scope.read, mutating: false),
   gitOutgoing('git.outgoing', Scope.read, mutating: false),
+  dockerLint('docker.lint', Scope.read, mutating: false),
+  dockerInfo('docker.info', Scope.docker, mutating: false),
+  dockerImages('docker.images', Scope.docker, mutating: false),
+  dockerContainers('docker.containers', Scope.docker, mutating: false),
+  dockerLogs('docker.logs', Scope.docker, mutating: false),
   projectBackup('project.backup', Scope.gitWrite, mutating: false),
   projectDetect('project.detect', Scope.read, mutating: false),
   gitStatus('git.status', Scope.read, mutating: false),
@@ -54,7 +65,8 @@ enum OpType {
   backupRestore('backup.restore', Scope.gitWrite, mutating: true),
   gitRemoteAdd('git.remote.add', Scope.gitWrite, mutating: true),
   gitPush('git.push', Scope.remote, mutating: true),
-  gitPull('git.pull', Scope.remote, mutating: true);
+  gitPull('git.pull', Scope.remote, mutating: true),
+  dockerScaffold('docker.scaffold', Scope.gitWrite, mutating: true);
 
   const OpType(this.code, this.scope, {required this.mutating});
 

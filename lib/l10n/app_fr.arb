@@ -755,5 +755,80 @@
       }
     }
   },
-  "pbScopeMissing": "Cet appareil n'a pas la portée « remote » : appairez-le avec --scopes read,git-write,remote."
+  "pbScopeMissing": "Cet appareil n'a pas la portée « remote » : appairez-le avec --scopes read,git-write,remote.",
+  "labStatic": "Labo hors ligne : le fichier est analysé, aucun conteneur n'est lancé.",
+  "labAnalyze": "Analyser",
+  "labReset": "Réinitialiser",
+  "labGoals": "Objectifs",
+  "labFindings": "Constats de l'analyseur",
+  "labNoFinding": "Aucun constat : bravo.",
+  "labDone": "Labo réussi ! Mousse Byte salue votre rigueur.",
+  "labLine": "ligne {line}",
+  "@labLine": {
+    "placeholders": {
+      "line": {
+        "type": "int"
+      }
+    }
+  },
+  "labFix": "Correction : {fix}",
+  "@labFix": {
+    "placeholders": {
+      "fix": {
+        "type": "String"
+      }
+    }
+  },
+  "dkRoom": "Salle des machines Docker",
+  "dkRoomSubtitle": "Inspection en lecture seule du Docker de votre PC",
+  "dkUnavailable": "Docker indisponible sur l'hôte.",
+  "dkServer": "Docker {version}",
+  "@dkServer": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "dkRootless": "Mode rootless",
+  "dkCounts": "{containers} conteneur(s) dont {running} en marche · {images} image(s)",
+  "@dkCounts": {
+    "placeholders": {
+      "containers": {
+        "type": "String"
+      },
+      "running": {
+        "type": "String"
+      },
+      "images": {
+        "type": "String"
+      }
+    }
+  },
+  "dkImages": "Images",
+  "dkContainers": "Conteneurs",
+  "dkLogs": "Journal de {name}",
+  "@dkLogs": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "dkReadOnly": "Lecture seule : La Cambuse ne lance, n'arrête ni ne supprime aucun conteneur.",
+  "dkScopeMissing": "Cet appareil n'a pas la portée « docker » : appairez-le avec --scopes …,docker (l'accès à Docker équivaut à des droits root).",
+  "wsTabDocker": "Docker",
+  "dkLintIntro": "Analyse statique des fichiers Docker du projet (aucun conteneur lancé).",
+  "dkRunLint": "Analyser les fichiers Docker",
+  "dkNoFiles": "Aucun Dockerfile ni compose.yaml dans ce projet.",
+  "dkGenerate": "Générer un Dockerfile ({template})",
+  "@dkGenerate": {
+    "placeholders": {
+      "template": {
+        "type": "String"
+      }
+    }
+  },
+  "dkNoDockerignore": "Pas de .dockerignore : le contexte de build peut embarquer .git, .env et les dépendances.",
+  "dkOpenRoom": "Salle des machines Docker"
 }

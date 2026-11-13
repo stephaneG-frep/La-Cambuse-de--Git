@@ -2,7 +2,17 @@
 
 Format inspiré de « Keep a Changelog ». Versions non publiées.
 
-## [Non publié] — Phase 6 : GitHub et GitLab (2026-11-13)
+## [Non publié] — Phase 7 : Docker et Compose (2026-11-13)
+
+### Ajouté
+- Analyseurs Dockerfile et Compose partagés, modèles Dockerfile sûrs, masquage des secrets des journaux.
+- Compagnon : portée `docker`, diagnostic, images, conteneurs, journaux (lecture seule), analyse de projet, génération sans écrasement.
+- Académie : modules Docker et Docker Compose avec « labos fichier » ; Atelier : Salle des machines et onglet Docker.
+
+### Corrigé
+- Faux positif `curl | sh` sur `| sha256sum` ; démarrage du compagnon sur un port occupé.
+
+## Phase 6 : GitHub et GitLab (2026-11-13)
 
 ### Ajouté
 - Compagnon : remotes (HTTPS, sans identifiants), analyse de ce qui serait envoyé, push sans force et pull en avance rapide (portée `remote`), jeton transmis par l'environnement et masqué.

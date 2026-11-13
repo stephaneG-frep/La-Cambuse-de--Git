@@ -2,7 +2,7 @@
 
 Application Flutter **Android** et **Linux** : académie Git / GitHub / GitLab / Docker / DevOps de zéro à expert, atelier d'opérations réelles sur projets et capitaine automatique supervisé.
 
-> État actuel : **fin de phase 6** (Académie, professeur IA facultatif, compagnon Linux sécurisé, Atelier Git local, publication GitHub/GitLab). Voir [docs/ACCEPTANCE_MATRIX.md](docs/ACCEPTANCE_MATRIX.md) pour l'état réel de chaque fonctionnalité. Le Capitaine affiche honnêtement la phase où il sera livré. Le bac à sable de l'Académie est un **simulateur pédagogique** clairement signalé : il n'exécute aucune commande réelle.
+> État actuel : **fin de phase 7** (Académie Git/Docker/Compose, professeur IA facultatif, compagnon Linux sécurisé, Atelier, publication GitHub/GitLab, inspection Docker). Voir [docs/ACCEPTANCE_MATRIX.md](docs/ACCEPTANCE_MATRIX.md) pour l'état réel de chaque fonctionnalité. Le Capitaine affiche honnêtement la phase où il sera livré. Le bac à sable de l'Académie est un **simulateur pédagogique** clairement signalé : il n'exécute aucune commande réelle.
 
 ## Documents de référence
 
@@ -16,6 +16,7 @@ Application Flutter **Android** et **Linux** : académie Git / GitHub / GitLab /
 - [docs/PHASE4_BILAN.md](docs/PHASE4_BILAN.md) — bilan de la phase 4
 - [docs/PHASE5_BILAN.md](docs/PHASE5_BILAN.md) — bilan de la phase 5
 - [docs/PHASE6_BILAN.md](docs/PHASE6_BILAN.md) — bilan de la phase 6
+- [docs/PHASE7_BILAN.md](docs/PHASE7_BILAN.md) — bilan de la phase 7
 - [companion/README.md](companion/README.md) — compagnon Linux (installation, sécurité)
 - [CHANGELOG.md](CHANGELOG.md)
 
@@ -30,6 +31,7 @@ Application Flutter **Android** et **Linux** : académie Git / GitHub / GitLab /
 ```bash
 flutter pub get
 python3 tool/content/git_module.py                          # régénère assets/courses/git.json
+python3 tool/content/docker_modules.py                       # régénère docker.json et compose.json
 dart run build_runner build --delete-conflicting-outputs   # code Drift
 flutter analyze --fatal-infos
 flutter test
@@ -38,6 +40,7 @@ flutter run -d linux
 flutter build linux --release                                  # bundle Linux
 flutter build apk --debug --target-platform android-arm64      # APK de TEST
 (cd companion && dart test)                                    # tests du compagnon
+(cd packages/cambuse_protocol && dart test)                    # tests du protocole et des analyseurs
 dart compile exe companion/bin/cambuse_companion.dart -o build/companion/cambuse-companion
 ```
 

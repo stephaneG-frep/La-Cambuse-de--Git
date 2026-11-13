@@ -21,15 +21,15 @@ class Island {
   bool get isAvailable => availablePhase == null;
 }
 
-/// Ordre du parcours de zéro à expert. Seul Git est livré en phase 2 ; les
-/// autres modules sont affichés honnêtement « en brume », sans contenu simulé.
+/// Ordre du parcours de zéro à expert. Git (phase 2), Docker et Compose
+/// (phase 7) sont livrés ; les autres sont affichés honnêtement « en brume ».
 const islands = <Island>[
   Island(id: 'linux', title: 'Terminal Linux', icon: Icons.terminal, prerequisites: [], availablePhase: 9),
   Island(id: 'git', title: 'Git', icon: Icons.account_tree, prerequisites: []),
   Island(id: 'github', title: 'GitHub', icon: Icons.hub, prerequisites: ['git'], availablePhase: 6),
   Island(id: 'gitlab', title: 'GitLab', icon: Icons.merge_type, prerequisites: ['git'], availablePhase: 6),
-  Island(id: 'docker', title: 'Docker', icon: Icons.inventory_2, prerequisites: ['linux'], availablePhase: 7),
-  Island(id: 'compose', title: 'Docker Compose', icon: Icons.layers, prerequisites: ['docker'], availablePhase: 7),
+  Island(id: 'docker', title: 'Docker', icon: Icons.inventory_2, prerequisites: ['git']),
+  Island(id: 'compose', title: 'Docker Compose', icon: Icons.layers, prerequisites: ['docker']),
   Island(id: 'devops', title: 'DevOps et CI/CD', icon: Icons.all_inclusive, prerequisites: ['git', 'docker'], availablePhase: 8),
   Island(id: 'reseaux', title: 'Réseaux, serveurs, cloud', icon: Icons.lan, prerequisites: ['linux'], availablePhase: 9),
   Island(id: 'kubernetes', title: 'Kubernetes', icon: Icons.sailing, prerequisites: ['compose', 'reseaux'], availablePhase: 9),

@@ -58,7 +58,7 @@ void main() {
     test('exercice réalisable : ${l.id}', () => replay(l.exercise!, l.id));
   }
 
-  test('projet final réalisable', () => replay(module.project.exercise, 'projet'));
+  test('projet final réalisable', () => replay(module.project.exercise!, 'projet'));
 
   test('chaque question à commande accepte sa propre réponse normalisée', () {
     for (final q in module.lessons.expand((l) => l.quiz)) {

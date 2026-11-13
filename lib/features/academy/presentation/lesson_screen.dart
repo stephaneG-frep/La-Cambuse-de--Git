@@ -11,6 +11,7 @@ import '../domain/course.dart';
 import 'academy_providers.dart';
 import 'widgets/course_view.dart';
 import 'widgets/exercise_view.dart';
+import 'widgets/lab_view.dart';
 import 'widgets/quiz_view.dart';
 
 class LessonScreen extends ConsumerWidget {
@@ -67,7 +68,7 @@ class _LessonBodyState extends ConsumerState<_LessonBody> {
     final lesson = widget.lesson;
     final moduleId = widget.module.id;
     final row = ref.watch(moduleProgressProvider(moduleId)).value?[lesson.id];
-    final hasExercise = lesson.exercise != null;
+    final hasExercise = lesson.hasPractice;
     final done = row?.completedAt != null;
     final next = _next;
     final wide = MediaQuery.sizeOf(context).width >= CambuseBreakpoints.rail;
@@ -136,7 +137,15 @@ class _LessonBodyState extends ConsumerState<_LessonBody> {
             child: TabBarView(
               children: [
                 CourseView(lesson: lesson, footer: nextButton),
-                hasExercise
+                lesson.lab != null
+                    ? LabView(
+                        lab: lesson.lab!,
+                        alreadyDone: row?.exerciseDone ?? false,
+                        onCompleted: () => ref
+                            .read(progressRepositoryProvider)
+                            .markExerciseDone(moduleId, lesson.id, hasExercise: true),
+                      )
+                    : lesson.exercise != null
                     ? ExerciseView(
                         exercise: lesson.exercise!,
                         alreadyDone: row?.exerciseDone ?? false,

@@ -108,7 +108,11 @@ class OpRunner {
     this.backups,
     this.allowedRemoteHosts = const {'github.com', 'gitlab.com'},
     this.allowFileRemotes = false,
+    this.dockerExecutable = 'docker',
   });
+
+  /// Exécutable Docker (remplaçable dans les tests).
+  final String dockerExecutable;
 
   /// Hôtes autorisés pour les dépôts distants (HTTPS uniquement).
   final Set<String> allowedRemoteHosts;
@@ -138,6 +142,8 @@ class OpRunner {
     if (type == OpType.systemInfo) {
       return PreparedOp(type: type, root: null, plan: ['Lire les informations du compagnon'], internal: _systemInfo);
     }
+    final dockerOp = _prepareDocker(type, req.params);
+    if (dockerOp != null) return dockerOp;
     final root = guard.resolveProject(req.root);
     final p = req.params;
     switch (type) {
@@ -399,6 +405,45 @@ class OpRunner {
                 }
               : null,
         );
+      case OpType.dockerLint:
+        return PreparedOp(type: type, root: root, plan: ['Analyser (lecture seule) les fichiers Docker de $root'],
+            internal: () async => lintProjectDocker(root));
+      case OpType.dockerScaffold:
+        final kind = '${p['template'] ?? ''}';
+        if (kind == 'flutter') {
+          throw OpValidationError(ErrorCodes.invalidRequest, flutterDockerNote);
+        }
+        final files = dockerTemplate(kind) ??
+            (throw OpValidationError(ErrorCodes.invalidRequest, 'Modèle inconnu : « $kind » (disponibles : ${dockerTemplateKinds.join(', ')}).'));
+        for (final name in files.keys) {
+          RootGuard.resolveInProject(root, name);
+          if (FileSystemEntity.typeSync('$root/$name', followLinks: false) != FileSystemEntityType.notFound) {
+            throw OpValidationError(ErrorCodes.conflict, '« $name » existe déjà : il ne sera pas écrasé.');
+          }
+        }
+        return PreparedOp(
+          type: type,
+          root: root,
+          plan: [
+            'Créer dans $root (modèle $kind) :',
+            for (final e in files.entries) '+ ${e.key} (${e.value.split('\n').length} lignes)',
+            'Aucun fichier existant n\'est modifié. Crée des fichiers : approbation requise.',
+          ],
+          internal: () async {
+            for (final e in files.entries) {
+              final f = File('$root/${e.key}');
+              if (f.existsSync()) throw OpValidationError(ErrorCodes.conflict, '« ${e.key} » est apparu entre-temps.');
+              final tmp = File('$root/${e.key}.cambuse-tmp')..writeAsStringSync(e.value, flush: true);
+              tmp.renameSync(f.path);
+            }
+            return {'created': files.keys.toList()};
+          },
+        );
+      case OpType.dockerInfo:
+      case OpType.dockerImages:
+      case OpType.dockerContainers:
+      case OpType.dockerLogs:
+        throw StateError('inatteignable');
       case OpType.systemInfo:
         throw StateError('inatteignable');
     }
@@ -450,6 +495,116 @@ class OpRunner {
     return [for (final x in paths) RootGuard.resolveInProject(root, x)];
   }
 
+
+
+  // ------------------------------------------------------------- Docker
+
+  Map<String, String> get _dockerEnv => {
+        'PATH': Platform.environment['PATH'] ?? '/usr/bin:/bin',
+        'HOME': Platform.environment['HOME'] ?? '/tmp',
+        'LANG': 'C.UTF-8',
+        for (final k in ['DOCKER_HOST', 'DOCKER_CONTEXT', 'DOCKER_CONFIG', 'XDG_RUNTIME_DIR'])
+          if (Platform.environment[k] != null) k: Platform.environment[k]!,
+      };
+
+  Future<ProcessResult> _docker(List<String> args) => Process.run(dockerExecutable, args,
+          includeParentEnvironment: false, environment: _dockerEnv)
+      .timeout(const Duration(seconds: 20));
+
+  static List<Map<String, dynamic>> _jsonLines(Object? out) => [
+        for (final l in '$out'.split('\n').where((l) => l.trim().startsWith('{')))
+          (jsonDecode(l) as Map).cast<String, dynamic>(),
+      ];
+
+  /// Opérations d'inspection Docker : lecture seule, arguments fixes, aucune
+  /// opération run/stop/rm/pull n'existe.
+  PreparedOp? _prepareDocker(OpType type, Map<String, dynamic> p) {
+    PreparedOp op(String plan, Future<Map<String, dynamic>> Function() f) =>
+        PreparedOp(type: type, root: null, plan: [plan, 'Lecture seule : aucun conteneur ni image n\'est modifié.'], internal: f);
+    switch (type) {
+      case OpType.dockerInfo:
+        return op('Diagnostic du démon Docker de l\'hôte', _dockerDiagnostic);
+      case OpType.dockerImages:
+        return op('Lister les images Docker', () async {
+          final r = await _docker(['image', 'ls', '--format', '{{json .}}']);
+          if (r.exitCode != 0) throw OpValidationError(ErrorCodes.conflict, 'Docker indisponible : ${'${r.stderr}'.trim()}');
+          return {'images': _jsonLines(r.stdout)};
+        });
+      case OpType.dockerContainers:
+        return op('Lister les conteneurs (y compris arrêtés)', () async {
+          final r = await _docker(['ps', '--all', '--no-trunc=false', '--format', '{{json .}}']);
+          if (r.exitCode != 0) throw OpValidationError(ErrorCodes.conflict, 'Docker indisponible : ${'${r.stderr}'.trim()}');
+          return {'containers': _jsonLines(r.stdout)};
+        });
+      case OpType.dockerLogs:
+        final id = '${p['container'] ?? ''}';
+        if (!RegExp(r'^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$').hasMatch(id)) {
+          throw OpValidationError(ErrorCodes.invalidRequest, 'Identifiant de conteneur invalide.');
+        }
+        final tail = ((p['tail'] as int?) ?? 100).clamp(1, 500);
+        return op('Lire les $tail dernières lignes du journal de $id', () async {
+          final r = await _docker(['logs', '--tail', '$tail', '--timestamps', '--', id]);
+          if (r.exitCode != 0) throw OpValidationError(ErrorCodes.notFound, 'Journal indisponible : ${'${r.stderr}'.trim()}');
+          final text = '${r.stdout}${r.stderr}';
+          final capped = text.length > maxOutputBytes ? '${text.substring(text.length - maxOutputBytes)}\n[début tronqué]' : text;
+          return {'logs': maskSecrets(capped)};
+        });
+      default:
+        return null;
+    }
+  }
+
+  Future<Map<String, dynamic>> _dockerDiagnostic() async {
+    final notes = <Map<String, String>>[];
+    ProcessResult version;
+    try {
+      version = await _docker(['version', '--format', '{{json .}}']);
+    } on ProcessException {
+      return {'available': false, 'notes': [{'severity': 'info', 'message': 'Docker n\'est pas installé sur cet hôte. Il est facultatif : les builds Flutter n\'en ont pas besoin.'}]};
+    }
+    Map<String, dynamic>? v;
+    try {
+      v = (jsonDecode('${version.stdout}'.trim().split('\n').first) as Map).cast<String, dynamic>();
+    } catch (_) {}
+    if (version.exitCode != 0 || v?['Server'] == null) {
+      return {
+        'available': false,
+        'client': (v?['Client'] as Map?)?['Version'],
+        'notes': [{'severity': 'warning', 'message': 'Client Docker présent mais démon injoignable : ${'${version.stderr}'.trim().split('\n').first}'}],
+      };
+    }
+    final info = await _docker(['info', '--format', '{{json .}}']);
+    Map<String, dynamic> i = {};
+    try {
+      i = (jsonDecode('${info.stdout}'.trim()) as Map).cast<String, dynamic>();
+    } catch (_) {}
+    final security = ((i['SecurityOptions'] as List?) ?? const []).join(' ');
+    final rootless = security.contains('rootless');
+    final groups = '${(await Process.run('id', ['-nG'])).stdout}'.split(RegExp(r'\s+'));
+    if (!rootless && groups.contains('docker')) {
+      notes.add({'severity': 'warning', 'message': 'Votre compte est dans le groupe « docker » : cela équivaut à des droits root sur la machine. Envisagez Docker en mode rootless.'});
+    }
+    if (rootless) notes.add({'severity': 'info', 'message': 'Docker en mode rootless : bonne pratique de sécurité.'});
+    final df = await _docker(['system', 'df', '--format', '{{json .}}']);
+    final usage = _jsonLines(df.stdout);
+    for (final u in usage) {
+      final reclaim = '${u['Reclaimable'] ?? ''}';
+      if (RegExp(r'^\s*([1-9]\d*(\.\d+)?)\s*GB').hasMatch(reclaim)) {
+        notes.add({'severity': 'info', 'message': '${u['Type']} : $reclaim récupérable (docker system prune, à lancer vous-même en connaissance de cause).'});
+      }
+    }
+    return {
+      'available': true,
+      'client': (v!['Client'] as Map?)?['Version'],
+      'server': (v['Server'] as Map?)?['Version'],
+      'rootless': rootless,
+      'containers': i['Containers'],
+      'running': i['ContainersRunning'],
+      'images': i['Images'],
+      'usage': usage,
+      'notes': notes,
+    };
+  }
 
   static String _remoteName(Object raw) {
     final n = '$raw'.trim();
@@ -821,5 +976,33 @@ Map<String, dynamic> listProjects(String root) {
         },
     ],
     'truncated': entries.length > 200,
+  };
+}
+
+/// Fichiers Docker d'un projet analysés (Dockerfile*, compose*.yaml/yml).
+Map<String, dynamic> lintProjectDocker(String root) {
+  final files = <Map<String, dynamic>>[];
+  final entries = Directory(root).listSync(followLinks: false).whereType<File>().toList()
+    ..sort((a, b) => a.path.compareTo(b.path));
+  for (final f in entries) {
+    final name = f.path.split('/').last;
+    final isDockerfile = name == 'Dockerfile' || name.startsWith('Dockerfile.') || name.endsWith('.Dockerfile');
+    final isCompose = RegExp(r'^(docker-)?compose(\.[\w-]+)?\.ya?ml$').hasMatch(name);
+    if (!isDockerfile && !isCompose) continue;
+    if (f.lengthSync() > 512 * 1024) continue;
+    final content = f.readAsStringSync();
+    files.add({
+      'path': name,
+      'kind': isDockerfile ? 'dockerfile' : 'compose',
+      'findings': [for (final x in isDockerfile ? lintDockerfile(content) : lintCompose(content)) x.toJson()],
+    });
+  }
+  final kinds = (detectProject(root)['kinds'] as List).cast<String>();
+  return {
+    'files': files,
+    'kinds': kinds,
+    'hasDockerignore': File('$root/.dockerignore').existsSync(),
+    if (kinds.contains('flutter')) 'flutterNote': flutterDockerNote,
+    'suggestedTemplate': [for (final k in kinds) if (dockerTemplateKinds.contains(k == 'dart' ? 'dart' : k)) k].firstOrNull,
   };
 }

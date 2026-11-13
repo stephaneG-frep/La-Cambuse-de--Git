@@ -1159,4 +1159,102 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get pbScopeMissing =>
       'This device lacks the \"remote\" scope: pair it with --scopes read,git-write,remote.';
+
+  @override
+  String get labStatic =>
+      'Offline lab: the file is analysed, no container is started.';
+
+  @override
+  String get labAnalyze => 'Analyse';
+
+  @override
+  String get labReset => 'Reset';
+
+  @override
+  String get labGoals => 'Goals';
+
+  @override
+  String get labFindings => 'Analyser findings';
+
+  @override
+  String get labNoFinding => 'No findings: well done.';
+
+  @override
+  String get labDone => 'Lab complete! Mousse Byte salutes your rigour.';
+
+  @override
+  String labLine(int line) {
+    return 'line $line';
+  }
+
+  @override
+  String labFix(String fix) {
+    return 'Fix: $fix';
+  }
+
+  @override
+  String get dkRoom => 'Docker engine room';
+
+  @override
+  String get dkRoomSubtitle => 'Read-only inspection of your PC\'s Docker';
+
+  @override
+  String get dkUnavailable => 'Docker unavailable on the host.';
+
+  @override
+  String dkServer(String version) {
+    return 'Docker $version';
+  }
+
+  @override
+  String get dkRootless => 'Rootless mode';
+
+  @override
+  String dkCounts(String containers, String running, String images) {
+    return '$containers container(s), $running running · $images image(s)';
+  }
+
+  @override
+  String get dkImages => 'Images';
+
+  @override
+  String get dkContainers => 'Containers';
+
+  @override
+  String dkLogs(String name) {
+    return 'Log of $name';
+  }
+
+  @override
+  String get dkReadOnly =>
+      'Read-only: La Cambuse never starts, stops or removes any container.';
+
+  @override
+  String get dkScopeMissing =>
+      'This device lacks the \"docker\" scope: pair it with --scopes …,docker (Docker access is equivalent to root).';
+
+  @override
+  String get wsTabDocker => 'Docker';
+
+  @override
+  String get dkLintIntro =>
+      'Static analysis of the project\'s Docker files (no container started).';
+
+  @override
+  String get dkRunLint => 'Analyse Docker files';
+
+  @override
+  String get dkNoFiles => 'No Dockerfile or compose.yaml in this project.';
+
+  @override
+  String dkGenerate(String template) {
+    return 'Generate a Dockerfile ($template)';
+  }
+
+  @override
+  String get dkNoDockerignore =>
+      'No .dockerignore: the build context may include .git, .env and dependencies.';
+
+  @override
+  String get dkOpenRoom => 'Docker engine room';
 }

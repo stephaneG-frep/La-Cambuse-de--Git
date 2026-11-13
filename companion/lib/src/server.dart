@@ -70,9 +70,11 @@ class CompanionServer {
     config.dataDir.createSync(recursive: true);
     Process.runSync('chmod', ['700', config.dataDir.path]);
     adminToken = randomToken();
+    _loopback = await HttpServer.bind(InternetAddress.loopbackIPv4, config.port);
+    // Jeton administrateur écrit seulement une fois le port ouvert : un échec
+    // de démarrage ne laisse aucun jeton orphelin.
     adminTokenFile.writeAsStringSync(adminToken, flush: true);
     setOwnerOnly(adminTokenFile.path);
-    _loopback = await HttpServer.bind(InternetAddress.loopbackIPv4, config.port);
     _loopback!.listen((r) => _handle(r, local: true));
     if (config.lan) {
       final tls = await TlsMaterial.ensure(config.dataDir);

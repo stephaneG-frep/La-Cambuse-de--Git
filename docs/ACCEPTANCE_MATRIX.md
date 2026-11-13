@@ -2,7 +2,7 @@
 
 États : ⬜ non commencé · 🟨 partiel · ✅ réel et testé · ⛔ bloqué
 
-Dernière mise à jour : 2026-11-12 (fin de phase 6)
+Dernière mise à jour : 2026-11-12 (fin de phase 7)
 
 | Phase | Fonctionnalité | État | Preuve / remarque |
 |---|---|---|---|
@@ -21,7 +21,7 @@ Dernière mise à jour : 2026-11-12 (fin de phase 6)
 | 4 | Compagnon Linux, appairage, API v1 | ✅ | 27 tests sécurité + contrat réel ; essai réel Honor (lecture + mutation approuvée) ; LAN TLS non essayé depuis le téléphone — [PHASE4_BILAN.md](PHASE4_BILAN.md) |
 | 5 | Atelier Git local (import, audit, diff, init, commit) | ✅ | 39 tests compagnon, 174 app ; scénario complet réel sur Honor — [PHASE5_BILAN.md](PHASE5_BILAN.md) |
 | 6 | GitHub / GitLab (dépôt privé, push avec consentement) | 🟨 | GitHub ✅ réel (push, PR #1, ticket #2) ; GitLab testé sur serveur simulé seulement — [PHASE6_BILAN.md](PHASE6_BILAN.md) |
-| 7 | Docker et Compose | ⬜ | |
+| 7 | Docker et Compose | ✅ | modules Docker + Compose (13 labos), analyseurs, inspection lecture seule, génération ; essai réel Honor — [PHASE7_BILAN.md](PHASE7_BILAN.md) |
 | 8 | CI/CD générée, APK debug, .deb, checksums | ⬜ | |
 | 9 | Académie avancée | ⬜ | |
 | 10 | Capitaine automatique | ⬜ | |

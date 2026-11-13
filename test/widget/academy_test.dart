@@ -61,8 +61,8 @@ void main() {
     final db = await pumpApp(tester, size: desktop);
     await openAcademy(tester);
     expect(find.text('Carte des îles'), findsOneWidget);
-    expect(find.text('Disponible hors ligne'), findsOneWidget);
-    expect(find.textContaining('En brume — prévu en phase'), findsNWidgets(9));
+    expect(find.text('Disponible hors ligne'), findsNWidgets(3));
+    expect(find.textContaining('En brume — prévu en phase'), findsNWidgets(7));
     await teardown(tester, db);
   });
 

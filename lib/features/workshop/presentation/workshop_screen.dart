@@ -76,14 +76,18 @@ class WorkshopScreen extends ConsumerWidget {
         padding: const EdgeInsets.all(CambuseSpacing.md),
         children: [
           ...header,
-          Align(
-            alignment: Alignment.centerLeft,
-            child: OutlinedButton.icon(
+          Wrap(spacing: CambuseSpacing.sm, runSpacing: CambuseSpacing.sm, children: [
+            OutlinedButton.icon(
               onPressed: () => ref.invalidate(workshopProjectsProvider),
               icon: const Icon(Icons.refresh),
               label: Text(l.wsRefresh),
             ),
-          ),
+            OutlinedButton.icon(
+              onPressed: () => context.go('/atelier/docker'),
+              icon: const Icon(Icons.inventory_2_outlined),
+              label: Text(l.dkOpenRoom),
+            ),
+          ]),
           const SizedBox(height: CambuseSpacing.sm),
           projects.when(
             loading: () => const Padding(padding: EdgeInsets.all(CambuseSpacing.lg), child: LoadingView()),

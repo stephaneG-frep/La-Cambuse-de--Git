@@ -2053,6 +2053,168 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Cet appareil n\'a pas la portée « remote » : appairez-le avec --scopes read,git-write,remote.'**
   String get pbScopeMissing;
+
+  /// No description provided for @labStatic.
+  ///
+  /// In fr, this message translates to:
+  /// **'Labo hors ligne : le fichier est analysé, aucun conteneur n\'est lancé.'**
+  String get labStatic;
+
+  /// No description provided for @labAnalyze.
+  ///
+  /// In fr, this message translates to:
+  /// **'Analyser'**
+  String get labAnalyze;
+
+  /// No description provided for @labReset.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réinitialiser'**
+  String get labReset;
+
+  /// No description provided for @labGoals.
+  ///
+  /// In fr, this message translates to:
+  /// **'Objectifs'**
+  String get labGoals;
+
+  /// No description provided for @labFindings.
+  ///
+  /// In fr, this message translates to:
+  /// **'Constats de l\'analyseur'**
+  String get labFindings;
+
+  /// No description provided for @labNoFinding.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun constat : bravo.'**
+  String get labNoFinding;
+
+  /// No description provided for @labDone.
+  ///
+  /// In fr, this message translates to:
+  /// **'Labo réussi ! Mousse Byte salue votre rigueur.'**
+  String get labDone;
+
+  /// No description provided for @labLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'ligne {line}'**
+  String labLine(int line);
+
+  /// No description provided for @labFix.
+  ///
+  /// In fr, this message translates to:
+  /// **'Correction : {fix}'**
+  String labFix(String fix);
+
+  /// No description provided for @dkRoom.
+  ///
+  /// In fr, this message translates to:
+  /// **'Salle des machines Docker'**
+  String get dkRoom;
+
+  /// No description provided for @dkRoomSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Inspection en lecture seule du Docker de votre PC'**
+  String get dkRoomSubtitle;
+
+  /// No description provided for @dkUnavailable.
+  ///
+  /// In fr, this message translates to:
+  /// **'Docker indisponible sur l\'hôte.'**
+  String get dkUnavailable;
+
+  /// No description provided for @dkServer.
+  ///
+  /// In fr, this message translates to:
+  /// **'Docker {version}'**
+  String dkServer(String version);
+
+  /// No description provided for @dkRootless.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mode rootless'**
+  String get dkRootless;
+
+  /// No description provided for @dkCounts.
+  ///
+  /// In fr, this message translates to:
+  /// **'{containers} conteneur(s) dont {running} en marche · {images} image(s)'**
+  String dkCounts(String containers, String running, String images);
+
+  /// No description provided for @dkImages.
+  ///
+  /// In fr, this message translates to:
+  /// **'Images'**
+  String get dkImages;
+
+  /// No description provided for @dkContainers.
+  ///
+  /// In fr, this message translates to:
+  /// **'Conteneurs'**
+  String get dkContainers;
+
+  /// No description provided for @dkLogs.
+  ///
+  /// In fr, this message translates to:
+  /// **'Journal de {name}'**
+  String dkLogs(String name);
+
+  /// No description provided for @dkReadOnly.
+  ///
+  /// In fr, this message translates to:
+  /// **'Lecture seule : La Cambuse ne lance, n\'arrête ni ne supprime aucun conteneur.'**
+  String get dkReadOnly;
+
+  /// No description provided for @dkScopeMissing.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cet appareil n\'a pas la portée « docker » : appairez-le avec --scopes …,docker (l\'accès à Docker équivaut à des droits root).'**
+  String get dkScopeMissing;
+
+  /// No description provided for @wsTabDocker.
+  ///
+  /// In fr, this message translates to:
+  /// **'Docker'**
+  String get wsTabDocker;
+
+  /// No description provided for @dkLintIntro.
+  ///
+  /// In fr, this message translates to:
+  /// **'Analyse statique des fichiers Docker du projet (aucun conteneur lancé).'**
+  String get dkLintIntro;
+
+  /// No description provided for @dkRunLint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Analyser les fichiers Docker'**
+  String get dkRunLint;
+
+  /// No description provided for @dkNoFiles.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun Dockerfile ni compose.yaml dans ce projet.'**
+  String get dkNoFiles;
+
+  /// No description provided for @dkGenerate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Générer un Dockerfile ({template})'**
+  String dkGenerate(String template);
+
+  /// No description provided for @dkNoDockerignore.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pas de .dockerignore : le contexte de build peut embarquer .git, .env et les dépendances.'**
+  String get dkNoDockerignore;
+
+  /// No description provided for @dkOpenRoom.
+  ///
+  /// In fr, this message translates to:
+  /// **'Salle des machines Docker'**
+  String get dkOpenRoom;
 }
 
 class _AppLocalizationsDelegate

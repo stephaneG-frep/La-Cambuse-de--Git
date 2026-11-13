@@ -1,0 +1,1190 @@
+{
+ "id": "docker",
+ "version": 1,
+ "title": "Docker, du conteneur à l'image propre",
+ "summary": "Comprendre les conteneurs, écrire des Dockerfile reproductibles, légers et sûrs, et les exploiter sereinement.",
+ "objectives": [
+  "Expliquer images, conteneurs, couches et registres",
+  "Écrire un Dockerfile multi-étapes non root et sans secret",
+  "Exploiter un conteneur : journaux, volumes, réseaux, santé",
+  "Reconnaître quand Docker n'est pas utile (apps Flutter)"
+ ],
+ "prerequisites": [
+  "Module Git",
+  "Notions de ligne de commande (module Terminal Linux recommandé, phase 9)"
+ ],
+ "lessons": [
+  {
+   "id": "pourquoi-conteneurs",
+   "title": "Pourquoi les conteneurs ?",
+   "minutes": 15,
+   "objectives": [
+    "Distinguer image, conteneur et machine virtuelle",
+    "Savoir quand Docker est utile… et quand il ne l'est pas"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Un conteneur exécute un programme isolé avec ses dépendances, en partageant le noyau de la machine hôte. Il démarre en une fraction de seconde et consomme bien moins qu'une machine virtuelle, qui embarque tout un système."
+    },
+    {
+     "type": "text",
+     "body": "Une image est un modèle en lecture seule (le « plan du navire »), un conteneur est une instance en cours d'exécution de cette image. Une même image peut lancer des dizaines de conteneurs."
+    },
+    {
+     "type": "code",
+     "body": "docker run --rm hello-world\ndocker ps -a",
+     "caption": "Lancer un conteneur de démonstration, puis lister les conteneurs"
+    },
+    {
+     "type": "warning",
+     "body": "Docker n'est pas magique : une application Flutter mobile ou de bureau se distribue en APK ou en paquet .deb, elle ne tourne pas dans un conteneur. Docker sert plutôt aux serveurs, API, bases de données et outils de CI."
+    },
+    {
+     "type": "tip",
+     "body": "L'accès au démon Docker équivaut à des droits root sur la machine : le mode « rootless » limite ce risque."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "dk-1-1",
+     "type": "single",
+     "prompt": "Quelle différence entre une image et un conteneur ?",
+     "choices": [
+      "L'image est un modèle en lecture seule, le conteneur une instance qui s'exécute",
+      "Ce sont des synonymes",
+      "Le conteneur est stocké sur Docker Hub, l'image sur le PC",
+      "L'image tourne, le conteneur dort"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "On construit une image une fois, puis on lance autant de conteneurs que nécessaire à partir d'elle."
+    },
+    {
+     "id": "dk-1-2",
+     "type": "single",
+     "prompt": "Pourquoi un conteneur est-il plus léger qu'une machine virtuelle ?",
+     "choices": [
+      "Il partage le noyau de l'hôte au lieu d'embarquer un système complet",
+      "Il est compressé",
+      "Il n'a pas de fichiers",
+      "Il tourne sur le GPU"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Pas de système invité à démarrer : seul le processus isolé et ses bibliothèques sont présents."
+    },
+    {
+     "id": "dk-1-3",
+     "type": "single",
+     "prompt": "Faut-il conteneuriser une application Flutter Android pour la distribuer ?",
+     "choices": [
+      "Non : elle se distribue en APK, Docker peut servir à la CI ou à un backend",
+      "Oui, toujours",
+      "Oui, sinon elle ne compile pas",
+      "Seulement sur iOS"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Conteneuriser pour le principe ajoute de la complexité sans bénéfice : on choisit Docker pour un besoin réel."
+    },
+    {
+     "id": "dk-1-4",
+     "type": "single",
+     "prompt": "Pourquoi l'appartenance au groupe « docker » est-elle sensible ?",
+     "choices": [
+      "Elle équivaut à des droits root sur la machine",
+      "Elle ralentit Docker",
+      "Elle empêche le réseau",
+      "Elle supprime les images"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Le démon Docker tourne en root : qui le pilote peut monter n'importe quel dossier de l'hôte dans un conteneur."
+    }
+   ]
+  },
+  {
+   "id": "images-registres",
+   "title": "Images, tags et registres",
+   "minutes": 18,
+   "objectives": [
+    "Lire un nom d'image complet",
+    "Épingler une version pour des builds reproductibles"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Un nom d'image se lit registre/espace/nom:tag, par exemple docker.io/library/node:22.11-slim. Sans registre, Docker Hub est utilisé ; sans tag, c'est « latest »."
+    },
+    {
+     "type": "warning",
+     "body": "« latest » n'est qu'une étiquette mobile, pas la « dernière version stable » : votre build peut changer du jour au lendemain sans que vous ayez modifié une ligne."
+    },
+    {
+     "type": "text",
+     "body": "Pour une reproductibilité totale, on peut référencer le digest : node@sha256:… désigne un contenu exact et immuable."
+    },
+    {
+     "type": "code",
+     "body": "docker pull node:22.11-slim\ndocker image ls\ndocker image inspect node:22.11-slim",
+     "caption": "Télécharger, lister et inspecter une image"
+    },
+    {
+     "type": "tip",
+     "body": "Les variantes -slim et -alpine sont plus légères ; alpine utilise musl, ce qui peut gêner certaines bibliothèques natives."
+    }
+   ],
+   "lab": {
+    "kind": "dockerfile",
+    "intro": "Ce Dockerfile utilise une image non épinglée. Rendez le build reproductible.",
+    "starter": "FROM node\nWORKDIR /app\nCOPY . .\nUSER node\nCMD [\"node\", \"server.js\"]\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "Image de base épinglée (pas de latest)",
+      "rule": "DF001"
+     },
+     {
+      "type": "valid",
+      "label": "Dockerfile valide"
+     }
+    ],
+    "hint": "Ajoutez une version précise après le nom : node:22.11-slim.",
+    "solution": "FROM node:22.11-slim\nWORKDIR /app\nCOPY . .\nUSER node\nCMD [\"node\", \"server.js\"]\n"
+   },
+   "quiz": [
+    {
+     "id": "dk-2-1",
+     "type": "single",
+     "prompt": "Que désigne une image sans tag, comme « node » ?",
+     "choices": [
+      "node:latest, une étiquette mobile",
+      "La version la plus stable",
+      "La version installée sur le PC",
+      "Une erreur"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Sans tag, Docker utilise latest, qui peut pointer vers n'importe quelle version au fil du temps."
+    },
+    {
+     "id": "dk-2-2",
+     "type": "single",
+     "prompt": "Quelle référence garantit un contenu strictement identique ?",
+     "choices": [
+      "node@sha256:…",
+      "node:latest",
+      "node:lts",
+      "node"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Le digest est l'empreinte du contenu : il ne peut pas changer."
+    },
+    {
+     "id": "dk-2-3",
+     "type": "command",
+     "prompt": "Quelle commande liste les images présentes localement ?",
+     "accepted": [
+      "docker image ls",
+      "docker images"
+     ],
+     "explanation": "docker image ls (ou l'alias docker images) affiche dépôt, tag, identifiant et taille."
+    },
+    {
+     "id": "dk-2-4",
+     "type": "single",
+     "prompt": "Sans registre indiqué, d'où vient l'image ?",
+     "choices": [
+      "Docker Hub",
+      "GitHub",
+      "Le dossier courant",
+      "Nulle part"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "docker.io (Docker Hub) est le registre par défaut ; d'autres existent (ghcr.io, registry.gitlab.com…)."
+    }
+   ]
+  },
+  {
+   "id": "premier-dockerfile",
+   "title": "Écrire son premier Dockerfile",
+   "minutes": 20,
+   "objectives": [
+    "Connaître FROM, WORKDIR, COPY, RUN, CMD",
+    "Utiliser la forme JSON de CMD"
+   ],
+   "sections": [
+    {
+     "type": "code",
+     "body": "FROM python:3.12.7-slim\nWORKDIR /app\nCOPY requirements.txt .\nRUN pip install --no-cache-dir -r requirements.txt\nCOPY . .\nCMD [\"python\", \"-m\", \"app\"]",
+     "caption": "Un Dockerfile minimal"
+    },
+    {
+     "type": "text",
+     "body": "FROM choisit l'image de base, WORKDIR fixe le répertoire de travail (chemin absolu), COPY copie des fichiers, RUN exécute une commande pendant le build, CMD indique le programme lancé au démarrage du conteneur."
+    },
+    {
+     "type": "text",
+     "body": "La forme JSON (CMD [\"python\", \"-m\", \"app\"]) lance le programme directement : il reçoit les signaux d'arrêt et s'arrête proprement. La forme « shell » passe par /bin/sh, qui ne relaie pas toujours ces signaux."
+    },
+    {
+     "type": "code",
+     "body": "docker build -t mon-appli:1.0 .\ndocker run --rm -p 8000:8000 mon-appli:1.0",
+     "caption": "Construire puis lancer"
+    },
+    {
+     "type": "tip",
+     "body": "« cd » dans un RUN ne persiste pas : utilisez WORKDIR."
+    }
+   ],
+   "lab": {
+    "kind": "dockerfile",
+    "intro": "Corrigez le répertoire de travail et la commande de démarrage.",
+    "starter": "FROM python:3.12.7-slim\nWORKDIR app\nCOPY . .\nRUN pip install --no-cache-dir -r requirements.txt\nUSER nobody\nCMD python -m app\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "WORKDIR absolu",
+      "rule": "DF013"
+     },
+     {
+      "type": "noRule",
+      "label": "CMD en forme JSON",
+      "rule": "DF014"
+     },
+     {
+      "type": "instruction",
+      "label": "Une instruction CMD est présente",
+      "keyword": "CMD"
+     }
+    ],
+    "hint": "WORKDIR /app et CMD [\"python\", \"-m\", \"app\"].",
+    "solution": "FROM python:3.12.7-slim\nWORKDIR /app\nCOPY . .\nRUN pip install --no-cache-dir -r requirements.txt\nUSER nobody\nCMD [\"python\", \"-m\", \"app\"]\n"
+   },
+   "quiz": [
+    {
+     "id": "dk-3-1",
+     "type": "single",
+     "prompt": "Quelle instruction s'exécute au démarrage du conteneur (et non pendant le build) ?",
+     "choices": [
+      "CMD",
+      "RUN",
+      "COPY",
+      "FROM"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "RUN agit pendant la construction de l'image ; CMD définit ce qui est lancé à chaque démarrage."
+    },
+    {
+     "id": "dk-3-2",
+     "type": "single",
+     "prompt": "Pourquoi préférer CMD [\"node\", \"app.js\"] à CMD node app.js ?",
+     "choices": [
+      "Le processus reçoit directement les signaux d'arrêt",
+      "C'est plus court",
+      "Pour éviter le réseau",
+      "Pour activer le cache"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "La forme JSON évite un shell intermédiaire : docker stop arrête l'application proprement."
+    },
+    {
+     "id": "dk-3-3",
+     "type": "command",
+     "prompt": "Construisez l'image du dossier courant avec le nom mon-appli et le tag 1.0.",
+     "accepted": [
+      "docker build -t mon-appli:1.0 ."
+     ],
+     "explanation": "-t donne le nom et le tag ; le point final désigne le contexte de build (dossier courant)."
+    },
+    {
+     "id": "dk-3-4",
+     "type": "single",
+     "prompt": "Comment changer durablement de répertoire dans un Dockerfile ?",
+     "choices": [
+      "WORKDIR /chemin",
+      "RUN cd /chemin",
+      "ENV PWD=/chemin",
+      "COPY /chemin"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Chaque RUN démarre un nouveau shell ; WORKDIR s'applique à toutes les instructions suivantes."
+    }
+   ]
+  },
+  {
+   "id": "cycle-de-vie",
+   "title": "Le cycle de vie d'un conteneur",
+   "minutes": 18,
+   "objectives": [
+    "Lancer, observer, arrêter et supprimer un conteneur",
+    "Lire les journaux et entrer dans un conteneur"
+   ],
+   "sections": [
+    {
+     "type": "code",
+     "body": "docker run -d --name web -p 127.0.0.1:8080:80 nginx:1.27\ndocker ps\ndocker logs --tail 50 web\ndocker exec -it web sh\ndocker stop web\ndocker rm web",
+     "caption": "Lancer en arrière-plan, lister, lire les journaux, ouvrir un shell, arrêter, supprimer"
+    },
+    {
+     "type": "text",
+     "body": "-d détache le conteneur, --name lui donne un nom, -p publie un port (hôte:conteneur). --rm supprime automatiquement le conteneur à l'arrêt : pratique pour les essais."
+    },
+    {
+     "type": "warning",
+     "body": "docker rm supprime le conteneur et ses données non persistées ; docker system prune supprime en masse : à utiliser en sachant ce que l'on jette. La Cambuse ne lance jamais ces commandes à votre place."
+    },
+    {
+     "type": "tip",
+     "body": "L'écran « Salle des machines » de l'Atelier liste vos conteneurs et affiche leurs journaux en lecture seule."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "dk-4-1",
+     "type": "command",
+     "prompt": "Affichez les 50 dernières lignes du journal du conteneur « web ».",
+     "accepted": [
+      "docker logs --tail 50 web",
+      "docker logs -n 50 web"
+     ],
+     "explanation": "--tail (ou -n) limite le nombre de lignes ; ajoutez -f pour suivre en direct."
+    },
+    {
+     "id": "dk-4-2",
+     "type": "single",
+     "prompt": "Que fait l'option --rm de docker run ?",
+     "choices": [
+      "Supprime le conteneur quand il s'arrête",
+      "Supprime l'image",
+      "Redémarre le conteneur",
+      "Retire le réseau"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Idéal pour les commandes ponctuelles : pas de conteneurs arrêtés qui s'accumulent."
+    },
+    {
+     "id": "dk-4-3",
+     "type": "single",
+     "prompt": "-p 127.0.0.1:8080:80 signifie :",
+     "choices": [
+      "Le port 80 du conteneur est joignable sur le port 8080 de l'hôte, en local uniquement",
+      "Le port 8080 du conteneur est publié sur le 80",
+      "Tous les ports sont ouverts",
+      "Le conteneur n'a pas de réseau"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Format hôte:conteneur ; préfixer par 127.0.0.1 évite d'exposer le service au réseau local."
+    },
+    {
+     "id": "dk-4-4",
+     "type": "command",
+     "prompt": "Listez tous les conteneurs, y compris arrêtés.",
+     "accepted": [
+      "docker ps -a",
+      "docker ps --all",
+      "docker container ls -a"
+     ],
+     "explanation": "Sans -a, seuls les conteneurs en cours d'exécution apparaissent."
+    }
+   ]
+  },
+  {
+   "id": "couches-cache",
+   "title": "Couches et cache de build",
+   "minutes": 18,
+   "objectives": [
+    "Comprendre les couches d'une image",
+    "Ordonner les instructions pour profiter du cache"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Chaque instruction crée une couche. Si une instruction et son contexte n'ont pas changé, Docker réutilise la couche en cache. Dès qu'une couche change, toutes les suivantes sont reconstruites."
+    },
+    {
+     "type": "text",
+     "body": "On copie donc d'abord ce qui change rarement (le fichier des dépendances), on installe, puis on copie le code qui change souvent."
+    },
+    {
+     "type": "code",
+     "body": "COPY package.json package-lock.json ./\nRUN npm ci\nCOPY . .",
+     "caption": "Bon ordre : les dépendances restent en cache tant que package.json ne change pas"
+    },
+    {
+     "type": "tip",
+     "body": "Un fichier .dockerignore (node_modules, .git, .env…) réduit le contexte envoyé et évite d'invalider le cache inutilement."
+    }
+   ],
+   "lab": {
+    "kind": "dockerfile",
+    "intro": "Ce Dockerfile réinstalle les dépendances à chaque modification du code. Réordonnez-le.",
+    "starter": "FROM node:22.11-slim\nWORKDIR /app\nCOPY . .\nRUN npm ci\nUSER node\nCMD [\"node\", \"server.js\"]\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "Dépendances installées avant la copie du code",
+      "rule": "DF007"
+     },
+     {
+      "type": "contains",
+      "label": "package.json copié à part",
+      "text": "COPY package"
+     }
+    ],
+    "hint": "Copiez d'abord package.json et package-lock.json, lancez npm ci, puis copiez le reste.",
+    "solution": "FROM node:22.11-slim\nWORKDIR /app\nCOPY package.json package-lock.json ./\nRUN npm ci\nCOPY . .\nUSER node\nCMD [\"node\", \"server.js\"]\n"
+   },
+   "quiz": [
+    {
+     "id": "dk-5-1",
+     "type": "single",
+     "prompt": "Une couche change. Que devient le cache des instructions suivantes ?",
+     "choices": [
+      "Il est invalidé : elles sont reconstruites",
+      "Il est conservé",
+      "Il est supprimé du disque",
+      "Il passe en lecture seule"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Le cache est séquentiel : tout ce qui suit une couche modifiée est refait."
+    },
+    {
+     "id": "dk-5-2",
+     "type": "single",
+     "prompt": "Pourquoi copier package.json avant le reste du code ?",
+     "choices": [
+      "Pour garder npm ci en cache tant que les dépendances ne changent pas",
+      "Pour que l'image soit plus jolie",
+      "Parce que COPY . . est interdit",
+      "Pour exécuter les tests"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Modifier le code ne touche plus la couche des dépendances : builds bien plus rapides."
+    },
+    {
+     "id": "dk-5-3",
+     "type": "single",
+     "prompt": "À quoi sert .dockerignore ?",
+     "choices": [
+      "Exclure des fichiers du contexte de build",
+      "Ignorer des erreurs",
+      "Masquer des conteneurs",
+      "Désactiver le cache"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Il évite d'envoyer node_modules, .git ou des secrets au démon, et de les copier par erreur."
+    },
+    {
+     "id": "dk-5-4",
+     "type": "multiple",
+     "prompt": "Que mettre dans un .dockerignore ? (plusieurs réponses)",
+     "choices": [
+      ".git",
+      ".env",
+      "node_modules",
+      "Le code source principal"
+     ],
+     "answer": [
+      0,
+      1,
+      2
+     ],
+     "explanation": "On exclut l'historique, les secrets et les dépendances locales ; le code, lui, doit être copié."
+    }
+   ]
+  },
+  {
+   "id": "multi-etapes",
+   "title": "Builds multi-étapes",
+   "minutes": 20,
+   "objectives": [
+    "Séparer construction et exécution",
+    "Réduire la taille et la surface d'attaque de l'image finale"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Un build multi-étapes utilise plusieurs FROM : une étape lourde compile, une étape légère n'emporte que le résultat. Les outils de compilation ne se retrouvent pas dans l'image finale."
+    },
+    {
+     "type": "code",
+     "body": "FROM golang:1.23.3 AS build\nWORKDIR /src\nCOPY . .\nRUN CGO_ENABLED=0 go build -o /out/appli\n\nFROM gcr.io/distroless/static-debian12:nonroot\nCOPY --from=build /out/appli /appli\nUSER nonroot\nCMD [\"/appli\"]",
+     "caption": "Compilation dans golang, exécution dans une image minimale"
+    },
+    {
+     "type": "tip",
+     "body": "COPY --from=build reprend des fichiers d'une étape précédente nommée avec AS."
+    }
+   ],
+   "lab": {
+    "kind": "dockerfile",
+    "intro": "Ce Dockerfile embarque Node et les outils de build dans l'image finale. Passez en multi-étapes.",
+    "starter": "FROM node:22.11-slim\nWORKDIR /app\nCOPY package.json package-lock.json ./\nRUN npm ci\nCOPY . .\nRUN npm run build\nUSER node\nCMD [\"node\", \"dist/server.js\"]\n",
+    "goals": [
+     {
+      "type": "stages",
+      "label": "Au moins deux étapes (FROM … AS build)",
+      "min": 2
+     },
+     {
+      "type": "noRule",
+      "label": "Build et exécution séparés",
+      "rule": "DF010"
+     },
+     {
+      "type": "contains",
+      "label": "Résultat copié depuis l'étape de build",
+      "text": "--from=build"
+     }
+    ],
+    "hint": "Nommez la première étape « AS build », puis ajoutez un second FROM et COPY --from=build /app/dist ./dist.",
+    "solution": "FROM node:22.11-slim AS build\nWORKDIR /app\nCOPY package.json package-lock.json ./\nRUN npm ci\nCOPY . .\nRUN npm run build\n\nFROM node:22.11-slim\nWORKDIR /app\nCOPY --from=build /app/dist ./dist\nUSER node\nCMD [\"node\", \"dist/server.js\"]\n"
+   },
+   "quiz": [
+    {
+     "id": "dk-6-1",
+     "type": "single",
+     "prompt": "Quel est l'intérêt principal d'un build multi-étapes ?",
+     "choices": [
+      "Une image finale sans les outils de compilation",
+      "Un build plus lent mais plus sûr",
+      "Plusieurs conteneurs à la fois",
+      "Éviter Docker Hub"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Moins de fichiers = image plus légère et moins de logiciels exploitables par un attaquant."
+    },
+    {
+     "id": "dk-6-2",
+     "type": "command",
+     "prompt": "Écrivez l'instruction qui copie /out/appli depuis l'étape nommée build vers /appli.",
+     "accepted": [
+      "COPY --from=build /out/appli /appli"
+     ],
+     "explanation": "--from accepte le nom donné avec AS (ou l'index de l'étape)."
+    },
+    {
+     "id": "dk-6-3",
+     "type": "single",
+     "prompt": "Comment nomme-t-on une étape ?",
+     "choices": [
+      "FROM image AS nom",
+      "STAGE nom",
+      "LABEL stage=nom",
+      "ARG nom"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Le nom permet ensuite de la référencer dans COPY --from=nom."
+    },
+    {
+     "id": "dk-6-4",
+     "type": "single",
+     "prompt": "Une image « distroless » contient :",
+     "choices": [
+      "L'application et ses bibliothèques, sans shell ni gestionnaire de paquets",
+      "Tout Debian",
+      "Uniquement un shell",
+      "Aucun fichier"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Sans shell, un attaquant a beaucoup moins d'outils ; en contrepartie, le débogage se fait autrement."
+    }
+   ]
+  },
+  {
+   "id": "non-root",
+   "title": "Utilisateur non root et permissions",
+   "minutes": 16,
+   "objectives": [
+    "Exécuter le conteneur avec un utilisateur dédié",
+    "Éviter les permissions trop larges"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Par défaut, un conteneur s'exécute en root. Si l'application est compromise, l'attaquant a tous les droits dans le conteneur, et une faille d'isolation pourrait lui ouvrir l'hôte."
+    },
+    {
+     "type": "code",
+     "body": "RUN useradd --create-home --uid 10001 appli\nCOPY --chown=appli . /app\nUSER appli",
+     "caption": "Créer un utilisateur, lui donner les fichiers, basculer dessus"
+    },
+    {
+     "type": "warning",
+     "body": "chmod 777 donne à tout le monde le droit de modifier : on attribue plutôt la propriété (chown) et des droits minimaux."
+    },
+    {
+     "type": "tip",
+     "body": "Beaucoup d'images officielles fournissent déjà un utilisateur : node, nobody, nonroot (distroless)."
+    }
+   ],
+   "lab": {
+    "kind": "dockerfile",
+    "intro": "Ce conteneur tourne en root avec des permissions trop larges. Sécurisez-le.",
+    "starter": "FROM python:3.12.7-slim\nWORKDIR /app\nCOPY . .\nRUN chmod -R 777 /app\nCMD [\"python\", \"-m\", \"app\"]\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "Utilisateur non root",
+      "rule": "DF002"
+     },
+     {
+      "type": "noRule",
+      "label": "Pas de chmod 777",
+      "rule": "DF015"
+     }
+    ],
+    "hint": "Remplacez le chmod par useradd + COPY --chown, puis USER appli avant CMD.",
+    "solution": "FROM python:3.12.7-slim\nWORKDIR /app\nRUN useradd --create-home --uid 10001 appli\nCOPY --chown=appli . .\nUSER appli\nCMD [\"python\", \"-m\", \"app\"]\n"
+   },
+   "quiz": [
+    {
+     "id": "dk-7-1",
+     "type": "single",
+     "prompt": "Pourquoi ne pas laisser un conteneur tourner en root ?",
+     "choices": [
+      "Une compromission donnerait tous les droits dans le conteneur",
+      "C'est plus lent",
+      "Docker l'interdit",
+      "Pour économiser la mémoire"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Le principe du moindre privilège limite les dégâts en cas de faille."
+    },
+    {
+     "id": "dk-7-2",
+     "type": "command",
+     "prompt": "Écrivez l'instruction qui bascule sur l'utilisateur « appli ».",
+     "accepted": [
+      "USER appli"
+     ],
+     "explanation": "Toutes les instructions suivantes et le processus principal s'exécutent alors sous cet utilisateur."
+    },
+    {
+     "id": "dk-7-3",
+     "type": "single",
+     "prompt": "Quelle alternative à chmod 777 ?",
+     "choices": [
+      "chown vers l'utilisateur dédié et droits minimaux",
+      "chmod 666",
+      "sudo",
+      "Lancer en root"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "On donne la propriété au bon utilisateur, pas les droits à tout le monde."
+    },
+    {
+     "id": "dk-7-4",
+     "type": "single",
+     "prompt": "Où placer USER dans un Dockerfile ?",
+     "choices": [
+      "Après les installations qui nécessitent root, avant CMD",
+      "Tout en haut, avant FROM",
+      "Nulle part",
+      "Après CMD"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Les installations système se font en root ; on bascule ensuite pour l'exécution."
+    }
+   ]
+  },
+  {
+   "id": "secrets-config",
+   "title": "Secrets et configuration",
+   "minutes": 18,
+   "objectives": [
+    "Ne jamais graver de secret dans une image",
+    "Fournir la configuration à l'exécution"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Tout ce qui est écrit dans un Dockerfile (ENV, ARG, fichiers copiés) reste lisible dans les couches de l'image, même si on le supprime plus tard. Quiconque récupère l'image récupère le secret."
+    },
+    {
+     "type": "code",
+     "body": "docker run -e DB_PASSWORD -p 127.0.0.1:8000:8000 mon-appli:1.0",
+     "caption": "Le secret est fourni à l'exécution, depuis votre environnement"
+    },
+    {
+     "type": "code",
+     "body": "RUN --mount=type=secret,id=npmrc,target=/root/.npmrc npm ci",
+     "caption": "Secret de build (BuildKit) : disponible pendant RUN, absent de l'image"
+    },
+    {
+     "type": "warning",
+     "body": "Un secret publié par erreur doit être considéré comme compromis : révoquez-le, même après l'avoir retiré."
+    }
+   ],
+   "lab": {
+    "kind": "dockerfile",
+    "intro": "Une clé est écrite en clair dans l'image. Retirez-la : elle sera fournie à l'exécution.",
+    "starter": "FROM node:22.11-slim\nWORKDIR /app\nENV NODE_ENV=production\nENV API_KEY=cle-secrete-de-prod-123\nCOPY . .\nUSER node\nCMD [\"node\", \"server.js\"]\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "Aucun secret dans le Dockerfile",
+      "rule": "DF003"
+     },
+     {
+      "type": "noSeverity",
+      "label": "Aucun problème bloquant",
+      "severity": "blocking"
+     },
+     {
+      "type": "notContains",
+      "label": "La valeur a disparu",
+      "text": "cle-secrete"
+     }
+    ],
+    "hint": "Supprimez la ligne ENV API_KEY : la clé sera passée avec docker run -e API_KEY.",
+    "solution": "FROM node:22.11-slim\nWORKDIR /app\nENV NODE_ENV=production\nCOPY . .\nUSER node\nCMD [\"node\", \"server.js\"]\n"
+   },
+   "quiz": [
+    {
+     "id": "dk-8-1",
+     "type": "single",
+     "prompt": "Un secret mis dans ENV puis supprimé dans une couche suivante est-il protégé ?",
+     "choices": [
+      "Non, il reste lisible dans la couche où il a été écrit",
+      "Oui",
+      "Oui si l'image est privée",
+      "Oui après docker rmi"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Les couches sont empilées, pas effacées : l'historique de l'image contient toujours la valeur."
+    },
+    {
+     "id": "dk-8-2",
+     "type": "single",
+     "prompt": "Comment fournir un mot de passe à un conteneur ?",
+     "choices": [
+      "À l'exécution (variable d'environnement, secret Compose ou orchestrateur)",
+      "Dans le Dockerfile",
+      "Dans le nom de l'image",
+      "Dans un tag"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "L'image reste générique et partageable ; le secret vit hors de l'image."
+    },
+    {
+     "id": "dk-8-3",
+     "type": "single",
+     "prompt": "À quoi sert RUN --mount=type=secret ?",
+     "choices": [
+      "Utiliser un secret pendant le build sans l'inscrire dans l'image",
+      "Monter un volume persistant",
+      "Chiffrer l'image",
+      "Ouvrir un port"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Le fichier n'est visible que pendant l'instruction RUN concernée."
+    },
+    {
+     "id": "dk-8-4",
+     "type": "single",
+     "prompt": "Un jeton a été publié dans une image. Que faire en premier ?",
+     "choices": [
+      "Le révoquer et en créer un nouveau",
+      "Supprimer le tag",
+      "Renommer l'image",
+      "Attendre"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Supprimer l'image ne suffit pas : des copies ont pu être tirées. Seule la révocation protège."
+    }
+   ]
+  },
+  {
+   "id": "volumes-reseaux",
+   "title": "Volumes et réseaux",
+   "minutes": 18,
+   "objectives": [
+    "Persister des données avec les volumes",
+    "Faire communiquer des conteneurs sur un réseau"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Le système de fichiers d'un conteneur disparaît avec lui. Pour garder des données (base de données…), on utilise un volume nommé, géré par Docker, ou un montage de dossier de l'hôte (bind mount)."
+    },
+    {
+     "type": "code",
+     "body": "docker volume create donnees\ndocker run -d --name pg -v donnees:/var/lib/postgresql/data postgres:17.2-alpine",
+     "caption": "Volume nommé pour une base de données"
+    },
+    {
+     "type": "text",
+     "body": "Sur un réseau défini par l'utilisateur, les conteneurs se joignent par leur nom : l'application contacte « pg » au lieu d'une adresse IP."
+    },
+    {
+     "type": "code",
+     "body": "docker network create cambuse\ndocker run -d --network cambuse --name pg postgres:17.2-alpine",
+     "caption": "Réseau dédié avec résolution des noms"
+    },
+    {
+     "type": "warning",
+     "body": "Monter /var/run/docker.sock dans un conteneur lui donne le contrôle total de l'hôte."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "dk-9-1",
+     "type": "single",
+     "prompt": "Que deviennent les fichiers écrits dans un conteneur supprimé, hors volume ?",
+     "choices": [
+      "Ils sont perdus",
+      "Ils sont conservés dans l'image",
+      "Ils vont dans /tmp de l'hôte",
+      "Ils sont envoyés au registre"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "La couche d'écriture du conteneur disparaît avec lui : les données à garder vont dans un volume."
+    },
+    {
+     "id": "dk-9-2",
+     "type": "command",
+     "prompt": "Créez un volume nommé « donnees ».",
+     "accepted": [
+      "docker volume create donnees"
+     ],
+     "explanation": "Il pourra être monté avec -v donnees:/chemin/dans/le/conteneur."
+    },
+    {
+     "id": "dk-9-3",
+     "type": "single",
+     "prompt": "Sur un réseau Docker défini par l'utilisateur, comment l'appli joint-elle la base « pg » ?",
+     "choices": [
+      "Par son nom : pg",
+      "Par l'IP de l'hôte",
+      "Par localhost",
+      "Impossible"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Docker fournit un DNS interne qui résout le nom des conteneurs du même réseau."
+    },
+    {
+     "id": "dk-9-4",
+     "type": "single",
+     "prompt": "Pourquoi ne pas monter /var/run/docker.sock dans un conteneur applicatif ?",
+     "choices": [
+      "Il pourrait contrôler tout Docker, donc l'hôte",
+      "C'est lent",
+      "Le fichier est vide",
+      "Cela supprime les volumes"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Le socket donne l'accès complet au démon : c'est l'équivalent d'un accès root."
+    }
+   ]
+  },
+  {
+   "id": "sante-securite",
+   "title": "Santé, journaux et chaîne d'approvisionnement",
+   "minutes": 20,
+   "objectives": [
+    "Déclarer un HEALTHCHECK",
+    "Éviter curl | sh et alléger les installations système"
+   ],
+   "sections": [
+    {
+     "type": "code",
+     "body": "HEALTHCHECK --interval=30s --timeout=3s CMD [\"curl\", \"-fsS\", \"http://127.0.0.1:8080/health\"]",
+     "caption": "Docker sait si l'application répond"
+    },
+    {
+     "type": "text",
+     "body": "Un conteneur « Up » n'est pas forcément en bonne santé. HEALTHCHECK permet à Docker (et à Compose) de distinguer « démarré » et « prêt », et de redémarrer un service bloqué."
+    },
+    {
+     "type": "warning",
+     "body": "curl … | sh exécute un script téléchargé sans vérification : si le serveur est compromis, votre image aussi. Téléchargez, vérifiez la somme SHA-256, puis exécutez."
+    },
+    {
+     "type": "code",
+     "body": "RUN apt-get update \\\n    && apt-get install -y --no-install-recommends curl \\\n    && rm -rf /var/lib/apt/lists/*",
+     "caption": "Installation système légère"
+    }
+   ],
+   "lab": {
+    "kind": "dockerfile",
+    "intro": "Ajoutez un contrôle de santé, supprimez le curl | sh et allégez l'installation apt.",
+    "starter": "FROM debian:12.8-slim\nRUN apt-get update && apt-get install -y curl\nRUN curl -fsSL https://outil.exemple.com/install.sh | sh\nUSER nobody\nCMD [\"/usr/local/bin/outil\"]\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "HEALTHCHECK présent",
+      "rule": "DF008"
+     },
+     {
+      "type": "noRule",
+      "label": "Pas de curl | sh",
+      "rule": "DF009"
+     },
+     {
+      "type": "noRule",
+      "label": "apt allégé et nettoyé",
+      "rule": "DF005"
+     }
+    ],
+    "hint": "Téléchargez le script dans un fichier, vérifiez-le, ajoutez --no-install-recommends et rm -rf /var/lib/apt/lists/*, puis HEALTHCHECK.",
+    "solution": "FROM debian:12.8-slim\nRUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*\nRUN curl -fsSL -o /tmp/install.sh https://outil.exemple.com/install.sh && echo \"<sha256>  /tmp/install.sh\" | sha256sum -c && sh /tmp/install.sh\nUSER nobody\nHEALTHCHECK CMD [\"/usr/local/bin/outil\", \"--version\"]\nCMD [\"/usr/local/bin/outil\"]\n"
+   },
+   "quiz": [
+    {
+     "id": "dk-10-1",
+     "type": "single",
+     "prompt": "Que permet HEALTHCHECK ?",
+     "choices": [
+      "Savoir si l'application répond vraiment",
+      "Accélérer le build",
+      "Chiffrer le trafic",
+      "Limiter la mémoire"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "L'état passe à healthy ou unhealthy ; Compose peut attendre qu'un service soit healthy."
+    },
+    {
+     "id": "dk-10-2",
+     "type": "single",
+     "prompt": "Pourquoi éviter curl … | sh dans un Dockerfile ?",
+     "choices": [
+      "Le script n'est pas vérifié : une compromission du serveur infecte l'image",
+      "C'est trop lent",
+      "curl est interdit",
+      "sh n'existe pas"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "On vérifie l'intégrité (somme SHA-256, signature) avant d'exécuter."
+    },
+    {
+     "id": "dk-10-3",
+     "type": "multiple",
+     "prompt": "Bonnes pratiques apt dans un Dockerfile : (plusieurs réponses)",
+     "choices": [
+      "--no-install-recommends",
+      "rm -rf /var/lib/apt/lists/* dans le même RUN",
+      "apt-get upgrade à chaque build",
+      "Regrouper update et install"
+     ],
+     "answer": [
+      0,
+      1,
+      3
+     ],
+     "explanation": "upgrade rend le build non reproductible : on met plutôt à jour l'image de base épinglée."
+    },
+    {
+     "id": "dk-10-4",
+     "type": "single",
+     "prompt": "Un conteneur « Up » est-il forcément en bonne santé ?",
+     "choices": [
+      "Non : le processus tourne mais l'appli peut être bloquée",
+      "Oui",
+      "Oui s'il a un port",
+      "Oui s'il a un nom"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "D'où l'intérêt du HEALTHCHECK, qui interroge réellement l'application."
+    }
+   ]
+  }
+ ],
+ "project": {
+  "title": "Radoub complet d'un Dockerfile",
+  "brief": "Un Dockerfile hérité cumule les mauvaises pratiques. Rendez-le reproductible, léger, sans secret, non root, multi-étapes et surveillé.",
+  "lab": {
+   "kind": "dockerfile",
+   "intro": "Objectif : plus aucun problème bloquant ni avertissement, deux étapes, un HEALTHCHECK.",
+   "starter": "FROM node\nWORKDIR app\nENV DB_PASSWORD=motdepasse123\nRUN apt-get update && apt-get upgrade -y\nCOPY . .\nRUN npm install && npm run build && chmod -R 777 /app\nEXPOSE 3000\nCMD npm start\n",
+   "goals": [
+    {
+     "type": "noSeverity",
+     "label": "Aucun problème bloquant",
+     "severity": "blocking"
+    },
+    {
+     "type": "noSeverity",
+     "label": "Aucun avertissement",
+     "severity": "warning"
+    },
+    {
+     "type": "stages",
+     "label": "Build multi-étapes",
+     "min": 2
+    },
+    {
+     "type": "instruction",
+     "label": "HEALTHCHECK déclaré",
+     "keyword": "HEALTHCHECK"
+    },
+    {
+     "type": "noRule",
+     "label": "CMD en forme JSON",
+     "rule": "DF014"
+    }
+   ],
+   "hint": "Partez du modèle de la leçon multi-étapes et appliquez une à une les corrections des leçons précédentes.",
+   "solution": "FROM node:22.11-slim AS build\nWORKDIR /app\nCOPY package.json package-lock.json ./\nRUN npm ci\nCOPY . .\nRUN npm run build\n\nFROM node:22.11-slim\nWORKDIR /app\nENV NODE_ENV=production\nCOPY package.json package-lock.json ./\nRUN npm ci --omit=dev\nCOPY --from=build /app/dist ./dist\nUSER node\nEXPOSE 3000\nHEALTHCHECK CMD [\"node\", \"dist/health.js\"]\nCMD [\"node\", \"dist/server.js\"]\n"
+  },
+  "rubric": [
+   {
+    "criterion": "Reproductibilité",
+    "levels": [
+     "Images latest, upgrade",
+     "Versions épinglées",
+     "Versions épinglées et build déterministe (npm ci, verrous)"
+    ]
+   },
+   {
+    "criterion": "Sécurité",
+    "levels": [
+     "Root et secrets en clair",
+     "Non root ou sans secret",
+     "Non root, sans secret, permissions minimales"
+    ]
+   },
+   {
+    "criterion": "Taille de l'image",
+    "levels": [
+     "Outils de build embarqués",
+     "Variante slim",
+     "Multi-étapes, seulement le nécessaire"
+    ]
+   },
+   {
+    "criterion": "Cache de build",
+    "levels": [
+     "Tout recopié avant les dépendances",
+     "Ordre partiellement optimisé",
+     "Dépendances isolées, .dockerignore"
+    ]
+   },
+   {
+    "criterion": "Exploitation",
+    "levels": [
+     "Ni santé ni arrêt propre",
+     "HEALTHCHECK ou CMD JSON",
+     "HEALTHCHECK et CMD JSON"
+    ]
+   }
+  ]
+ },
+ "glossary": [
+  {
+   "term": "Image",
+   "definition": "Modèle en lecture seule composé de couches, à partir duquel on lance des conteneurs."
+  },
+  {
+   "term": "Conteneur",
+   "definition": "Processus isolé lancé à partir d'une image, avec sa propre couche d'écriture."
+  },
+  {
+   "term": "Dockerfile",
+   "definition": "Recette textuelle décrivant la construction d'une image."
+  },
+  {
+   "term": "Couche",
+   "definition": "Résultat d'une instruction du Dockerfile, mise en cache et partagée entre images."
+  },
+  {
+   "term": "Tag",
+   "definition": "Étiquette lisible d'une image (ex. 22.11-slim) ; latest est une étiquette mobile."
+  },
+  {
+   "term": "Digest",
+   "definition": "Empreinte SHA-256 identifiant un contenu d'image exact et immuable."
+  },
+  {
+   "term": "Registre",
+   "definition": "Serveur stockant des images (Docker Hub, ghcr.io, registry.gitlab.com)."
+  },
+  {
+   "term": "Build multi-étapes",
+   "definition": "Dockerfile à plusieurs FROM séparant compilation et exécution."
+  },
+  {
+   "term": "Volume",
+   "definition": "Stockage persistant géré par Docker, indépendant du cycle de vie des conteneurs."
+  },
+  {
+   "term": "Bind mount",
+   "definition": "Montage d'un dossier de l'hôte dans un conteneur."
+  },
+  {
+   "term": "HEALTHCHECK",
+   "definition": "Commande indiquant à Docker si l'application répond."
+  },
+  {
+   "term": "Rootless",
+   "definition": "Mode où le démon Docker tourne sans privilèges root."
+  },
+  {
+   "term": ".dockerignore",
+   "definition": "Liste des fichiers exclus du contexte de build."
+  },
+  {
+   "term": "Distroless",
+   "definition": "Image minimale sans shell ni gestionnaire de paquets."
+  }
+ ]
+}

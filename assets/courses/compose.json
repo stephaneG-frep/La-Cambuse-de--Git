@@ -1,0 +1,932 @@
+{
+ "id": "compose",
+ "version": 1,
+ "title": "Docker Compose, la flotte de conteneurs",
+ "summary": "Décrire une application multi-services sûre et robuste : versions, secrets, réseaux, volumes, santé et environnements.",
+ "objectives": [
+  "Écrire un compose.yaml lisible et reproductible",
+  "Sortir les secrets et limiter l'exposition réseau",
+  "Garantir un démarrage fiable avec healthchecks et dépendances",
+  "Durcir les services (privilèges, capacités)"
+ ],
+ "prerequisites": [
+  "Module Docker"
+ ],
+ "lessons": [
+  {
+   "id": "pourquoi-compose",
+   "title": "Pourquoi Docker Compose ?",
+   "minutes": 14,
+   "objectives": [
+    "Décrire une application multi-services dans un fichier",
+    "Connaître up, down, ps, logs"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Une application réelle combine souvent plusieurs conteneurs : une API, une base de données, un cache. Compose les décrit dans un seul fichier compose.yaml et les démarre ensemble, sur un réseau commun."
+    },
+    {
+     "type": "code",
+     "body": "services:\n  api:\n    build: .\n    ports: [\"127.0.0.1:8000:8000\"]\n  db:\n    image: postgres:17.2-alpine",
+     "caption": "Deux services"
+    },
+    {
+     "type": "code",
+     "body": "docker compose up -d\ndocker compose ps\ndocker compose logs -f api\ndocker compose down",
+     "caption": "Démarrer, lister, suivre les journaux, arrêter"
+    },
+    {
+     "type": "tip",
+     "body": "docker compose down conserve les volumes nommés ; down -v les supprime (données perdues)."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "dc-1-1",
+     "type": "single",
+     "prompt": "Quel est le rôle de Docker Compose ?",
+     "choices": [
+      "Décrire et lancer ensemble plusieurs services",
+      "Construire des APK",
+      "Remplacer Git",
+      "Héberger des images"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Le fichier compose.yaml décrit services, réseaux et volumes ; une commande démarre le tout."
+    },
+    {
+     "id": "dc-1-2",
+     "type": "command",
+     "prompt": "Démarrez les services en arrière-plan.",
+     "accepted": [
+      "docker compose up -d"
+     ],
+     "explanation": "-d détache ; sans lui, les journaux s'affichent dans le terminal."
+    },
+    {
+     "id": "dc-1-3",
+     "type": "single",
+     "prompt": "docker compose down supprime-t-il les volumes nommés ?",
+     "choices": [
+      "Non, sauf avec -v",
+      "Oui, toujours",
+      "Seulement le dimanche",
+      "Il supprime les images"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Par sécurité, les données persistent ; -v les supprime explicitement."
+    },
+    {
+     "id": "dc-1-4",
+     "type": "command",
+     "prompt": "Suivez en direct les journaux du service « api ».",
+     "accepted": [
+      "docker compose logs -f api"
+     ],
+     "explanation": "-f suit le flux (follow), comme tail -f."
+    }
+   ]
+  },
+  {
+   "id": "services-images",
+   "title": "Services, images et build",
+   "minutes": 16,
+   "objectives": [
+    "Choisir entre image et build",
+    "Épingler les versions des services"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Un service utilise soit une image existante (image: postgres:17.2-alpine), soit un Dockerfile local (build: .). On peut combiner les deux pour nommer l'image construite."
+    },
+    {
+     "type": "warning",
+     "body": "Comme dans un Dockerfile, image: redis sans tag signifie latest : la base peut changer de version majeure sans prévenir."
+    },
+    {
+     "type": "code",
+     "body": "services:\n  cache:\n    image: redis:7.4.1-alpine\n  api:\n    build:\n      context: .\n      dockerfile: Dockerfile",
+     "caption": "Image épinglée et build local"
+    }
+   ],
+   "lab": {
+    "kind": "compose",
+    "intro": "Épinglez les versions des images.",
+    "starter": "services:\n  cache:\n    image: redis\n    restart: unless-stopped\n  db:\n    image: postgres:latest\n    restart: unless-stopped\n    healthcheck:\n      test: [\"CMD\", \"pg_isready\"]\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "Images épinglées",
+      "rule": "DC001"
+     },
+     {
+      "type": "valid",
+      "label": "Fichier Compose valide"
+     }
+    ],
+    "hint": "Ajoutez une version précise : redis:7.4.1-alpine, postgres:17.2-alpine.",
+    "solution": "services:\n  cache:\n    image: redis:7.4.1-alpine\n    restart: unless-stopped\n  db:\n    image: postgres:17.2-alpine\n    restart: unless-stopped\n    healthcheck:\n      test: [\"CMD\", \"pg_isready\"]\n"
+   },
+   "quiz": [
+    {
+     "id": "dc-2-1",
+     "type": "single",
+     "prompt": "image: redis signifie :",
+     "choices": [
+      "redis:latest",
+      "La version installée",
+      "Une erreur",
+      "redis:stable"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Sans tag, latest est utilisé, avec les mêmes risques que dans un Dockerfile."
+    },
+    {
+     "id": "dc-2-2",
+     "type": "single",
+     "prompt": "Comment utiliser un Dockerfile local pour un service ?",
+     "choices": [
+      "build: .",
+      "image: .",
+      "dockerfile: true",
+      "local: yes"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "build indique le contexte (et éventuellement le Dockerfile)."
+    },
+    {
+     "id": "dc-2-3",
+     "type": "single",
+     "prompt": "Pourquoi épingler la version d'une base de données ?",
+     "choices": [
+      "Éviter une montée de version majeure non maîtrisée",
+      "Pour le style",
+      "Pour réduire la taille",
+      "Ce n'est pas utile"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Une base de données change parfois son format de stockage entre versions majeures."
+    },
+    {
+     "id": "dc-2-4",
+     "type": "command",
+     "prompt": "Reconstruisez les images des services qui ont un build.",
+     "accepted": [
+      "docker compose build"
+     ],
+     "explanation": "Utile après une modification du Dockerfile ; up --build fait build puis up."
+    }
+   ]
+  },
+  {
+   "id": "ports-reseaux",
+   "title": "Ports et réseaux",
+   "minutes": 16,
+   "objectives": [
+    "Publier un port seulement en local",
+    "Utiliser le nom des services comme adresse"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "Compose crée un réseau par projet : les services se joignent par leur nom (l'API contacte db:5432). Il n'est pas nécessaire de publier le port de la base pour que l'API y accède."
+    },
+    {
+     "type": "warning",
+     "body": "\"8080:80\" publie le port sur toutes les interfaces : votre service devient joignable depuis le réseau local (café, salon…). Pour le développement, préférez \"127.0.0.1:8080:80\"."
+    },
+    {
+     "type": "code",
+     "body": "services:\n  web:\n    image: nginx:1.27.3\n    ports:\n      - \"127.0.0.1:8080:80\"",
+     "caption": "Port publié en local uniquement"
+    }
+   ],
+   "lab": {
+    "kind": "compose",
+    "intro": "Le site est exposé à tout le réseau local. Limitez-le à votre machine.",
+    "starter": "services:\n  web:\n    image: nginx:1.27.3\n    restart: unless-stopped\n    ports:\n      - \"8080:80\"\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "Port publié sur 127.0.0.1 uniquement",
+      "rule": "DC007"
+     }
+    ],
+    "hint": "Préfixez le port : \"127.0.0.1:8080:80\".",
+    "solution": "services:\n  web:\n    image: nginx:1.27.3\n    restart: unless-stopped\n    ports:\n      - \"127.0.0.1:8080:80\"\n"
+   },
+   "quiz": [
+    {
+     "id": "dc-3-1",
+     "type": "single",
+     "prompt": "Dans Compose, comment l'API joint-elle le service db ?",
+     "choices": [
+      "Par le nom db",
+      "Par localhost",
+      "Par l'IP du PC",
+      "Impossible sans ports"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Le réseau du projet fournit la résolution des noms de services."
+    },
+    {
+     "id": "dc-3-2",
+     "type": "single",
+     "prompt": "\"8080:80\" rend le service joignable :",
+     "choices": [
+      "Depuis le réseau local aussi",
+      "Uniquement en local",
+      "Uniquement dans le conteneur",
+      "Nulle part"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Sans adresse, Docker écoute sur toutes les interfaces de l'hôte."
+    },
+    {
+     "id": "dc-3-3",
+     "type": "single",
+     "prompt": "Faut-il publier le port de la base pour que l'API s'y connecte ?",
+     "choices": [
+      "Non, ils partagent le réseau Compose",
+      "Oui, toujours",
+      "Oui, en 0.0.0.0",
+      "Seulement en production"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Publier un port sert à l'accès depuis l'hôte ; entre services, le réseau interne suffit."
+    },
+    {
+     "id": "dc-3-4",
+     "type": "single",
+     "prompt": "Quelle écriture limite l'accès à votre machine ?",
+     "choices": [
+      "\"127.0.0.1:8080:80\"",
+      "\"8080:80\"",
+      "\"0.0.0.0:8080:80\"",
+      "\"80\""
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "L'adresse 127.0.0.1 (loopback) n'est pas joignable depuis le réseau."
+    }
+   ]
+  },
+  {
+   "id": "variables-secrets",
+   "title": "Variables et secrets",
+   "minutes": 18,
+   "objectives": [
+    "Sortir les secrets du fichier Compose",
+    "Utiliser env_file et l'interpolation ${VAR}"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "compose.yaml est versionné : il ne doit contenir aucun secret. On utilise des variables ${DB_PASSWORD} lues depuis l'environnement ou un fichier .env (ignoré par Git), ou les secrets Compose montés comme fichiers."
+    },
+    {
+     "type": "code",
+     "body": "services:\n  db:\n    image: postgres:17.2-alpine\n    environment:\n      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}",
+     "caption": "Valeur fournie par l'environnement ou .env"
+    },
+    {
+     "type": "code",
+     "body": "services:\n  db:\n    image: postgres:17.2-alpine\n    environment:\n      POSTGRES_PASSWORD_FILE: /run/secrets/pg\n    secrets: [pg]\nsecrets:\n  pg:\n    file: ./secrets/pg.txt",
+     "caption": "Secret monté comme fichier"
+    },
+    {
+     "type": "warning",
+     "body": "Vérifiez que .env et le dossier des secrets sont dans .gitignore avant tout commit."
+    }
+   ],
+   "lab": {
+    "kind": "compose",
+    "intro": "Le mot de passe de la base est en clair. Sortez-le du fichier.",
+    "starter": "services:\n  db:\n    image: postgres:17.2-alpine\n    restart: unless-stopped\n    environment:\n      POSTGRES_PASSWORD: super-secret-2024\n    healthcheck:\n      test: [\"CMD\", \"pg_isready\"]\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "Aucun secret en clair",
+      "rule": "DC006"
+     },
+     {
+      "type": "notContains",
+      "label": "La valeur a disparu",
+      "text": "super-secret"
+     }
+    ],
+    "hint": "Remplacez la valeur par ${POSTGRES_PASSWORD} (défini dans un .env ignoré par Git).",
+    "solution": "services:\n  db:\n    image: postgres:17.2-alpine\n    restart: unless-stopped\n    environment:\n      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}\n    healthcheck:\n      test: [\"CMD\", \"pg_isready\"]\n"
+   },
+   "quiz": [
+    {
+     "id": "dc-4-1",
+     "type": "single",
+     "prompt": "Où mettre un mot de passe utilisé par Compose ?",
+     "choices": [
+      "Dans un .env ignoré par Git ou un secret Compose",
+      "Directement dans compose.yaml",
+      "Dans le nom du service",
+      "Dans le README"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "compose.yaml est versionné et partagé : il ne doit référencer que des variables."
+    },
+    {
+     "id": "dc-4-2",
+     "type": "single",
+     "prompt": "Que signifie ${POSTGRES_PASSWORD} dans compose.yaml ?",
+     "choices": [
+      "La valeur est lue depuis l'environnement ou le fichier .env",
+      "Un texte littéral",
+      "Une commande",
+      "Un secret chiffré"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Compose remplace la variable au moment du lancement."
+    },
+    {
+     "id": "dc-4-3",
+     "type": "single",
+     "prompt": "Comment Compose expose-t-il un secret déclaré dans « secrets » ?",
+     "choices": [
+      "Comme un fichier dans /run/secrets/",
+      "Comme un port",
+      "Dans les journaux",
+      "Dans le nom de l'image"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Beaucoup d'images officielles acceptent une variable *_FILE pointant vers ce fichier."
+    },
+    {
+     "id": "dc-4-4",
+     "type": "single",
+     "prompt": "Que vérifier avant de committer un projet Compose ?",
+     "choices": [
+      ".env et les secrets sont ignorés par Git",
+      "Que les ports sont en 0.0.0.0",
+      "Que les images sont en latest",
+      "Rien"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Un .env versionné publie tous les mots de passe du projet."
+    }
+   ]
+  },
+  {
+   "id": "volumes-persistance",
+   "title": "Volumes et persistance",
+   "minutes": 16,
+   "objectives": [
+    "Déclarer des volumes nommés",
+    "Éviter les montages dangereux"
+   ],
+   "sections": [
+    {
+     "type": "code",
+     "body": "services:\n  db:\n    image: postgres:17.2-alpine\n    volumes:\n      - donnees:/var/lib/postgresql/data\nvolumes:\n  donnees:",
+     "caption": "Volume nommé déclaré au niveau du projet"
+    },
+    {
+     "type": "text",
+     "body": "Un volume nommé survit à docker compose down et aux recréations de conteneurs. Un bind mount (./src:/app) est pratique en développement pour voir ses modifications en direct."
+    },
+    {
+     "type": "warning",
+     "body": "Monter /var/run/docker.sock donne au conteneur le contrôle de Docker, donc de l'hôte : à réserver à des outils d'administration de confiance."
+    }
+   ],
+   "lab": {
+    "kind": "compose",
+    "intro": "Ce service monte le socket Docker sans raison. Remplacez par un volume de données.",
+    "starter": "services:\n  app:\n    image: nginx:1.27.3\n    restart: unless-stopped\n    volumes:\n      - /var/run/docker.sock:/var/run/docker.sock\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "Socket Docker non monté",
+      "rule": "DC005"
+     },
+     {
+      "type": "contains",
+      "label": "Un volume nommé est déclaré",
+      "text": "volumes:\n  "
+     }
+    ],
+    "hint": "Supprimez le montage du socket ; déclarez un volume nommé « contenu » monté sur /usr/share/nginx/html.",
+    "solution": "services:\n  app:\n    image: nginx:1.27.3\n    restart: unless-stopped\n    volumes:\n      - contenu:/usr/share/nginx/html\nvolumes:\n  contenu:\n"
+   },
+   "quiz": [
+    {
+     "id": "dc-5-1",
+     "type": "single",
+     "prompt": "Un volume nommé survit-il à docker compose down ?",
+     "choices": [
+      "Oui (sauf down -v)",
+      "Non",
+      "Seulement en production",
+      "Il est copié dans l'image"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Les données persistent tant qu'on ne supprime pas explicitement le volume."
+    },
+    {
+     "id": "dc-5-2",
+     "type": "single",
+     "prompt": "Quel montage donne le contrôle de l'hôte au conteneur ?",
+     "choices": [
+      "/var/run/docker.sock",
+      "./src:/app",
+      "donnees:/data",
+      "/tmp"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Le socket du démon permet de lancer n'importe quel conteneur privilégié."
+    },
+    {
+     "id": "dc-5-3",
+     "type": "single",
+     "prompt": "À quoi sert un bind mount comme ./src:/app en développement ?",
+     "choices": [
+      "Voir ses modifications sans reconstruire l'image",
+      "Chiffrer le code",
+      "Publier un port",
+      "Accélérer le réseau"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Les fichiers de l'hôte sont visibles directement dans le conteneur."
+    },
+    {
+     "id": "dc-5-4",
+     "type": "command",
+     "prompt": "Arrêtez le projet ET supprimez ses volumes (données perdues).",
+     "accepted": [
+      "docker compose down -v"
+     ],
+     "explanation": "À réserver aux remises à zéro volontaires."
+    }
+   ]
+  },
+  {
+   "id": "sante-dependances",
+   "title": "Santé et dépendances",
+   "minutes": 18,
+   "objectives": [
+    "Déclarer un healthcheck",
+    "Attendre qu'un service soit prêt avec depends_on: condition"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "depends_on simple n'attend que le démarrage du conteneur, pas que la base accepte des connexions. Avec un healthcheck et condition: service_healthy, l'API attend que la base soit vraiment prête."
+    },
+    {
+     "type": "code",
+     "body": "services:\n  api:\n    build: .\n    depends_on:\n      db:\n        condition: service_healthy\n  db:\n    image: postgres:17.2-alpine\n    healthcheck:\n      test: [\"CMD-SHELL\", \"pg_isready -U postgres\"]\n      interval: 5s\n      retries: 10",
+     "caption": "L'API démarre quand la base est healthy"
+    },
+    {
+     "type": "tip",
+     "body": "docker compose ps affiche l'état de santé de chaque service (healthy, starting, unhealthy)."
+    }
+   ],
+   "lab": {
+    "kind": "compose",
+    "intro": "L'API démarre avant que la base soit prête. Faites-la attendre.",
+    "starter": "services:\n  api:\n    build: .\n    restart: unless-stopped\n    depends_on:\n      - db\n  db:\n    image: postgres:17.2-alpine\n    restart: unless-stopped\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "La base a un healthcheck",
+      "rule": "DC010"
+     },
+     {
+      "type": "contains",
+      "label": "L'API attend service_healthy",
+      "text": "service_healthy"
+     }
+    ],
+    "hint": "Ajoutez un healthcheck pg_isready à db, puis depends_on: { db: { condition: service_healthy } } dans api.",
+    "solution": "services:\n  api:\n    build: .\n    restart: unless-stopped\n    depends_on:\n      db:\n        condition: service_healthy\n  db:\n    image: postgres:17.2-alpine\n    restart: unless-stopped\n    healthcheck:\n      test: [\"CMD-SHELL\", \"pg_isready -U postgres\"]\n"
+   },
+   "quiz": [
+    {
+     "id": "dc-6-1",
+     "type": "single",
+     "prompt": "depends_on: [db] garantit-il que la base accepte des connexions ?",
+     "choices": [
+      "Non, seulement que son conteneur a démarré",
+      "Oui",
+      "Oui si le port est publié",
+      "Oui après 1 seconde"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "D'où condition: service_healthy, couplé à un healthcheck."
+    },
+    {
+     "id": "dc-6-2",
+     "type": "single",
+     "prompt": "Quelle commande teste la disponibilité de PostgreSQL ?",
+     "choices": [
+      "pg_isready",
+      "psql --start",
+      "postgres --ping",
+      "docker ps"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "pg_isready renvoie 0 quand le serveur accepte des connexions."
+    },
+    {
+     "id": "dc-6-3",
+     "type": "single",
+     "prompt": "Quelle condition attend qu'un service soit prêt ?",
+     "choices": [
+      "service_healthy",
+      "service_started",
+      "service_running",
+      "service_ok"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "service_started est le comportement par défaut, insuffisant pour une base."
+    },
+    {
+     "id": "dc-6-4",
+     "type": "single",
+     "prompt": "Que se passe-t-il si le healthcheck échoue en permanence ?",
+     "choices": [
+      "Le service reste unhealthy et les dépendants n'attendent pas indéfiniment sans erreur visible",
+      "Docker supprime l'image",
+      "Le PC redémarre",
+      "Rien n'est visible"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "docker compose ps affiche l'état ; les journaux du service expliquent généralement pourquoi."
+    }
+   ]
+  },
+  {
+   "id": "securite-redemarrage",
+   "title": "Redémarrage et privilèges",
+   "minutes": 16,
+   "objectives": [
+    "Choisir une politique de redémarrage",
+    "Refuser privileged, network_mode host et cap_add larges"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "restart: unless-stopped relance un service après un plantage ou un redémarrage de la machine, sauf si vous l'avez arrêté vous-même."
+    },
+    {
+     "type": "warning",
+     "body": "privileged: true, network_mode: host et cap_add: [ALL] suppriment presque toute l'isolation. Si un outil le demande, cherchez la capacité précise nécessaire (ex. NET_ADMIN) et justifiez-la."
+    },
+    {
+     "type": "code",
+     "body": "services:\n  outil:\n    image: exemple/outil:2.1.0\n    restart: on-failure\n    cap_drop: [ALL]\n    cap_add: [NET_BIND_SERVICE]\n    read_only: true",
+     "caption": "Durcissement d'un service"
+    }
+   ],
+   "lab": {
+    "kind": "compose",
+    "intro": "Ce service a tous les privilèges. Durcissez-le et ajoutez une politique de redémarrage.",
+    "starter": "services:\n  outil:\n    image: exemple/outil:2.1.0\n    privileged: true\n    network_mode: host\n    cap_add: [ALL]\n",
+    "goals": [
+     {
+      "type": "noRule",
+      "label": "Pas de privileged",
+      "rule": "DC002"
+     },
+     {
+      "type": "noRule",
+      "label": "Pas de capacités larges",
+      "rule": "DC003"
+     },
+     {
+      "type": "noRule",
+      "label": "Pas de network_mode host",
+      "rule": "DC004"
+     },
+     {
+      "type": "noRule",
+      "label": "Politique de redémarrage",
+      "rule": "DC009"
+     }
+    ],
+    "hint": "Retirez privileged et network_mode, remplacez cap_add par la capacité utile et ajoutez restart: on-failure.",
+    "solution": "services:\n  outil:\n    image: exemple/outil:2.1.0\n    restart: on-failure\n    cap_drop: [ALL]\n    cap_add: [NET_BIND_SERVICE]\n"
+   },
+   "quiz": [
+    {
+     "id": "dc-7-1",
+     "type": "single",
+     "prompt": "Que fait restart: unless-stopped ?",
+     "choices": [
+      "Relance le service sauf s'il a été arrêté manuellement",
+      "Ne relance jamais",
+      "Relance en boucle même arrêté",
+      "Arrête le service"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "C'est la politique la plus courante pour des services de développement durables."
+    },
+    {
+     "id": "dc-7-2",
+     "type": "single",
+     "prompt": "Pourquoi éviter privileged: true ?",
+     "choices": [
+      "Le conteneur obtient un accès quasi total à l'hôte",
+      "C'est plus lent",
+      "Il ne démarre pas",
+      "Il supprime les volumes"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Il donne accès aux périphériques et désactive la plupart des protections."
+    },
+    {
+     "id": "dc-7-3",
+     "type": "single",
+     "prompt": "Quelle approche pour les capacités Linux ?",
+     "choices": [
+      "cap_drop: [ALL] puis ajouter seulement le nécessaire",
+      "cap_add: [ALL]",
+      "privileged: true",
+      "Ne rien faire"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Le moindre privilège s'applique aussi aux capacités."
+    },
+    {
+     "id": "dc-7-4",
+     "type": "single",
+     "prompt": "network_mode: host :",
+     "choices": [
+      "Supprime l'isolation réseau du conteneur",
+      "Accélère le DNS",
+      "Crée un réseau privé",
+      "Bloque Internet"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Le conteneur partage directement la pile réseau de l'hôte."
+    }
+   ]
+  },
+  {
+   "id": "environnements",
+   "title": "Environnements et fichiers multiples",
+   "minutes": 15,
+   "objectives": [
+    "Superposer des fichiers Compose",
+    "Activer des services optionnels avec les profils"
+   ],
+   "sections": [
+    {
+     "type": "text",
+     "body": "compose.override.yaml est lu automatiquement en plus de compose.yaml : idéal pour les réglages de développement (bind mounts, ports supplémentaires). Pour la production, on passe un autre fichier avec -f."
+    },
+    {
+     "type": "code",
+     "body": "docker compose -f compose.yaml -f compose.prod.yaml up -d",
+     "caption": "Superposition explicite"
+    },
+    {
+     "type": "code",
+     "body": "services:\n  adminer:\n    image: adminer:4.8.1\n    profiles: [outils]",
+     "caption": "Service démarré seulement avec --profile outils"
+    },
+    {
+     "type": "tip",
+     "body": "docker compose config affiche la configuration finale fusionnée : pratique pour vérifier ce qui sera réellement lancé."
+    }
+   ],
+   "quiz": [
+    {
+     "id": "dc-8-1",
+     "type": "single",
+     "prompt": "Quel fichier Compose est lu automatiquement en plus de compose.yaml ?",
+     "choices": [
+      "compose.override.yaml",
+      "compose.dev.yaml",
+      "docker.yaml",
+      ".compose"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "Il sert habituellement aux réglages de développement."
+    },
+    {
+     "id": "dc-8-2",
+     "type": "command",
+     "prompt": "Affichez la configuration finale fusionnée.",
+     "accepted": [
+      "docker compose config"
+     ],
+     "explanation": "Elle montre les variables remplacées et les fichiers combinés."
+    },
+    {
+     "id": "dc-8-3",
+     "type": "single",
+     "prompt": "À quoi servent les profiles ?",
+     "choices": [
+      "Démarrer certains services seulement sur demande",
+      "Gérer les utilisateurs",
+      "Chiffrer les volumes",
+      "Limiter la mémoire"
+     ],
+     "answer": [
+      0
+     ],
+     "explanation": "docker compose --profile outils up active les services du profil."
+    },
+    {
+     "id": "dc-8-4",
+     "type": "command",
+     "prompt": "Lancez avec compose.yaml et compose.prod.yaml superposés, en arrière-plan.",
+     "accepted": [
+      "docker compose -f compose.yaml -f compose.prod.yaml up -d"
+     ],
+     "explanation": "L'ordre compte : le dernier fichier l'emporte sur les précédents."
+    }
+   ]
+  }
+ ],
+ "project": {
+  "title": "Mise en sécurité d'une pile Compose",
+  "brief": "Une pile API + base + cache a été écrite à la hâte. Rendez-la reproductible, sans secret, sans privilège et robuste au démarrage.",
+  "lab": {
+   "kind": "compose",
+   "intro": "Objectif : plus aucun problème bloquant ni avertissement, healthcheck et dépendance prête.",
+   "starter": "services:\n  api:\n    build: .\n    ports:\n      - \"8000:8000\"\n    environment:\n      DB_PASSWORD: motdepasse-2024\n    depends_on:\n      - db\n    privileged: true\n  db:\n    image: postgres\n    volumes:\n      - /var/run/docker.sock:/var/run/docker.sock\n  cache:\n    image: redis:latest\n",
+   "goals": [
+    {
+     "type": "noSeverity",
+     "label": "Aucun problème bloquant",
+     "severity": "blocking"
+    },
+    {
+     "type": "noSeverity",
+     "label": "Aucun avertissement",
+     "severity": "warning"
+    },
+    {
+     "type": "contains",
+     "label": "L'API attend une base prête",
+     "text": "service_healthy"
+    },
+    {
+     "type": "noRule",
+     "label": "La base a un healthcheck",
+     "rule": "DC010"
+    },
+    {
+     "type": "noRule",
+     "label": "Ports limités à la machine",
+     "rule": "DC007"
+    }
+   ],
+   "hint": "Reprenez les labos du module un par un : versions, secrets, privilèges, ports, healthcheck, dépendances.",
+   "solution": "services:\n  api:\n    build: .\n    restart: unless-stopped\n    ports:\n      - \"127.0.0.1:8000:8000\"\n    environment:\n      DB_PASSWORD: ${DB_PASSWORD}\n    depends_on:\n      db:\n        condition: service_healthy\n  db:\n    image: postgres:17.2-alpine\n    restart: unless-stopped\n    environment:\n      POSTGRES_PASSWORD: ${DB_PASSWORD}\n    volumes:\n      - donnees:/var/lib/postgresql/data\n    healthcheck:\n      test: [\"CMD-SHELL\", \"pg_isready -U postgres\"]\n  cache:\n    image: redis:7.4.1-alpine\n    restart: unless-stopped\n    healthcheck:\n      test: [\"CMD\", \"redis-cli\", \"ping\"]\nvolumes:\n  donnees:\n"
+  },
+  "rubric": [
+   {
+    "criterion": "Reproductibilité",
+    "levels": [
+     "Images latest",
+     "Versions épinglées",
+     "Versions épinglées et configuration vérifiée (compose config)"
+    ]
+   },
+   {
+    "criterion": "Secrets",
+    "levels": [
+     "Mots de passe en clair",
+     "Variables ${…}",
+     "Variables ou secrets Compose, .env ignoré par Git"
+    ]
+   },
+   {
+    "criterion": "Isolation",
+    "levels": [
+     "privileged ou socket Docker",
+     "Privilèges retirés",
+     "Privilèges retirés, capacités minimales"
+    ]
+   },
+   {
+    "criterion": "Exposition réseau",
+    "levels": [
+     "Ports sur toutes les interfaces",
+     "Ports limités",
+     "Seuls les ports nécessaires, en local"
+    ]
+   },
+   {
+    "criterion": "Robustesse",
+    "levels": [
+     "Démarrage sans attente",
+     "Healthchecks",
+     "Healthchecks, depends_on healthy, restart"
+    ]
+   }
+  ]
+ },
+ "glossary": [
+  {
+   "term": "compose.yaml",
+   "definition": "Fichier décrivant les services, réseaux, volumes et secrets d'un projet."
+  },
+  {
+   "term": "Service",
+   "definition": "Conteneur (ou groupe de conteneurs identiques) décrit dans compose.yaml."
+  },
+  {
+   "term": "depends_on",
+   "definition": "Ordre de démarrage entre services ; avec condition: service_healthy, attend qu'un service soit prêt."
+  },
+  {
+   "term": "healthcheck",
+   "definition": "Commande indiquant si un service est prêt."
+  },
+  {
+   "term": "env_file",
+   "definition": "Fichier de variables d'environnement chargé pour un service."
+  },
+  {
+   "term": "Interpolation",
+   "definition": "Remplacement de ${VAR} par une valeur de l'environnement ou du .env."
+  },
+  {
+   "term": "Secrets Compose",
+   "definition": "Fichiers sensibles montés dans /run/secrets/ plutôt que passés en variables."
+  },
+  {
+   "term": "Volume nommé",
+   "definition": "Stockage persistant déclaré dans la section volumes du projet."
+  },
+  {
+   "term": "Profil",
+   "definition": "Groupe de services démarrés seulement sur demande (--profile)."
+  },
+  {
+   "term": "compose.override.yaml",
+   "definition": "Fichier superposé automatiquement à compose.yaml."
+  },
+  {
+   "term": "restart",
+   "definition": "Politique de redémarrage (no, on-failure, unless-stopped, always)."
+  },
+  {
+   "term": "cap_add / cap_drop",
+   "definition": "Ajout ou retrait de capacités Linux d'un conteneur."
+  }
+ ]
+}

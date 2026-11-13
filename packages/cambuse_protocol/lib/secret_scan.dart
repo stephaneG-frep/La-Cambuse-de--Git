@@ -64,6 +64,15 @@ List<SecretFinding> scanContent(String path, String content, {int maxFindings = 
   return out;
 }
 
+/// Masque les secrets probables d'un texte (journaux de conteneurs…).
+String maskSecrets(String text) {
+  var out = text;
+  for (final re in secretContentPatterns.values) {
+    out = out.replaceAll(re, '[SECRET MASQUÉ]');
+  }
+  return out;
+}
+
 /// Vrai si [bytes] ressemble à du binaire (octet nul dans les 8000 premiers).
 bool looksBinary(List<int> bytes) {
   final n = bytes.length < 8000 ? bytes.length : 8000;

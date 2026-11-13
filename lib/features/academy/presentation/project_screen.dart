@@ -10,6 +10,7 @@ import '../data/progress_repository.dart';
 import '../domain/course.dart';
 import 'academy_providers.dart';
 import 'widgets/exercise_view.dart';
+import 'widgets/lab_view.dart';
 
 class ProjectScreen extends ConsumerWidget {
   const ProjectScreen({super.key, required this.moduleId});
@@ -62,12 +63,17 @@ class _ProjectBody extends ConsumerWidget {
               loading: () => const LoadingView(),
               error: (e, _) => ErrorView(error: e),
               data: (row) => TabBarView(children: [
-                ExerciseView(
-                  exercise: project.exercise,
-                  alreadyDone: row?.exerciseCompletedAt != null,
-                  onCompleted: () =>
-                      ref.read(progressRepositoryProvider).markProjectExercise(module.id),
-                ),
+                project.lab != null
+                    ? LabView(
+                        lab: project.lab!,
+                        alreadyDone: row?.exerciseCompletedAt != null,
+                        onCompleted: () => ref.read(progressRepositoryProvider).markProjectExercise(module.id),
+                      )
+                    : ExerciseView(
+                        exercise: project.exercise!,
+                        alreadyDone: row?.exerciseCompletedAt != null,
+                        onCompleted: () => ref.read(progressRepositoryProvider).markProjectExercise(module.id),
+                      ),
                 row?.exerciseCompletedAt == null
                     ? EmptyView(message: l.projectExerciseFirst, icon: Icons.lock_outline)
                     : _RubricForm(

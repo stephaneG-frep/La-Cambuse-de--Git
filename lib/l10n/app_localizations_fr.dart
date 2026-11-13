@@ -1160,4 +1160,103 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get pbScopeMissing =>
       'Cet appareil n\'a pas la portée « remote » : appairez-le avec --scopes read,git-write,remote.';
+
+  @override
+  String get labStatic =>
+      'Labo hors ligne : le fichier est analysé, aucun conteneur n\'est lancé.';
+
+  @override
+  String get labAnalyze => 'Analyser';
+
+  @override
+  String get labReset => 'Réinitialiser';
+
+  @override
+  String get labGoals => 'Objectifs';
+
+  @override
+  String get labFindings => 'Constats de l\'analyseur';
+
+  @override
+  String get labNoFinding => 'Aucun constat : bravo.';
+
+  @override
+  String get labDone => 'Labo réussi ! Mousse Byte salue votre rigueur.';
+
+  @override
+  String labLine(int line) {
+    return 'ligne $line';
+  }
+
+  @override
+  String labFix(String fix) {
+    return 'Correction : $fix';
+  }
+
+  @override
+  String get dkRoom => 'Salle des machines Docker';
+
+  @override
+  String get dkRoomSubtitle =>
+      'Inspection en lecture seule du Docker de votre PC';
+
+  @override
+  String get dkUnavailable => 'Docker indisponible sur l\'hôte.';
+
+  @override
+  String dkServer(String version) {
+    return 'Docker $version';
+  }
+
+  @override
+  String get dkRootless => 'Mode rootless';
+
+  @override
+  String dkCounts(String containers, String running, String images) {
+    return '$containers conteneur(s) dont $running en marche · $images image(s)';
+  }
+
+  @override
+  String get dkImages => 'Images';
+
+  @override
+  String get dkContainers => 'Conteneurs';
+
+  @override
+  String dkLogs(String name) {
+    return 'Journal de $name';
+  }
+
+  @override
+  String get dkReadOnly =>
+      'Lecture seule : La Cambuse ne lance, n\'arrête ni ne supprime aucun conteneur.';
+
+  @override
+  String get dkScopeMissing =>
+      'Cet appareil n\'a pas la portée « docker » : appairez-le avec --scopes …,docker (l\'accès à Docker équivaut à des droits root).';
+
+  @override
+  String get wsTabDocker => 'Docker';
+
+  @override
+  String get dkLintIntro =>
+      'Analyse statique des fichiers Docker du projet (aucun conteneur lancé).';
+
+  @override
+  String get dkRunLint => 'Analyser les fichiers Docker';
+
+  @override
+  String get dkNoFiles => 'Aucun Dockerfile ni compose.yaml dans ce projet.';
+
+  @override
+  String dkGenerate(String template) {
+    return 'Générer un Dockerfile ($template)';
+  }
+
+  @override
+  String get dkNoDockerignore =>
+      'Pas de .dockerignore : le contexte de build peut embarquer .git, .env et les dépendances.';
+
+  @override
+  String get dkOpenRoom => 'Salle des machines Docker';
 }

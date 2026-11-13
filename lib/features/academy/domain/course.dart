@@ -175,6 +175,62 @@ class Exercise {
   final List<ExerciseStep> steps;
 }
 
+/// Objectif d'un labo fichier, évalué par l'analyseur Docker/Compose.
+class LabGoal {
+  const LabGoal(this.type, this.params, this.label);
+
+  factory LabGoal.fromJson(Map<String, dynamic> j, String ctx) {
+    final type = _req<String>(j, 'type', ctx);
+    if (!labGoalTypes.contains(type)) throw FormatException('$ctx : objectif de labo inconnu $type');
+    return LabGoal(type, Map<String, dynamic>.of(j)..remove('type')..remove('label'), _req<String>(j, 'label', ctx));
+  }
+
+  static const labGoalTypes = {'noRule', 'noSeverity', 'contains', 'notContains', 'instruction', 'stages', 'valid'};
+
+  final String type;
+  final Map<String, dynamic> params;
+
+  /// Libellé affiché à l'apprenant.
+  final String label;
+}
+
+/// Labo « fichier » : corriger un Dockerfile ou un compose.yaml. Aucun
+/// conteneur n'est lancé : l'analyse est statique, hors ligne.
+class FileLab {
+  const FileLab({
+    required this.kind,
+    required this.intro,
+    required this.starter,
+    required this.goals,
+    required this.hint,
+    required this.solution,
+  });
+
+  factory FileLab.fromJson(Map<String, dynamic> j, String ctx) {
+    final kind = _req<String>(j, 'kind', ctx);
+    if (kind != 'dockerfile' && kind != 'compose') throw FormatException('$ctx : type de labo inconnu $kind');
+    final goals = [for (final g in _maps(j, 'goals', ctx)) LabGoal.fromJson(g, ctx)];
+    if (goals.isEmpty) throw FormatException('$ctx : labo sans objectif');
+    return FileLab(
+      kind: kind,
+      intro: _req<String>(j, 'intro', ctx),
+      starter: _req<String>(j, 'starter', ctx),
+      goals: goals,
+      hint: _req<String>(j, 'hint', ctx),
+      solution: _req<String>(j, 'solution', ctx),
+    );
+  }
+
+  final String kind;
+  final String intro;
+  final String starter;
+  final List<LabGoal> goals;
+  final String hint;
+  final String solution;
+
+  String get fileName => kind == 'dockerfile' ? 'Dockerfile' : 'compose.yaml';
+}
+
 class Lesson {
   const Lesson({
     required this.id,
@@ -184,6 +240,7 @@ class Lesson {
     required this.sections,
     required this.exercise,
     required this.quiz,
+    this.lab,
   });
 
   factory Lesson.fromJson(Map<String, dynamic> j, String ctx) {
@@ -199,6 +256,7 @@ class Lesson {
       objectives: _strings(j, 'objectives', c),
       sections: [for (final s in _maps(j, 'sections', c)) LessonSection.fromJson(s, c)],
       exercise: ex == null ? null : Exercise.fromJson(ex as Map<String, dynamic>, '$c/exercice'),
+      lab: j['lab'] == null ? null : FileLab.fromJson(j['lab'] as Map<String, dynamic>, '$c/labo'),
       quiz: quiz,
     );
   }
@@ -210,6 +268,12 @@ class Lesson {
   final List<LessonSection> sections;
   final Exercise? exercise;
   final List<QuizQuestion> quiz;
+
+  /// Labo fichier (Docker/Compose), alternative à l'exercice du bac à sable.
+  final FileLab? lab;
+
+  /// Vrai si la leçon comporte une pratique à réussir (exercice ou labo).
+  bool get hasPractice => exercise != null || lab != null;
 
   /// Texte brut pour la recherche.
   String get searchText => [
@@ -238,20 +302,27 @@ class FinalProject {
   const FinalProject({
     required this.title,
     required this.brief,
-    required this.exercise,
     required this.rubric,
+    this.exercise,
+    this.lab,
   });
 
-  factory FinalProject.fromJson(Map<String, dynamic> j, String ctx) => FinalProject(
-        title: _req<String>(j, 'title', ctx),
-        brief: _req<String>(j, 'brief', ctx),
-        exercise: Exercise.fromJson(_req<Map<String, dynamic>>(j, 'exercise', ctx), '$ctx/exercice'),
-        rubric: [for (final r in _maps(j, 'rubric', ctx)) RubricCriterion.fromJson(r, ctx)],
-      );
+  factory FinalProject.fromJson(Map<String, dynamic> j, String ctx) {
+    final ex = j['exercise'], lab = j['lab'];
+    if ((ex == null) == (lab == null)) throw FormatException('$ctx : un exercice OU un labo est attendu');
+    return FinalProject(
+      title: _req<String>(j, 'title', ctx),
+      brief: _req<String>(j, 'brief', ctx),
+      exercise: ex == null ? null : Exercise.fromJson(ex as Map<String, dynamic>, '$ctx/exercice'),
+      lab: lab == null ? null : FileLab.fromJson(lab as Map<String, dynamic>, '$ctx/labo'),
+      rubric: [for (final r in _maps(j, 'rubric', ctx)) RubricCriterion.fromJson(r, ctx)],
+    );
+  }
 
   final String title;
   final String brief;
-  final Exercise exercise;
+  final Exercise? exercise;
+  final FileLab? lab;
   final List<RubricCriterion> rubric;
 }
 

@@ -12,6 +12,7 @@ import '../features/ai/presentation/chat_screen.dart';
 import '../features/captain/presentation/captain_screen.dart';
 import '../features/companion_link/presentation/companion_screen.dart';
 import '../features/dashboard/presentation/dashboard_screen.dart';
+import '../features/docker/presentation/docker_room_screen.dart';
 import '../features/forge/presentation/forge_settings_screen.dart';
 import '../features/logbook/presentation/logbook_screen.dart';
 import '../features/settings/presentation/settings_screen.dart';
@@ -93,6 +94,7 @@ GoRouter buildRouter() => GoRouter(
                     path: 'projet',
                     builder: (c, s) => workshop.WorkshopProjectScreen(path: s.uri.queryParameters['chemin'] ?? ''),
                   ),
+                  GoRoute(path: 'docker', builder: (c, s) => const DockerRoomScreen()),
                 ],
               ),
             ]),
