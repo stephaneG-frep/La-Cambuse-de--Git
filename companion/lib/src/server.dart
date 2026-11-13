@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:cambuse_protocol/cambuse_protocol.dart';
 
 import 'audit.dart';
+import 'backups.dart';
 import 'ops.dart';
 import 'paths.dart';
 import 'store.dart';
@@ -41,7 +42,7 @@ class CompanionServer {
   CompanionServer(this.config, {DateTime Function()? clock, OpRunner? runner})
       : store = DeviceStore(config.dataDir, clock: clock),
         audit = AuditLog(config.dataDir, clock: clock),
-        runner = runner ?? OpRunner(RootGuard(config.roots));
+        runner = runner ?? OpRunner(RootGuard(config.roots), backups: BackupManager(config.dataDir, clock: clock));
 
   final CompanionConfig config;
   final DeviceStore store;
@@ -104,7 +105,13 @@ class CompanionServer {
       res.statusCode = 403;
       res.write(jsonEncode(errorEnvelope(e.code, e.message)));
     } on OpValidationError catch (e) {
-      res.statusCode = e.code == ErrorCodes.conflict ? 409 : 400;
+      res.statusCode = switch (e.code) {
+        ErrorCodes.conflict => 409,
+        ErrorCodes.secretDetected => 422,
+        ErrorCodes.notFound => 404,
+        ErrorCodes.pathOutsideRoot => 403,
+        _ => 400,
+      };
       res.write(jsonEncode(errorEnvelope(e.code, e.message)));
     } catch (e) {
       res.statusCode = 500;

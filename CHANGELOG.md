@@ -2,7 +2,16 @@
 
 Format inspiré de « Keep a Changelog ». Versions non publiées.
 
-## [Non publié] — Phase 4 : compagnon Linux (2026-11-12)
+## [Non publié] — Phase 5 : Atelier Git local (2026-11-13)
+
+### Ajouté
+- Compagnon : audit non destructif, branches, restore avec sauvegarde automatique, mise à jour du .gitignore, sauvegardes et restauration dans un nouveau dossier ; blocage des secrets à l'ajout et au commit.
+- Onglet Atelier : projets, audit et plan proposé, changements et diff, historique et branches, sauvegardes.
+
+### Corrigé
+- Branche inconnue sur un dépôt sans commit ; diff périmé après commit ; en-tête trop haut sur téléphone ; affichage « 0 Ko ».
+
+## Phase 4 : compagnon Linux (2026-11-12)
 
 ### Ajouté
 - Paquet partagé `cambuse_protocol` (contrat d'API v1) et exécutable `cambuse-companion` (serve, pair, devices, revoke, audit).

@@ -2,7 +2,7 @@
 
 États : ⬜ non commencé · 🟨 partiel · ✅ réel et testé · ⛔ bloqué
 
-Dernière mise à jour : 2026-11-12 (fin de phase 4)
+Dernière mise à jour : 2026-11-12 (fin de phase 5)
 
 | Phase | Fonctionnalité | État | Preuve / remarque |
 |---|---|---|---|
@@ -19,7 +19,7 @@ Dernière mise à jour : 2026-11-12 (fin de phase 4)
 | 2 | Progression persistante, reprise après redémarrage | ✅ | widget + Honor (base lue après redémarrage) ; répétition espacée Leitner |
 | 3 | Agent IA multifournisseur, coffre de clés, mode sans IA | ✅ | Anthropic testé en réel sur Honor ; compatible OpenAI testé sur serveur simulé — [PHASE3_BILAN.md](PHASE3_BILAN.md) |
 | 4 | Compagnon Linux, appairage, API v1 | ✅ | 27 tests sécurité + contrat réel ; essai réel Honor (lecture + mutation approuvée) ; LAN TLS non essayé depuis le téléphone — [PHASE4_BILAN.md](PHASE4_BILAN.md) |
-| 5 | Atelier Git local (import, audit, diff, init, commit) | ⬜ | |
+| 5 | Atelier Git local (import, audit, diff, init, commit) | ✅ | 39 tests compagnon, 174 app ; scénario complet réel sur Honor — [PHASE5_BILAN.md](PHASE5_BILAN.md) |
 | 6 | GitHub / GitLab (dépôt privé, push avec consentement) | ⬜ | glab absent |
 | 7 | Docker et Compose | ⬜ | |
 | 8 | CI/CD générée, APK debug, .deb, checksums | ⬜ | |
@@ -34,7 +34,7 @@ Dernière mise à jour : 2026-11-12 (fin de phase 4)
 | APK debug installé sur appareil + .deb sur Linux, démarrage sans écran blanc | 🟨 APK installé et démarré sur Honor MTN-NX1M ; .deb en phase 8 |
 | Profil local, 1 module Git complet, progression conservée | ✅ |
 | Chat IA avec fournisseur ; contenu consultable sans fournisseur | ✅ (claude-opus-5-5, essai réel) |
-| Import projet Flutter Linux, audit, diff, plan sans mutation non consentie | ⬜ |
-| Git local, dépôt privé de test avec consentement, push, rapport | ⬜ |
+| Import projet Flutter Linux, audit, diff, plan sans mutation non consentie | ✅ (via compagnon ; essai réel depuis le Honor) |
+| Git local, dépôt privé de test avec consentement, push, rapport | 🟨 Git local ✅ ; dépôt distant et push en phase 6 |
 | Pipeline analyse/tests + APK de test, limites de signature affichées | ⬜ |
 | Logs, erreurs, artefacts, historique, reprise après échec | 🟨 (journal de bord seulement) |

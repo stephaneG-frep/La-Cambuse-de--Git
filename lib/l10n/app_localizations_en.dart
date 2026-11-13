@@ -774,4 +774,193 @@ class AppLocalizationsEn extends AppLocalizations {
   String compGit(String version) {
     return 'Git: $version';
   }
+
+  @override
+  String get wsTitle => 'Shipyard';
+
+  @override
+  String get wsSubtitle =>
+      'Your projects on the Linux PC, through the companion. Nothing changes without your approval.';
+
+  @override
+  String get wsNotPaired =>
+      'The Workshop goes through the Linux companion: the app never acts on your files by itself.';
+
+  @override
+  String get wsOpenCompanion => 'Set up the companion';
+
+  @override
+  String get wsProjects => 'Projects';
+
+  @override
+  String get wsNoProjects => 'No subfolder in this allowed folder.';
+
+  @override
+  String get wsGitRepo => 'Git repository';
+
+  @override
+  String get wsNoGit => 'No Git yet';
+
+  @override
+  String get wsRefresh => 'Refresh';
+
+  @override
+  String get wsTabAudit => 'Audit';
+
+  @override
+  String get wsTabChanges => 'Changes';
+
+  @override
+  String get wsTabHistory => 'History';
+
+  @override
+  String get wsTabBackups => 'Backups';
+
+  @override
+  String get wsRunAudit => 'Run audit (read-only)';
+
+  @override
+  String get wsAuditIntro =>
+      'The audit reads the project without changing anything: secrets, large files, artefacts, .gitignore, licence and Git state.';
+
+  @override
+  String get wsBlocking => 'Blocking';
+
+  @override
+  String get wsWarning => 'Warning';
+
+  @override
+  String get wsInfo => 'Info';
+
+  @override
+  String wsFilesCount(int files, String size) {
+    return '$files files scanned · $size';
+  }
+
+  @override
+  String get wsNoFindings => 'No problem found. Fair winds!';
+
+  @override
+  String get wsPlan => 'Proposed plan';
+
+  @override
+  String get wsStepBackup => '1. Back up the project';
+
+  @override
+  String get wsStepInit => '2. Initialise Git (main branch)';
+
+  @override
+  String wsStepGitignore(int count) {
+    return '3. Complete .gitignore (+$count lines)';
+  }
+
+  @override
+  String wsStepFixBlocking(int count) {
+    return 'Fix the $count blocking problem(s) first: no commit is possible with a secret.';
+  }
+
+  @override
+  String get wsStepCommit => '4. Stage and commit in the Changes tab';
+
+  @override
+  String get wsDone => 'Done';
+
+  @override
+  String get wsDo => 'Run';
+
+  @override
+  String get wsClean => 'Working tree clean: nothing to commit.';
+
+  @override
+  String get wsSelectAll => 'Select all';
+
+  @override
+  String get wsStage => 'Stage';
+
+  @override
+  String get wsUnstage => 'Unstage';
+
+  @override
+  String get wsDiscard => 'Discard changes';
+
+  @override
+  String get wsDiscardHint => 'An automatic backup is made first.';
+
+  @override
+  String get wsCommitMessage =>
+      'Commit message (imperative, e.g. \"Add home screen\")';
+
+  @override
+  String get wsCommit => 'Commit';
+
+  @override
+  String get wsStaged => 'Staged';
+
+  @override
+  String get wsUnstagedLabel => 'Not staged';
+
+  @override
+  String get wsUntracked => 'Untracked';
+
+  @override
+  String get wsDiffUntracked =>
+      'Untracked file: stage it to see its content in the diff.';
+
+  @override
+  String get wsNoDiff => 'No differences.';
+
+  @override
+  String get wsBranches => 'Branches';
+
+  @override
+  String get wsNewBranch => 'New branch';
+
+  @override
+  String get wsCreateBranch => 'Create';
+
+  @override
+  String get wsSwitch => 'Switch';
+
+  @override
+  String get wsCommits => 'Latest commits';
+
+  @override
+  String get wsNoCommits => 'No commits yet.';
+
+  @override
+  String get wsBackupNow => 'Back up now';
+
+  @override
+  String get wsNoBackups => 'No backup for this project.';
+
+  @override
+  String get wsRestore => 'Restore into a new folder';
+
+  @override
+  String wsRestoredTo(String path) {
+    return 'Restored into: $path';
+  }
+
+  @override
+  String wsBackupFiles(int count) {
+    return 'Files ($count)';
+  }
+
+  @override
+  String get wsBackupProject => 'Full project';
+
+  @override
+  String wsOpDone(String op) {
+    return '$op: done.';
+  }
+
+  @override
+  String wsOpFailed(String op) {
+    return '$op: failed.';
+  }
+
+  @override
+  String wsBranchLabel(String branch) {
+    return 'Branch: $branch';
+  }
 }

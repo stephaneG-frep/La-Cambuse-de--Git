@@ -4,6 +4,8 @@
 /// formats JSON : l'application et le compagnon l'importent tous les deux.
 library;
 
+export 'secret_scan.dart';
+
 const apiVersion = 1;
 const defaultLoopbackPort = 47820;
 const defaultLanPort = 47821;
@@ -29,13 +31,22 @@ enum Scope {
 enum OpType {
   systemInfo('system.info', Scope.read, mutating: false),
   projectList('project.list', Scope.read, mutating: false),
+  projectAudit('project.audit', Scope.read, mutating: false),
+  gitBranches('git.branches', Scope.read, mutating: false),
+  backupList('backup.list', Scope.read, mutating: false),
+  projectBackup('project.backup', Scope.gitWrite, mutating: false),
   projectDetect('project.detect', Scope.read, mutating: false),
   gitStatus('git.status', Scope.read, mutating: false),
   gitLog('git.log', Scope.read, mutating: false),
   gitDiff('git.diff', Scope.read, mutating: false),
   gitInit('git.init', Scope.gitWrite, mutating: true),
   gitAdd('git.add', Scope.gitWrite, mutating: true),
-  gitCommit('git.commit', Scope.gitWrite, mutating: true);
+  gitCommit('git.commit', Scope.gitWrite, mutating: true),
+  gitBranchCreate('git.branch.create', Scope.gitWrite, mutating: true),
+  gitSwitch('git.switch', Scope.gitWrite, mutating: true),
+  gitRestore('git.restore', Scope.gitWrite, mutating: true),
+  gitignoreUpdate('gitignore.update', Scope.gitWrite, mutating: true),
+  backupRestore('backup.restore', Scope.gitWrite, mutating: true);
 
   const OpType(this.code, this.scope, {required this.mutating});
 
@@ -83,6 +94,7 @@ abstract final class ErrorCodes {
   static const conflict = 'conflict';
   static const tooLarge = 'request_too_large';
   static const localOnly = 'local_only';
+  static const secretDetected = 'secret_detected';
 }
 
 class OpRequest {

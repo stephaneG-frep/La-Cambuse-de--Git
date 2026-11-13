@@ -467,5 +467,120 @@
         "type": "String"
       }
     }
+  },
+  "wsTitle": "Chantier naval",
+  "wsSubtitle": "Vos projets sur le PC Linux, via le compagnon. Rien n'est modifié sans votre accord.",
+  "wsNotPaired": "L'Atelier passe par le compagnon Linux : l'application n'agit jamais seule sur vos fichiers.",
+  "wsOpenCompanion": "Configurer le compagnon",
+  "wsProjects": "Projets",
+  "wsNoProjects": "Aucun sous-dossier dans ce dossier autorisé.",
+  "wsGitRepo": "Dépôt Git",
+  "wsNoGit": "Pas encore de Git",
+  "wsRefresh": "Actualiser",
+  "wsTabAudit": "Audit",
+  "wsTabChanges": "Changements",
+  "wsTabHistory": "Historique",
+  "wsTabBackups": "Sauvegardes",
+  "wsRunAudit": "Lancer l'audit (lecture seule)",
+  "wsAuditIntro": "L'audit lit le projet sans rien modifier : secrets, gros fichiers, artefacts, .gitignore, licence et état Git.",
+  "wsBlocking": "Bloquant",
+  "wsWarning": "Attention",
+  "wsInfo": "Info",
+  "wsFilesCount": "{files} fichiers analysés · {size}",
+  "@wsFilesCount": {
+    "placeholders": {
+      "files": {
+        "type": "int"
+      },
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "wsNoFindings": "Aucun problème détecté. Bon vent !",
+  "wsPlan": "Plan proposé",
+  "wsStepBackup": "1. Sauvegarder le projet",
+  "wsStepInit": "2. Initialiser Git (branche main)",
+  "wsStepGitignore": "3. Compléter le .gitignore (+{count} lignes)",
+  "@wsStepGitignore": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "wsStepFixBlocking": "Corrigez d'abord les {count} problème(s) bloquant(s) : aucun commit ne sera possible avec un secret.",
+  "@wsStepFixBlocking": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "wsStepCommit": "4. Indexer et valider dans l'onglet Changements",
+  "wsDone": "Fait",
+  "wsDo": "Exécuter",
+  "wsClean": "Copie de travail propre : rien à valider.",
+  "wsSelectAll": "Tout sélectionner",
+  "wsStage": "Indexer",
+  "wsUnstage": "Désindexer",
+  "wsDiscard": "Annuler les modifications",
+  "wsDiscardHint": "Une sauvegarde automatique est faite avant.",
+  "wsCommitMessage": "Message de commit (impératif, ex. « Ajoute l'écran d'accueil »)",
+  "wsCommit": "Valider (commit)",
+  "wsStaged": "Indexé",
+  "wsUnstagedLabel": "Non indexé",
+  "wsUntracked": "Non suivi",
+  "wsDiffUntracked": "Fichier non suivi : indexez-le pour voir son contenu dans le diff.",
+  "wsNoDiff": "Aucune différence.",
+  "wsBranches": "Branches",
+  "wsNewBranch": "Nouvelle branche",
+  "wsCreateBranch": "Créer",
+  "wsSwitch": "Basculer",
+  "wsCommits": "Derniers commits",
+  "wsNoCommits": "Aucun commit pour l'instant.",
+  "wsBackupNow": "Sauvegarder maintenant",
+  "wsNoBackups": "Aucune sauvegarde pour ce projet.",
+  "wsRestore": "Restaurer dans un nouveau dossier",
+  "wsRestoredTo": "Restauré dans : {path}",
+  "@wsRestoredTo": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "wsBackupFiles": "Fichiers ({count})",
+  "@wsBackupFiles": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "wsBackupProject": "Projet complet",
+  "wsOpDone": "{op} : terminé.",
+  "@wsOpDone": {
+    "placeholders": {
+      "op": {
+        "type": "String"
+      }
+    }
+  },
+  "wsOpFailed": "{op} : échec.",
+  "@wsOpFailed": {
+    "placeholders": {
+      "op": {
+        "type": "String"
+      }
+    }
+  },
+  "wsBranchLabel": "Branche : {branch}",
+  "@wsBranchLabel": {
+    "placeholders": {
+      "branch": {
+        "type": "String"
+      }
+    }
   }
 }

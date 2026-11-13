@@ -1405,6 +1405,342 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Git : {version}'**
   String compGit(String version);
+
+  /// No description provided for @wsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Chantier naval'**
+  String get wsTitle;
+
+  /// No description provided for @wsSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vos projets sur le PC Linux, via le compagnon. Rien n\'est modifié sans votre accord.'**
+  String get wsSubtitle;
+
+  /// No description provided for @wsNotPaired.
+  ///
+  /// In fr, this message translates to:
+  /// **'L\'Atelier passe par le compagnon Linux : l\'application n\'agit jamais seule sur vos fichiers.'**
+  String get wsNotPaired;
+
+  /// No description provided for @wsOpenCompanion.
+  ///
+  /// In fr, this message translates to:
+  /// **'Configurer le compagnon'**
+  String get wsOpenCompanion;
+
+  /// No description provided for @wsProjects.
+  ///
+  /// In fr, this message translates to:
+  /// **'Projets'**
+  String get wsProjects;
+
+  /// No description provided for @wsNoProjects.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun sous-dossier dans ce dossier autorisé.'**
+  String get wsNoProjects;
+
+  /// No description provided for @wsGitRepo.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dépôt Git'**
+  String get wsGitRepo;
+
+  /// No description provided for @wsNoGit.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pas encore de Git'**
+  String get wsNoGit;
+
+  /// No description provided for @wsRefresh.
+  ///
+  /// In fr, this message translates to:
+  /// **'Actualiser'**
+  String get wsRefresh;
+
+  /// No description provided for @wsTabAudit.
+  ///
+  /// In fr, this message translates to:
+  /// **'Audit'**
+  String get wsTabAudit;
+
+  /// No description provided for @wsTabChanges.
+  ///
+  /// In fr, this message translates to:
+  /// **'Changements'**
+  String get wsTabChanges;
+
+  /// No description provided for @wsTabHistory.
+  ///
+  /// In fr, this message translates to:
+  /// **'Historique'**
+  String get wsTabHistory;
+
+  /// No description provided for @wsTabBackups.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sauvegardes'**
+  String get wsTabBackups;
+
+  /// No description provided for @wsRunAudit.
+  ///
+  /// In fr, this message translates to:
+  /// **'Lancer l\'audit (lecture seule)'**
+  String get wsRunAudit;
+
+  /// No description provided for @wsAuditIntro.
+  ///
+  /// In fr, this message translates to:
+  /// **'L\'audit lit le projet sans rien modifier : secrets, gros fichiers, artefacts, .gitignore, licence et état Git.'**
+  String get wsAuditIntro;
+
+  /// No description provided for @wsBlocking.
+  ///
+  /// In fr, this message translates to:
+  /// **'Bloquant'**
+  String get wsBlocking;
+
+  /// No description provided for @wsWarning.
+  ///
+  /// In fr, this message translates to:
+  /// **'Attention'**
+  String get wsWarning;
+
+  /// No description provided for @wsInfo.
+  ///
+  /// In fr, this message translates to:
+  /// **'Info'**
+  String get wsInfo;
+
+  /// No description provided for @wsFilesCount.
+  ///
+  /// In fr, this message translates to:
+  /// **'{files} fichiers analysés · {size}'**
+  String wsFilesCount(int files, String size);
+
+  /// No description provided for @wsNoFindings.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun problème détecté. Bon vent !'**
+  String get wsNoFindings;
+
+  /// No description provided for @wsPlan.
+  ///
+  /// In fr, this message translates to:
+  /// **'Plan proposé'**
+  String get wsPlan;
+
+  /// No description provided for @wsStepBackup.
+  ///
+  /// In fr, this message translates to:
+  /// **'1. Sauvegarder le projet'**
+  String get wsStepBackup;
+
+  /// No description provided for @wsStepInit.
+  ///
+  /// In fr, this message translates to:
+  /// **'2. Initialiser Git (branche main)'**
+  String get wsStepInit;
+
+  /// No description provided for @wsStepGitignore.
+  ///
+  /// In fr, this message translates to:
+  /// **'3. Compléter le .gitignore (+{count} lignes)'**
+  String wsStepGitignore(int count);
+
+  /// No description provided for @wsStepFixBlocking.
+  ///
+  /// In fr, this message translates to:
+  /// **'Corrigez d\'abord les {count} problème(s) bloquant(s) : aucun commit ne sera possible avec un secret.'**
+  String wsStepFixBlocking(int count);
+
+  /// No description provided for @wsStepCommit.
+  ///
+  /// In fr, this message translates to:
+  /// **'4. Indexer et valider dans l\'onglet Changements'**
+  String get wsStepCommit;
+
+  /// No description provided for @wsDone.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fait'**
+  String get wsDone;
+
+  /// No description provided for @wsDo.
+  ///
+  /// In fr, this message translates to:
+  /// **'Exécuter'**
+  String get wsDo;
+
+  /// No description provided for @wsClean.
+  ///
+  /// In fr, this message translates to:
+  /// **'Copie de travail propre : rien à valider.'**
+  String get wsClean;
+
+  /// No description provided for @wsSelectAll.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tout sélectionner'**
+  String get wsSelectAll;
+
+  /// No description provided for @wsStage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Indexer'**
+  String get wsStage;
+
+  /// No description provided for @wsUnstage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Désindexer'**
+  String get wsUnstage;
+
+  /// No description provided for @wsDiscard.
+  ///
+  /// In fr, this message translates to:
+  /// **'Annuler les modifications'**
+  String get wsDiscard;
+
+  /// No description provided for @wsDiscardHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Une sauvegarde automatique est faite avant.'**
+  String get wsDiscardHint;
+
+  /// No description provided for @wsCommitMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Message de commit (impératif, ex. « Ajoute l\'écran d\'accueil »)'**
+  String get wsCommitMessage;
+
+  /// No description provided for @wsCommit.
+  ///
+  /// In fr, this message translates to:
+  /// **'Valider (commit)'**
+  String get wsCommit;
+
+  /// No description provided for @wsStaged.
+  ///
+  /// In fr, this message translates to:
+  /// **'Indexé'**
+  String get wsStaged;
+
+  /// No description provided for @wsUnstagedLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Non indexé'**
+  String get wsUnstagedLabel;
+
+  /// No description provided for @wsUntracked.
+  ///
+  /// In fr, this message translates to:
+  /// **'Non suivi'**
+  String get wsUntracked;
+
+  /// No description provided for @wsDiffUntracked.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fichier non suivi : indexez-le pour voir son contenu dans le diff.'**
+  String get wsDiffUntracked;
+
+  /// No description provided for @wsNoDiff.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune différence.'**
+  String get wsNoDiff;
+
+  /// No description provided for @wsBranches.
+  ///
+  /// In fr, this message translates to:
+  /// **'Branches'**
+  String get wsBranches;
+
+  /// No description provided for @wsNewBranch.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouvelle branche'**
+  String get wsNewBranch;
+
+  /// No description provided for @wsCreateBranch.
+  ///
+  /// In fr, this message translates to:
+  /// **'Créer'**
+  String get wsCreateBranch;
+
+  /// No description provided for @wsSwitch.
+  ///
+  /// In fr, this message translates to:
+  /// **'Basculer'**
+  String get wsSwitch;
+
+  /// No description provided for @wsCommits.
+  ///
+  /// In fr, this message translates to:
+  /// **'Derniers commits'**
+  String get wsCommits;
+
+  /// No description provided for @wsNoCommits.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun commit pour l\'instant.'**
+  String get wsNoCommits;
+
+  /// No description provided for @wsBackupNow.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sauvegarder maintenant'**
+  String get wsBackupNow;
+
+  /// No description provided for @wsNoBackups.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune sauvegarde pour ce projet.'**
+  String get wsNoBackups;
+
+  /// No description provided for @wsRestore.
+  ///
+  /// In fr, this message translates to:
+  /// **'Restaurer dans un nouveau dossier'**
+  String get wsRestore;
+
+  /// No description provided for @wsRestoredTo.
+  ///
+  /// In fr, this message translates to:
+  /// **'Restauré dans : {path}'**
+  String wsRestoredTo(String path);
+
+  /// No description provided for @wsBackupFiles.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fichiers ({count})'**
+  String wsBackupFiles(int count);
+
+  /// No description provided for @wsBackupProject.
+  ///
+  /// In fr, this message translates to:
+  /// **'Projet complet'**
+  String get wsBackupProject;
+
+  /// No description provided for @wsOpDone.
+  ///
+  /// In fr, this message translates to:
+  /// **'{op} : terminé.'**
+  String wsOpDone(String op);
+
+  /// No description provided for @wsOpFailed.
+  ///
+  /// In fr, this message translates to:
+  /// **'{op} : échec.'**
+  String wsOpFailed(String op);
+
+  /// No description provided for @wsBranchLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Branche : {branch}'**
+  String wsBranchLabel(String branch);
 }
 
 class _AppLocalizationsDelegate

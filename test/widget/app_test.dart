@@ -65,7 +65,7 @@ void main() {
     final db = await pumpApp(tester, size: desktop);
     await tester.tap(find.text('Atelier').last);
     await tester.pumpAndSettle();
-    expect(find.textContaining('phase 5 de la feuille de route'), findsOneWidget);
+    expect(find.text('Chantier naval'), findsOneWidget);
     await teardown(tester, db);
   });
 

@@ -23,7 +23,9 @@ build/companion/cambuse-companion devices | revoke ID | audit
 | Appairage | code à 6 chiffres généré sur l'hôte (jeton administrateur local), 2 min, usage unique, 5 essais max |
 | Jetons | accès 15 min (mémoire), rafraîchissement avec rotation, stockés hachés (SHA-256), révocables |
 | Portées | `read` (par défaut), `git-write` accordée explicitement sur l'hôte |
-| Opérations | liste blanche typée : `system.info`, `project.list`, `project.detect`, `git.status/log/diff`, `git.init/add/commit` ; aucun shell |
+| Opérations | liste blanche typée : lecture `system.info`, `project.list/detect/audit`, `git.status/log/diff/branches`, `backup.list` ; écriture `project.backup`, `git.init/add/commit/branch.create/switch/restore`, `gitignore.update`, `backup.restore` ; aucun shell |
+| Secrets | `git.add` et `git.commit` (contenu indexé, re-vérifié à l'exécution) bloqués si un secret probable est détecté ; valeurs jamais renvoyées |
+| Sauvegardes | automatique avant `git.restore` ; restauration toujours dans un nouveau dossier, jamais par écrasement |
 | Consentement | toute opération mutante attend une approbation explicite (`/approve`) ; refus possible |
 | Chemins | confinés aux `--root`, liens symboliques résolus, `..` et `.git` refusés ; ajout global ou de dossier refusé |
 | Dépôts piégés | `core.hooksPath=/dev/null`, `core.fsmonitor=false`, pas de diff externe ni de textconv, `--no-verify` ; opérations mutantes refusées si `.git/config` déclare filtres, pagers, alias, etc. |

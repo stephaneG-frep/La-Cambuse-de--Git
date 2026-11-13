@@ -5,7 +5,9 @@ import 'dart:typed_data';
 
 import 'package:cambuse_protocol/cambuse_protocol.dart';
 
+import 'backups.dart';
 import 'paths.dart';
+import 'project_audit.dart';
 import 'store.dart';
 
 class OpValidationError implements Exception {
@@ -23,8 +25,13 @@ class PreparedOp {
     required this.plan,
     this.gitArgs,
     this.internal,
+    this.before,
     this.timeout = const Duration(seconds: 30),
   });
+
+  /// Étape exécutée juste avant la commande (sauvegarde automatique,
+  /// re-vérification des secrets). Peut lever une [OpValidationError].
+  final Future<Map<String, dynamic>?> Function()? before;
 
   final OpType type;
   final String? root;
@@ -90,7 +97,11 @@ class OpRunner {
     this.maxOutputBytes = 1 << 20,
     this.gitExecutable = 'git',
     this.opTimeout = const Duration(seconds: 30),
+    this.backups,
   });
+
+  /// Sauvegardes (absentes = opérations de sauvegarde indisponibles).
+  final BackupManager? backups;
 
   /// Délai maximal d'une commande git.
   final Duration opTimeout;
@@ -154,14 +165,145 @@ class OpRunner {
           throw OpValidationError(ErrorCodes.invalidRequest,
               'Ajout global ou de dossier refusé : listez les fichiers un par un (protection contre l\'ajout de secrets).');
         }
-        return _git(type, root, ['add', '--', for (final x in paths) RootGuard.resolveInProject(root, x)]);
+        final files = [for (final x in paths) RootGuard.resolveInProject(root, x)];
+        _blockSecrets(_scanWorktree(root, files));
+        final op = _git(type, root, ['add', '--', ...files]);
+        return PreparedOp(type: type, root: root, gitArgs: op.gitArgs, plan: op.plan, timeout: opTimeout,
+            before: () async {
+              _blockSecrets(_scanWorktree(root, files));
+              return null;
+            });
       case OpType.gitCommit:
         _checkRepoConfig(root);
         final msg = (p['message'] as String? ?? '').trim();
         if (msg.isEmpty || msg.length > 5000 || msg.contains('\u0000')) {
           throw OpValidationError(ErrorCodes.invalidRequest, 'Message de commit vide ou invalide.');
         }
-        return _git(type, root, ['commit', '--no-verify', '-m', msg]);
+        final op = _git(type, root, ['commit', '--no-verify', '-m', msg]);
+        return PreparedOp(
+          type: type,
+          root: root,
+          gitArgs: op.gitArgs,
+          timeout: opTimeout,
+          plan: [...op.plan, 'Contenu indexé analysé : commit bloqué si un secret est détecté.'],
+          before: () async {
+            _blockSecrets(await _scanStaged(root));
+            return null;
+          },
+        );
+      case OpType.projectAudit:
+        return PreparedOp(
+          type: type,
+          root: root,
+          plan: ['Audit en lecture seule de $root (aucune écriture)'],
+          timeout: const Duration(minutes: 2),
+          internal: () => auditProject(root, git: (a) => gitRead(root, a)),
+        );
+      case OpType.gitBranches:
+        return _git(type, root, ['branch', '--list', '--no-color', '--format=%(HEAD)|%(refname:short)|%(objectname:short)|%(subject)']);
+      case OpType.backupList:
+        final b = _requireBackups();
+        return PreparedOp(type: type, root: root, plan: ['Lister les sauvegardes de $root'],
+            internal: () async => {'backups': b.list(project: root)});
+      case OpType.projectBackup:
+        final b = _requireBackups();
+        return PreparedOp(
+          type: type,
+          root: root,
+          plan: ['Archiver $root (dossiers générés exclus, .git inclus) dans le dossier privé du compagnon', 'Le projet n\'est pas modifié.'],
+          timeout: const Duration(minutes: 5),
+          internal: () => b.backupProject(root),
+        );
+      case OpType.gitBranchCreate:
+        _requireRepo(root);
+        final name = _branchName(p['name']);
+        return _git(type, root, ['branch', name]);
+      case OpType.gitSwitch:
+        _requireRepo(root);
+        _checkRepoConfig(root);
+        final name = _branchName(p['name']);
+        return _git(type, root, ['switch', name]);
+      case OpType.gitRestore:
+        _requireRepo(root);
+        _checkRepoConfig(root);
+        final paths = _explicitFiles(root, p['paths']);
+        if (p['staged'] == true) {
+          return _git(type, root, ['restore', '--staged', '--', ...paths]);
+        }
+        final b = _requireBackups();
+        final op = _git(type, root, ['restore', '--', ...paths]);
+        return PreparedOp(
+          type: type,
+          root: root,
+          gitArgs: op.gitArgs,
+          timeout: opTimeout,
+          plan: [
+            ...op.plan,
+            'Écrase les modifications locales de ${paths.length} fichier(s).',
+            'Sauvegarde automatique de ces fichiers avant écrasement (restaurable).',
+          ],
+          before: () async => {'backup': b.backupFiles(root, paths, reason: 'Avant git restore')},
+        );
+      case OpType.gitignoreUpdate:
+        final lines = ((p['lines'] as List?) ?? const []).map((e) => '$e'.trim()).toList();
+        if (lines.isEmpty || lines.length > 100 ||
+            lines.any((l) => l.isEmpty || l.length > 200 || l.contains('\n') || l.contains('\u0000'))) {
+          throw OpValidationError(ErrorCodes.invalidRequest, 'Lignes .gitignore invalides.');
+        }
+        RootGuard.resolveInProject(root, '.gitignore');
+        final file = File('$root/.gitignore');
+        final current = file.existsSync() ? file.readAsStringSync() : '';
+        final present = current.split('\n').map((l) => l.trim()).toSet();
+        final add = [for (final l in lines.toSet()) if (!present.contains(l)) l];
+        if (add.isEmpty) {
+          throw OpValidationError(ErrorCodes.conflict, 'Toutes ces lignes sont déjà dans le .gitignore.');
+        }
+        return PreparedOp(
+          type: type,
+          root: root,
+          plan: [
+            'Fichier : $root/.gitignore${file.existsSync() ? '' : ' (création)'}',
+            'Lignes ajoutées :',
+            for (final l in add) '+ $l',
+            'Modifie le projet : approbation requise.',
+          ],
+          internal: () async {
+            final base = file.existsSync() ? file.readAsStringSync() : '';
+            final sep = base.isEmpty || base.endsWith('\n') ? '' : '\n';
+            final tmp = File('$root/.gitignore.cambuse-tmp');
+            tmp.writeAsStringSync('$base$sep${add.join('\n')}\n', flush: true);
+            tmp.renameSync(file.path);
+            return {'added': add};
+          },
+        );
+      case OpType.backupRestore:
+        final b = _requireBackups();
+        final id = '${p['id'] ?? ''}';
+        final Map<String, dynamic> meta;
+        try {
+          meta = b.get(id);
+        } on ArgumentError catch (e) {
+          throw OpValidationError(ErrorCodes.notFound, '${e.message}');
+        }
+        if (meta['project'] != root) {
+          throw OpValidationError(ErrorCodes.invalidRequest, 'Cette sauvegarde appartient à un autre projet.');
+        }
+        final parent = File(root).parent.path;
+        if (!guard.roots.any((r) => parent == r || parent.startsWith('$r/'))) {
+          throw OpValidationError(ErrorCodes.pathOutsideRoot,
+              'La restauration créerait un dossier hors des dossiers autorisés ($parent).');
+        }
+        return PreparedOp(
+          type: type,
+          root: root,
+          timeout: const Duration(minutes: 5),
+          plan: [
+            'Sauvegarde : $id (${meta['kind']}, ${meta['createdAt']})',
+            'Restauration dans un NOUVEAU dossier à côté de $root : rien n\'est écrasé.',
+            'Crée des fichiers : approbation requise.',
+          ],
+          internal: () async => {'restoredTo': await b.restoreToNewFolder(id)},
+        );
       case OpType.systemInfo:
         throw StateError('inatteignable');
     }
@@ -181,6 +323,95 @@ class OpRunner {
 
   static String _quote(String a) =>
       RegExp(r'^[A-Za-z0-9._/=:@,+-]+$').hasMatch(a) ? a : "'${a.replaceAll("'", r"'\''")}'";
+
+
+  BackupManager _requireBackups() =>
+      backups ?? (throw OpValidationError(ErrorCodes.invalidRequest, 'Sauvegardes indisponibles sur ce compagnon.'));
+
+  void _requireRepo(String root) {
+    if (FileSystemEntity.typeSync('$root/.git', followLinks: false) == FileSystemEntityType.notFound) {
+      throw OpValidationError(ErrorCodes.conflict, 'Ce dossier n\'est pas un dépôt Git.');
+    }
+  }
+
+  static String _branchName(Object? raw) {
+    final n = '${raw ?? ''}'.trim();
+    if (!RegExp(r'^[A-Za-z0-9][A-Za-z0-9._/-]{0,99}$').hasMatch(n) ||
+        n.contains('..') || n.contains('//') || n.endsWith('/') || n.endsWith('.') || n.endsWith('.lock')) {
+      throw OpValidationError(ErrorCodes.invalidRequest, 'Nom de branche invalide : « $n ».');
+    }
+    return n;
+  }
+
+  static List<String> _explicitFiles(String root, Object? raw) {
+    final paths = ((raw as List?) ?? const []).map((e) => '$e').toList();
+    if (paths.isEmpty || paths.length > 500) {
+      throw OpValidationError(ErrorCodes.invalidRequest, 'Indiquez entre 1 et 500 fichiers explicites.');
+    }
+    if (paths.any((x) => x.contains('*') || x.split('/').every((s) => s == '.' || s.isEmpty) ||
+        FileSystemEntity.isDirectorySync('$root/$x'))) {
+      throw OpValidationError(ErrorCodes.invalidRequest, 'Listez les fichiers un par un (pas de dossier ni de motif).');
+    }
+    return [for (final x in paths) RootGuard.resolveInProject(root, x)];
+  }
+
+  static void _blockSecrets(List<SecretFinding> found) {
+    if (found.isEmpty) return;
+    final lines = found.take(10).map((f) => '${f.file}${f.line == null ? '' : ':${f.line}'} — ${f.kind}').join('\n');
+    throw OpValidationError(ErrorCodes.secretDetected,
+        'Secret probable détecté : opération bloquée.\n$lines\n'
+        'Retirez-le (et révoquez-le s\'il a fuité), ou ignorez le fichier via .gitignore.');
+  }
+
+  static List<SecretFinding> _scanWorktree(String root, List<String> files) {
+    final out = <SecretFinding>[];
+    for (final f in files) {
+      final kind = sensitiveFileKind(f);
+      if (kind != null) out.add(SecretFinding(f, kind));
+      final file = File('$root/$f');
+      if (!file.existsSync() || file.lengthSync() > 1024 * 1024) continue;
+      final raw = file.readAsBytesSync();
+      if (!looksBinary(raw)) out.addAll(scanContent(f, utf8.decode(raw, allowMalformed: true), maxFindings: 3));
+    }
+    return out;
+  }
+
+  Future<List<SecretFinding>> _scanStaged(String root) async {
+    final names = await gitRead(root, ['diff', '--cached', '--name-only', '-z', '--no-renames', '--diff-filter=ACM']);
+    final out = <SecretFinding>[];
+    for (final f in (names.stdout as String).split('\u0000').where((x) => x.isNotEmpty)) {
+      final kind = sensitiveFileKind(f);
+      if (kind != null) out.add(SecretFinding(f, kind));
+      final blob = await gitRead(root, ['cat-file', 'blob', ':$f'], binary: true);
+      if (blob.exitCode != 0) continue;
+      final bytes = blob.stdout as List<int>;
+      if (bytes.length > 1024 * 1024 || looksBinary(bytes)) continue;
+      out.addAll(scanContent(f, utf8.decode(bytes, allowMalformed: true), maxFindings: 3));
+    }
+    return out;
+  }
+
+  Map<String, String> get _gitEnv => {
+        'PATH': Platform.environment['PATH'] ?? '/usr/bin:/bin',
+        'HOME': Platform.environment['HOME'] ?? '/tmp',
+        'LANG': 'C.UTF-8',
+        'GIT_TERMINAL_PROMPT': '0',
+        'GIT_CONFIG_NOSYSTEM': '1',
+        'GIT_PAGER': 'cat',
+        'GIT_EDITOR': 'true',
+        'GIT_ASKPASS': 'true',
+        'GIT_OPTIONAL_LOCKS': '0',
+      };
+
+  /// Appel git en lecture (audit, contrôles), même durcissement que les opérations.
+  Future<ProcessResult> gitRead(String root, List<String> args, {bool binary = false}) => Process.run(
+        gitExecutable,
+        [...hardenedGitConfig, ...args],
+        workingDirectory: root,
+        includeParentEnvironment: false,
+        environment: _gitEnv,
+        stdoutEncoding: binary ? null : utf8,
+      ).timeout(opTimeout);
 
   void _checkRepoConfig(String root) {
     final cfg = File('$root/.git/config');
@@ -254,8 +485,12 @@ class OpRunner {
     rec.state = OpState.running;
     final p = rec.prepared;
     try {
+      if (p.before != null) {
+        final extra = await p.before!();
+        if (extra != null) rec.result = {...?rec.result, ...extra};
+      }
       if (p.internal != null) {
-        rec.result = await p.internal!().timeout(p.timeout);
+        rec.result = {...?rec.result, ...await p.internal!().timeout(p.timeout)};
         rec.state = OpState.succeeded;
         return;
       }
@@ -264,17 +499,7 @@ class OpRunner {
         [...hardenedGitConfig, ...p.gitArgs!],
         workingDirectory: p.root,
         includeParentEnvironment: false,
-        environment: {
-          'PATH': Platform.environment['PATH'] ?? '/usr/bin:/bin',
-          'HOME': Platform.environment['HOME'] ?? '/tmp',
-          'LANG': 'C.UTF-8',
-          'GIT_TERMINAL_PROMPT': '0',
-          'GIT_CONFIG_NOSYSTEM': '1',
-          'GIT_PAGER': 'cat',
-          'GIT_EDITOR': 'true',
-          'GIT_ASKPASS': 'true',
-          'GIT_OPTIONAL_LOCKS': '0',
-        },
+        environment: _gitEnv,
       );
       rec.process = proc;
       final out = _collect(proc.stdout);
@@ -294,6 +519,9 @@ class OpRunner {
       } else {
         rec.state = code == 0 ? OpState.succeeded : OpState.failed;
       }
+    } on OpValidationError catch (e) {
+      rec.state = OpState.failed;
+      rec.error = e.message;
     } on ProcessException catch (e) {
       rec.state = OpState.failed;
       rec.error = 'Impossible de lancer git : ${e.message}';

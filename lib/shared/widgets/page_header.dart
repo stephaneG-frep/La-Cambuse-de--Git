@@ -6,11 +6,14 @@ import '../../app/theme/tokens.dart';
 
 /// En-tête de page imbriquée dans une section (retour + titre « plaque »).
 class PageHeader extends StatelessWidget {
-  const PageHeader({super.key, required this.title, this.subtitle, this.trailing});
+  const PageHeader({super.key, required this.title, this.subtitle, this.trailing, this.subtitleMaxLines});
 
   final String title;
   final String? subtitle;
   final Widget? trailing;
+
+  /// Limite de lignes du sous-titre (points de suspension au-delà).
+  final int? subtitleMaxLines;
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +34,12 @@ class PageHeader extends StatelessWidget {
                   child: Text(title, style: text.headlineSmall?.copyWith(color: p.gold)),
                 ),
                 if (subtitle != null)
-                  Text(subtitle!, style: TextStyle(color: p.textSecondary)),
+                  Text(
+                    subtitle!,
+                    style: TextStyle(color: p.textSecondary),
+                    maxLines: subtitleMaxLines,
+                    overflow: subtitleMaxLines == null ? null : TextOverflow.ellipsis,
+                  ),
               ],
             ),
           ),

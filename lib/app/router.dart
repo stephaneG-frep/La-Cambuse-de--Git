@@ -14,6 +14,7 @@ import '../features/companion_link/presentation/companion_screen.dart';
 import '../features/dashboard/presentation/dashboard_screen.dart';
 import '../features/logbook/presentation/logbook_screen.dart';
 import '../features/settings/presentation/settings_screen.dart';
+import '../features/workshop/presentation/project_screen.dart' as workshop;
 import '../features/workshop/presentation/workshop_screen.dart';
 import 'shell/adaptive_shell.dart';
 
@@ -82,7 +83,18 @@ GoRouter buildRouter() => GoRouter(
                 ],
               ),
             ]),
-            _branch(Routes.workshop, const WorkshopScreen()),
+            StatefulShellBranch(routes: [
+              GoRoute(
+                path: Routes.workshop,
+                builder: (context, state) => const WorkshopScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'projet',
+                    builder: (c, s) => workshop.WorkshopProjectScreen(path: s.uri.queryParameters['chemin'] ?? ''),
+                  ),
+                ],
+              ),
+            ]),
             _branch(Routes.captain, const CaptainScreen()),
             _branch(Routes.logbook, const LogbookScreen()),
           ],
