@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:la_cambuse/core/db/database.dart';
+import 'package:la_cambuse/features/settings/presentation/settings_screen.dart';
 
 import '../helpers.dart';
 import 'widget_helpers.dart';
@@ -75,6 +76,9 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Contraste renforcé'));
     await tester.pumpAndSettle();
+    // Écran plus long que le téléphone : défilement jusqu'au choix de langue.
+    await tester.scrollUntilVisible(find.text('English'), 200,
+        scrollable: find.descendant(of: find.byType(SettingsScreen), matching: find.byType(Scrollable)).first);
     await tester.tap(find.text('English'));
     await tester.pumpAndSettle();
     expect(find.text('Settings'), findsOneWidget);

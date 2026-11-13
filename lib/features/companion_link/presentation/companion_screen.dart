@@ -114,7 +114,7 @@ class _PairFormState extends ConsumerState<_PairForm> {
                 padding: const EdgeInsets.all(CambuseSpacing.sm),
                 color: p.night,
                 child: SelectableText(
-                  'cambuse-companion serve --root ~/Projets\ncambuse-companion pair --scopes read,git-write',
+                  'cambuse-companion serve --root ~/Projets\ncambuse-companion pair --scopes read,git-write,remote',
                   style: TextStyle(fontFamily: 'monospace', color: p.turquoise),
                 ),
               ),

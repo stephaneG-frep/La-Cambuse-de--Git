@@ -16,9 +16,11 @@ Future<void> main(List<String> argv) async {
   parser.addCommand('serve', ArgParser()
     ..addMultiOption('root', help: 'Dossier autorisé (répétable). Obligatoire.')
     ..addFlag('lan', negatable: false, help: 'Écoute aussi sur le réseau local, en TLS uniquement.')
-    ..addOption('lan-port', defaultsTo: '$defaultLanPort'));
+    ..addOption('lan-port', defaultsTo: '$defaultLanPort')
+    ..addMultiOption('remote-host', defaultsTo: ['github.com', 'gitlab.com'],
+        help: 'Hôte HTTPS autorisé pour push/pull (répétable, ex. GitLab auto-hébergé).'));
   parser.addCommand('pair', ArgParser()
-    ..addOption('scopes', defaultsTo: 'read', help: 'Portées : read, git-write (séparées par des virgules).'));
+    ..addOption('scopes', defaultsTo: 'read', help: 'Portées : read, git-write, remote (séparées par des virgules).'));
   parser.addCommand('devices');
   parser.addCommand('revoke');
   parser.addCommand('audit', ArgParser()..addOption('limit', abbr: 'n', defaultsTo: '30'));
@@ -33,7 +35,7 @@ Future<void> main(List<String> argv) async {
   final cmd = args.command;
   if (args['help'] == true || cmd == null) {
     stdout.writeln('cambuse-companion — compagnon Linux de La Cambuse de Git\n\n'
-        'Commandes : serve --root DIR [--lan] | pair [--scopes read,git-write] | devices | revoke ID | audit\n\n'
+        'Commandes : serve --root DIR [--lan] [--remote-host H] | pair [--scopes read,git-write,remote] | devices | revoke ID | audit\n\n'
         '${parser.usage}');
     exit(cmd == null && args['help'] != true ? 64 : 0);
   }
@@ -60,6 +62,7 @@ Future<void> main(List<String> argv) async {
         port: port,
         lan: cmd['lan'] as bool,
         lanPort: int.parse(cmd['lan-port'] as String),
+        remoteHosts: (cmd['remote-host'] as List<String>).map((h) => h.toLowerCase()).toSet(),
       ));
       await server.start();
       stdout.writeln('Compagnon prêt sur http://127.0.0.1:${server.port}/v1');

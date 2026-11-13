@@ -26,8 +26,16 @@ class PreparedOp {
     this.gitArgs,
     this.internal,
     this.before,
+    this.env = const {},
+    this.secrets = const [],
     this.timeout = const Duration(seconds: 30),
   });
+
+  /// Variables d'environnement propres à l'opération (authentification).
+  final Map<String, String> env;
+
+  /// Valeurs à masquer dans toute sortie (jeton et dérivés).
+  final List<String> secrets;
 
   /// Étape exécutée juste avant la commande (sauvegarde automatique,
   /// re-vérification des secrets). Peut lever une [OpValidationError].
@@ -98,7 +106,15 @@ class OpRunner {
     this.gitExecutable = 'git',
     this.opTimeout = const Duration(seconds: 30),
     this.backups,
+    this.allowedRemoteHosts = const {'github.com', 'gitlab.com'},
+    this.allowFileRemotes = false,
   });
+
+  /// Hôtes autorisés pour les dépôts distants (HTTPS uniquement).
+  final Set<String> allowedRemoteHosts;
+
+  /// Tests uniquement : dépôts distants locaux (chemins dans les racines).
+  final bool allowFileRemotes;
 
   /// Sauvegardes (absentes = opérations de sauvegarde indisponibles).
   final BackupManager? backups;
@@ -304,6 +320,85 @@ class OpRunner {
           ],
           internal: () async => {'restoredTo': await b.restoreToNewFolder(id)},
         );
+      case OpType.gitRemoteList:
+        _requireRepo(root);
+        return _git(type, root, ['remote', '-v']);
+      case OpType.gitRemoteAdd:
+        _requireRepo(root);
+        _checkRepoConfig(root);
+        final name = _remoteName(p['name'] ?? 'origin');
+        final url = _remoteUrl('${p['url'] ?? ''}');
+        final existing = Process.runSync(gitExecutable, [...hardenedGitConfig, 'remote'],
+            workingDirectory: root, environment: _gitEnv, includeParentEnvironment: false);
+        if ('${existing.stdout}'.split('\n').map((l) => l.trim()).contains(name)) {
+          throw OpValidationError(ErrorCodes.conflict,
+              'Le dépôt distant « $name » existe déjà : il n\'est pas modifié (vos remotes sont préservés).');
+        }
+        return _git(type, root, ['remote', 'add', name, url]);
+      case OpType.gitOutgoing:
+        _requireRepo(root);
+        final name = _remoteName(p['remote'] ?? 'origin');
+        final branch = _branchName(p['branch']);
+        return PreparedOp(
+          type: type,
+          root: root,
+          plan: ['Analyser (lecture seule) ce que contiendrait un push de $branch vers $name'],
+          timeout: const Duration(minutes: 2),
+          internal: () => _outgoing(root, name, branch),
+        );
+      case OpType.gitPush:
+      case OpType.gitPull:
+        _requireRepo(root);
+        _checkRepoConfig(root);
+        final name = _remoteName(p['remote'] ?? 'origin');
+        final branch = _branchName(p['branch']);
+        final url = _configuredRemoteUrl(root, name);
+        final token = '${p['token'] ?? ''}';
+        final https = url.startsWith('https://');
+        if (https && token.isEmpty) {
+          throw OpValidationError(ErrorCodes.invalidRequest, 'Jeton requis pour un dépôt distant HTTPS.');
+        }
+        final auth = https ? _authEnv(url, token) : (env: <String, String>{}, secrets: <String>[]);
+        final push = type == OpType.gitPush;
+        final args = push
+            ? ['push', '--porcelain', name, 'refs/heads/$branch:refs/heads/$branch']
+            : ['pull', '--ff-only', '--no-rebase', name, branch];
+        return PreparedOp(
+          type: type,
+          root: root,
+          gitArgs: ['-c', 'credential.helper=', ...args],
+          env: auth.env,
+          secrets: [if (token.isNotEmpty) token, ...auth.secrets],
+          timeout: const Duration(minutes: 3),
+          plan: [
+            'Dossier : $root',
+            'Dépôt distant : $name → $url',
+            'Branche : $branch',
+            'Commande exacte : git ${args.map(_quote).join(' ')}',
+            if (push) ...[
+              'Jamais de --force : l\'historique distant n\'est pas réécrit.',
+              'Analyse des secrets de tout l\'historique envoyé juste avant l\'exécution (push bloqué si fuite probable).',
+            ] else
+              'Avance rapide uniquement (--ff-only) : aucun commit de fusion implicite.',
+            if (https) 'Jeton transmis pour cette seule opération : jamais stocké, affiché ni journalisé.',
+            'Réseau : approbation requise.',
+          ],
+          before: push
+              ? () async {
+                  final out = await _outgoing(root, name, branch);
+                  final secrets = (out['secrets'] as List).cast<Map<String, dynamic>>();
+                  final large = (out['largeFiles'] as List).cast<String>();
+                  if (secrets.isNotEmpty) {
+                    _blockSecrets([for (final s in secrets) SecretFinding('${s['file']}', '${s['kind']}', line: s['line'] as int?)]);
+                  }
+                  if (large.isNotEmpty) {
+                    throw OpValidationError(ErrorCodes.conflict,
+                        'Fichier(s) de 100 Mo ou plus dans l\'historique envoyé (refusés par GitHub) : ${large.join(', ')}');
+                  }
+                  return {'pushedCommits': (out['commits'] as List).length};
+                }
+              : null,
+        );
       case OpType.systemInfo:
         throw StateError('inatteignable');
     }
@@ -353,6 +448,122 @@ class OpRunner {
       throw OpValidationError(ErrorCodes.invalidRequest, 'Listez les fichiers un par un (pas de dossier ni de motif).');
     }
     return [for (final x in paths) RootGuard.resolveInProject(root, x)];
+  }
+
+
+  static String _remoteName(Object raw) {
+    final n = '$raw'.trim();
+    if (!RegExp(r'^[A-Za-z0-9][A-Za-z0-9._-]{0,49}$').hasMatch(n)) {
+      throw OpValidationError(ErrorCodes.invalidRequest, 'Nom de dépôt distant invalide : « $n ».');
+    }
+    return n;
+  }
+
+  /// URL distante autorisée : HTTPS vers un hôte connu, sans identifiants.
+  String _remoteUrl(String raw) {
+    final url = raw.trim();
+    if (allowFileRemotes && url.startsWith('/')) {
+      guard.resolveProject(url);
+      return url;
+    }
+    final u = Uri.tryParse(url);
+    if (u == null || u.scheme != 'https' || u.host.isEmpty) {
+      throw OpValidationError(ErrorCodes.invalidRequest, 'Seules les URL https:// sont acceptées (ex. https://github.com/moi/projet.git).');
+    }
+    if (u.userInfo.isNotEmpty) {
+      throw OpValidationError(ErrorCodes.invalidRequest,
+          'URL refusée : elle contient des identifiants. Un jeton ne doit jamais figurer dans une URL.');
+    }
+    if (!allowedRemoteHosts.contains(u.host.toLowerCase())) {
+      throw OpValidationError(ErrorCodes.invalidRequest,
+          'Hôte non autorisé : ${u.host} (autorisés : ${allowedRemoteHosts.join(', ')}).');
+    }
+    if (u.pathSegments.where((s) => s.isNotEmpty).length < 2 || url.contains(' ')) {
+      throw OpValidationError(ErrorCodes.invalidRequest, 'URL de dépôt incomplète (attendu : https://hôte/propriétaire/dépôt).');
+    }
+    return url;
+  }
+
+  String _configuredRemoteUrl(String root, String name) {
+    final r = Process.runSync(gitExecutable, [...hardenedGitConfig, 'remote', 'get-url', name],
+        workingDirectory: root, environment: _gitEnv, includeParentEnvironment: false);
+    if (r.exitCode != 0) {
+      throw OpValidationError(ErrorCodes.notFound, 'Dépôt distant « $name » introuvable : ajoutez-le d\'abord.');
+    }
+    // Revalide l'URL configurée (elle a pu être modifiée hors application).
+    return _remoteUrl('${r.stdout}'.trim());
+  }
+
+  /// Authentification par en-tête HTTP fourni via l'environnement de Git :
+  /// rien dans l'URL, rien dans les arguments visibles, helpers désactivés.
+  static ({Map<String, String> env, List<String> secrets}) _authEnv(String url, String token) {
+    final u = Uri.parse(url);
+    final user = u.host.contains('gitlab') ? 'oauth2' : 'x-access-token';
+    final basic = base64.encode(utf8.encode('$user:$token'));
+    return (
+      env: {
+        'GIT_CONFIG_COUNT': '1',
+        'GIT_CONFIG_KEY_0': 'http.https://${u.host}/.extraheader',
+        'GIT_CONFIG_VALUE_0': 'AUTHORIZATION: basic $basic',
+      },
+      secrets: [basic],
+    );
+  }
+
+  /// Ce qu'enverrait un push : commits, fichiers, secrets et gros fichiers sur
+  /// **tout l'historique** concerné (un secret supprimé ensuite reste publié).
+  Future<Map<String, dynamic>> _outgoing(String root, String remote, String branch) async {
+    final url = _configuredRemoteUrl(root, remote);
+    final tracking = 'refs/remotes/$remote/$branch';
+    final hasTracking = (await gitRead(root, ['rev-parse', '--verify', '-q', tracking])).exitCode == 0;
+    // Branche nouvelle : seuls les commits absents de TOUT le dépôt distant
+    // seront envoyés (ceux déjà présents sur une autre branche ne comptent pas).
+    final range = hasTracking ? ['$tracking..refs/heads/$branch'] : ['refs/heads/$branch', '--not', '--remotes=$remote'];
+    final revs = await gitRead(root, ['rev-list', '--max-count=500', ...range]);
+    if (revs.exitCode != 0) {
+      throw OpValidationError(ErrorCodes.notFound, 'Branche locale introuvable ou sans commit : $branch');
+    }
+    final commits = '${revs.stdout}'.split('\n').where((l) => l.trim().isNotEmpty).toList();
+    final subjects = await gitRead(root, ['log', '--max-count=500', '--format=%h%x09%s', ...range]);
+    final seenBlobs = <String>{};
+    final files = <String>{};
+    final secrets = <Map<String, dynamic>>[];
+    final large = <String>[];
+    for (final c in commits) {
+      final tree = await gitRead(root, ['diff-tree', '--no-commit-id', '-r', '--root', '--diff-filter=AM', '--no-renames', '-z', c]);
+      final parts = '${tree.stdout}'.split('\u0000');
+      for (var i = 0; i + 1 < parts.length; i += 2) {
+        final meta = parts[i].trim().split(' ');
+        final path = parts[i + 1];
+        if (meta.length < 4 || path.isEmpty) continue;
+        final blob = meta[3];
+        files.add(path);
+        if (!seenBlobs.add(blob)) continue;
+        final kind = sensitiveFileKind(path);
+        if (kind != null) secrets.add(SecretFinding(path, kind).toJson());
+        final size = int.tryParse('${(await gitRead(root, ['cat-file', '-s', blob])).stdout}'.trim()) ?? 0;
+        if (size >= blockBytes) large.add(path);
+        if (size > 1024 * 1024) continue;
+        final raw = await gitRead(root, ['cat-file', 'blob', blob], binary: true);
+        final bytes = raw.stdout as List<int>;
+        if (looksBinary(bytes)) continue;
+        for (final f in scanContent(path, utf8.decode(bytes, allowMalformed: true), maxFindings: 3)) {
+          secrets.add(f.toJson());
+        }
+      }
+    }
+    return {
+      'remoteUrl': url,
+      'remoteBranchExists': hasTracking,
+      'commits': [
+        for (final l in '${subjects.stdout}'.split('\n').where((l) => l.contains('\t')))
+          {'sha': l.split('\t').first, 'subject': l.substring(l.indexOf('\t') + 1)},
+      ],
+      'truncated': commits.length >= 500,
+      'files': files.toList()..sort(),
+      'secrets': secrets,
+      'largeFiles': large,
+    };
   }
 
   static void _blockSecrets(List<SecretFinding> found) {
@@ -499,7 +710,7 @@ class OpRunner {
         [...hardenedGitConfig, ...p.gitArgs!],
         workingDirectory: p.root,
         includeParentEnvironment: false,
-        environment: _gitEnv,
+        environment: {..._gitEnv, ...p.env},
       );
       rec.process = proc;
       final out = _collect(proc.stdout);
@@ -508,8 +719,8 @@ class OpRunner {
         proc.kill(ProcessSignal.sigkill);
         return -999;
       });
-      rec.stdout = await out;
-      rec.stderr = await err;
+      rec.stdout = _scrub(await out, p.secrets);
+      rec.stderr = _scrub(await err, p.secrets);
       rec.exitCode = code == -999 ? null : code;
       if (code == -999) {
         rec.state = OpState.timedOut;
@@ -534,6 +745,14 @@ class OpRunner {
     } finally {
       rec.process = null;
     }
+  }
+
+  static String _scrub(String text, List<String> secrets) {
+    var out = text;
+    for (final s in secrets.where((s) => s.length >= 4)) {
+      out = out.replaceAll(s, '[SECRET MASQUÉ]');
+    }
+    return out;
   }
 
   Future<String> _collect(Stream<List<int>> s) async {

@@ -964,4 +964,200 @@ class AppLocalizationsFr extends AppLocalizations {
   String wsBranchLabel(String branch) {
     return 'Branche : $branch';
   }
+
+  @override
+  String get fgTitle => 'GitHub et GitLab';
+
+  @override
+  String get fgSubtitle =>
+      'Jetons à portée minimale, rangés dans le coffre du système';
+
+  @override
+  String get fgTokenHelp =>
+      'Créez un jeton « fine-grained » limité à vos dépôts de test, avec seulement Contents, Pull requests et Issues en lecture-écriture. Ne le partagez jamais.';
+
+  @override
+  String get fgGitlabUrl => 'URL de l\'instance GitLab';
+
+  @override
+  String fgToken(String forge) {
+    return 'Jeton $forge';
+  }
+
+  @override
+  String get fgTest => 'Tester';
+
+  @override
+  String fgConnectedAs(String forge, String user) {
+    return 'Connecté à $forge en tant que $user.';
+  }
+
+  @override
+  String get wsTabPublish => 'Publication';
+
+  @override
+  String pbNoToken(String forge) {
+    return 'Aucun jeton $forge : ajoutez-le dans Paramètres → GitHub et GitLab.';
+  }
+
+  @override
+  String get pbOpenForges => 'Configurer les jetons';
+
+  @override
+  String get pbNoRemote => 'Ce projet n\'a pas encore de dépôt distant.';
+
+  @override
+  String get pbRepoName => 'Dépôt distant (propriétaire/nom)';
+
+  @override
+  String get pbLink => 'Associer comme origin';
+
+  @override
+  String get pbCreatePrivate => 'Créer un dépôt privé';
+
+  @override
+  String get pbCreateConfirmTitle => 'Créer un dépôt privé ?';
+
+  @override
+  String pbCreateConfirmBody(String name, String forge) {
+    return 'Le dépôt « $name » sera créé sur $forge, en PRIVÉ. Vous pourrez le rendre public plus tard, uniquement depuis $forge.';
+  }
+
+  @override
+  String get pbCreate => 'Créer';
+
+  @override
+  String get pbPrivate => 'PRIVÉ';
+
+  @override
+  String get pbPublic => 'PUBLIC';
+
+  @override
+  String pbDefaultBranch(String branch) {
+    return 'Branche par défaut : $branch';
+  }
+
+  @override
+  String get pbPush => 'Publier (push)';
+
+  @override
+  String get pbPull => 'Récupérer (pull, avance rapide)';
+
+  @override
+  String pbPanelTitle(String repo) {
+    return 'Publier sur $repo ?';
+  }
+
+  @override
+  String pbPanelBranch(String branch) {
+    return 'Branche : $branch';
+  }
+
+  @override
+  String pbPanelCommits(int count) {
+    return 'Commits envoyés ($count)';
+  }
+
+  @override
+  String pbPanelFiles(int count) {
+    return 'Fichiers concernés ($count)';
+  }
+
+  @override
+  String get pbPanelSecretsOk =>
+      'Analyse des secrets sur tout l\'historique envoyé : aucun secret détecté.';
+
+  @override
+  String get pbPanelSecretsKo =>
+      'Secret probable dans l\'historique envoyé : publication bloquée.';
+
+  @override
+  String get pbPanelPublicWarning =>
+      'Attention : ce dépôt est PUBLIC. Tout ce qui est envoyé sera visible par tous.';
+
+  @override
+  String get pbPanelNothing => 'Rien à envoyer : le dépôt distant est à jour.';
+
+  @override
+  String get pbPanelNewBranch =>
+      'La branche n\'existe pas encore sur le dépôt distant : elle sera créée.';
+
+  @override
+  String get pbPublish => 'Publier';
+
+  @override
+  String pbPushed(int count) {
+    return 'Publié : $count commit(s) envoyé(s).';
+  }
+
+  @override
+  String get pbChangeRequests => 'Demandes de fusion ouvertes';
+
+  @override
+  String get pbNoChangeRequests => 'Aucune demande ouverte.';
+
+  @override
+  String pbNewChangeRequest(String head, String base) {
+    return 'Nouvelle demande de fusion ($head → $base)';
+  }
+
+  @override
+  String get pbTitleField => 'Titre';
+
+  @override
+  String get pbBodyField => 'Description (facultatif)';
+
+  @override
+  String get pbOpen => 'Ouvrir';
+
+  @override
+  String get pbIssues => 'Tickets ouverts';
+
+  @override
+  String get pbNoIssues => 'Aucun ticket ouvert.';
+
+  @override
+  String get pbNewIssue => 'Nouveau ticket';
+
+  @override
+  String pbCreated(String url) {
+    return 'Créé : $url';
+  }
+
+  @override
+  String get pbErrAuth => 'Jeton refusé (401) : vérifiez-le ou régénérez-le.';
+
+  @override
+  String pbErrForbidden(String message) {
+    return 'Accès refusé (403) : le jeton n\'a pas cette permission ($message).';
+  }
+
+  @override
+  String get pbErrRate => 'Limite de requêtes atteinte : réessayez plus tard.';
+
+  @override
+  String get pbErrNotFound =>
+      'Introuvable (404) : dépôt inexistant ou jeton sans accès à ce dépôt.';
+
+  @override
+  String pbErrValidation(String message) {
+    return 'Refusé : $message';
+  }
+
+  @override
+  String pbErrNetwork(String forge) {
+    return 'Pas de connexion à $forge.';
+  }
+
+  @override
+  String get pbErrNoToken => 'Aucun jeton enregistré.';
+
+  @override
+  String pbErrUnknown(String message) {
+    return 'Erreur : $message';
+  }
+
+  @override
+  String get pbScopeMissing =>
+      'Cet appareil n\'a pas la portée « remote » : appairez-le avec --scopes read,git-write,remote.';
 }

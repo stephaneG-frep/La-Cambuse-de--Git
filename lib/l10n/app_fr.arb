@@ -582,5 +582,178 @@
         "type": "String"
       }
     }
-  }
+  },
+  "fgTitle": "GitHub et GitLab",
+  "fgSubtitle": "Jetons à portée minimale, rangés dans le coffre du système",
+  "fgTokenHelp": "Créez un jeton « fine-grained » limité à vos dépôts de test, avec seulement Contents, Pull requests et Issues en lecture-écriture. Ne le partagez jamais.",
+  "fgGitlabUrl": "URL de l'instance GitLab",
+  "fgToken": "Jeton {forge}",
+  "@fgToken": {
+    "placeholders": {
+      "forge": {
+        "type": "String"
+      }
+    }
+  },
+  "fgTest": "Tester",
+  "fgConnectedAs": "Connecté à {forge} en tant que {user}.",
+  "@fgConnectedAs": {
+    "placeholders": {
+      "forge": {
+        "type": "String"
+      },
+      "user": {
+        "type": "String"
+      }
+    }
+  },
+  "wsTabPublish": "Publication",
+  "pbNoToken": "Aucun jeton {forge} : ajoutez-le dans Paramètres → GitHub et GitLab.",
+  "@pbNoToken": {
+    "placeholders": {
+      "forge": {
+        "type": "String"
+      }
+    }
+  },
+  "pbOpenForges": "Configurer les jetons",
+  "pbNoRemote": "Ce projet n'a pas encore de dépôt distant.",
+  "pbRepoName": "Dépôt distant (propriétaire/nom)",
+  "pbLink": "Associer comme origin",
+  "pbCreatePrivate": "Créer un dépôt privé",
+  "pbCreateConfirmTitle": "Créer un dépôt privé ?",
+  "pbCreateConfirmBody": "Le dépôt « {name} » sera créé sur {forge}, en PRIVÉ. Vous pourrez le rendre public plus tard, uniquement depuis {forge}.",
+  "@pbCreateConfirmBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "forge": {
+        "type": "String"
+      }
+    }
+  },
+  "pbCreate": "Créer",
+  "pbPrivate": "PRIVÉ",
+  "pbPublic": "PUBLIC",
+  "pbDefaultBranch": "Branche par défaut : {branch}",
+  "@pbDefaultBranch": {
+    "placeholders": {
+      "branch": {
+        "type": "String"
+      }
+    }
+  },
+  "pbPush": "Publier (push)",
+  "pbPull": "Récupérer (pull, avance rapide)",
+  "pbPanelTitle": "Publier sur {repo} ?",
+  "@pbPanelTitle": {
+    "placeholders": {
+      "repo": {
+        "type": "String"
+      }
+    }
+  },
+  "pbPanelBranch": "Branche : {branch}",
+  "@pbPanelBranch": {
+    "placeholders": {
+      "branch": {
+        "type": "String"
+      }
+    }
+  },
+  "pbPanelCommits": "Commits envoyés ({count})",
+  "@pbPanelCommits": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pbPanelFiles": "Fichiers concernés ({count})",
+  "@pbPanelFiles": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pbPanelSecretsOk": "Analyse des secrets sur tout l'historique envoyé : aucun secret détecté.",
+  "pbPanelSecretsKo": "Secret probable dans l'historique envoyé : publication bloquée.",
+  "pbPanelPublicWarning": "Attention : ce dépôt est PUBLIC. Tout ce qui est envoyé sera visible par tous.",
+  "pbPanelNothing": "Rien à envoyer : le dépôt distant est à jour.",
+  "pbPanelNewBranch": "La branche n'existe pas encore sur le dépôt distant : elle sera créée.",
+  "pbPublish": "Publier",
+  "pbPushed": "Publié : {count} commit(s) envoyé(s).",
+  "@pbPushed": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pbChangeRequests": "Demandes de fusion ouvertes",
+  "pbNoChangeRequests": "Aucune demande ouverte.",
+  "pbNewChangeRequest": "Nouvelle demande de fusion ({head} → {base})",
+  "@pbNewChangeRequest": {
+    "placeholders": {
+      "head": {
+        "type": "String"
+      },
+      "base": {
+        "type": "String"
+      }
+    }
+  },
+  "pbTitleField": "Titre",
+  "pbBodyField": "Description (facultatif)",
+  "pbOpen": "Ouvrir",
+  "pbIssues": "Tickets ouverts",
+  "pbNoIssues": "Aucun ticket ouvert.",
+  "pbNewIssue": "Nouveau ticket",
+  "pbCreated": "Créé : {url}",
+  "@pbCreated": {
+    "placeholders": {
+      "url": {
+        "type": "String"
+      }
+    }
+  },
+  "pbErrAuth": "Jeton refusé (401) : vérifiez-le ou régénérez-le.",
+  "pbErrForbidden": "Accès refusé (403) : le jeton n'a pas cette permission ({message}).",
+  "@pbErrForbidden": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "pbErrRate": "Limite de requêtes atteinte : réessayez plus tard.",
+  "pbErrNotFound": "Introuvable (404) : dépôt inexistant ou jeton sans accès à ce dépôt.",
+  "pbErrValidation": "Refusé : {message}",
+  "@pbErrValidation": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "pbErrNetwork": "Pas de connexion à {forge}.",
+  "@pbErrNetwork": {
+    "placeholders": {
+      "forge": {
+        "type": "String"
+      }
+    }
+  },
+  "pbErrNoToken": "Aucun jeton enregistré.",
+  "pbErrUnknown": "Erreur : {message}",
+  "@pbErrUnknown": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "pbScopeMissing": "Cet appareil n'a pas la portée « remote » : appairez-le avec --scopes read,git-write,remote."
 }

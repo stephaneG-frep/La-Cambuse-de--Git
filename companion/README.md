@@ -22,7 +22,8 @@ build/companion/cambuse-companion devices | revoke ID | audit
 | Écoute | 127.0.0.1 par défaut ; réseau local seulement en TLS (`--lan`) |
 | Appairage | code à 6 chiffres généré sur l'hôte (jeton administrateur local), 2 min, usage unique, 5 essais max |
 | Jetons | accès 15 min (mémoire), rafraîchissement avec rotation, stockés hachés (SHA-256), révocables |
-| Portées | `read` (par défaut), `git-write` accordée explicitement sur l'hôte |
+| Portées | `read` (par défaut), `git-write` et `remote` (push/pull) accordées explicitement sur l'hôte |
+| Réseau | push sans `--force`, pull `--ff-only`, HTTPS vers hôtes autorisés (`--remote-host`), jeton transmis par opération via l'environnement, helpers d'identifiants désactivés, secrets de l'historique envoyé bloquants |
 | Opérations | liste blanche typée : lecture `system.info`, `project.list/detect/audit`, `git.status/log/diff/branches`, `backup.list` ; écriture `project.backup`, `git.init/add/commit/branch.create/switch/restore`, `gitignore.update`, `backup.restore` ; aucun shell |
 | Secrets | `git.add` et `git.commit` (contenu indexé, re-vérifié à l'exécution) bloqués si un secret probable est détecté ; valeurs jamais renvoyées |
 | Sauvegardes | automatique avant `git.restore` ; restauration toujours dans un nouveau dossier, jamais par écrasement |

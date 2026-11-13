@@ -16,7 +16,10 @@ enum Scope {
   read('read'),
 
   /// Modifications Git locales (init, add, commit, branches).
-  gitWrite('git-write');
+  gitWrite('git-write'),
+
+  /// Échanges réseau avec un dépôt distant (push, pull). Accordée à part.
+  remote('remote');
 
   const Scope(this.code);
   final String code;
@@ -34,6 +37,8 @@ enum OpType {
   projectAudit('project.audit', Scope.read, mutating: false),
   gitBranches('git.branches', Scope.read, mutating: false),
   backupList('backup.list', Scope.read, mutating: false),
+  gitRemoteList('git.remote.list', Scope.read, mutating: false),
+  gitOutgoing('git.outgoing', Scope.read, mutating: false),
   projectBackup('project.backup', Scope.gitWrite, mutating: false),
   projectDetect('project.detect', Scope.read, mutating: false),
   gitStatus('git.status', Scope.read, mutating: false),
@@ -46,7 +51,10 @@ enum OpType {
   gitSwitch('git.switch', Scope.gitWrite, mutating: true),
   gitRestore('git.restore', Scope.gitWrite, mutating: true),
   gitignoreUpdate('gitignore.update', Scope.gitWrite, mutating: true),
-  backupRestore('backup.restore', Scope.gitWrite, mutating: true);
+  backupRestore('backup.restore', Scope.gitWrite, mutating: true),
+  gitRemoteAdd('git.remote.add', Scope.gitWrite, mutating: true),
+  gitPush('git.push', Scope.remote, mutating: true),
+  gitPull('git.pull', Scope.remote, mutating: true);
 
   const OpType(this.code, this.scope, {required this.mutating});
 
@@ -96,6 +104,10 @@ abstract final class ErrorCodes {
   static const localOnly = 'local_only';
   static const secretDetected = 'secret_detected';
 }
+
+/// Paramètres secrets : transmis pour une seule opération, jamais stockés,
+/// renvoyés, journalisés ni affichés dans un plan.
+const secretParams = {'token'};
 
 class OpRequest {
   const OpRequest({required this.type, this.root, this.params = const {}});

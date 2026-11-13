@@ -963,4 +963,200 @@ class AppLocalizationsEn extends AppLocalizations {
   String wsBranchLabel(String branch) {
     return 'Branch: $branch';
   }
+
+  @override
+  String get fgTitle => 'GitHub and GitLab';
+
+  @override
+  String get fgSubtitle =>
+      'Least-privilege tokens, stored in the system keychain';
+
+  @override
+  String get fgTokenHelp =>
+      'Create a fine-grained token limited to your test repositories, with only Contents, Pull requests and Issues read-write. Never share it.';
+
+  @override
+  String get fgGitlabUrl => 'GitLab instance URL';
+
+  @override
+  String fgToken(String forge) {
+    return '$forge token';
+  }
+
+  @override
+  String get fgTest => 'Test';
+
+  @override
+  String fgConnectedAs(String forge, String user) {
+    return 'Connected to $forge as $user.';
+  }
+
+  @override
+  String get wsTabPublish => 'Publish';
+
+  @override
+  String pbNoToken(String forge) {
+    return 'No $forge token: add it in Settings → GitHub and GitLab.';
+  }
+
+  @override
+  String get pbOpenForges => 'Set up tokens';
+
+  @override
+  String get pbNoRemote => 'This project has no remote repository yet.';
+
+  @override
+  String get pbRepoName => 'Remote repository (owner/name)';
+
+  @override
+  String get pbLink => 'Link as origin';
+
+  @override
+  String get pbCreatePrivate => 'Create a private repository';
+
+  @override
+  String get pbCreateConfirmTitle => 'Create a private repository?';
+
+  @override
+  String pbCreateConfirmBody(String name, String forge) {
+    return 'Repository \"$name\" will be created on $forge, PRIVATE. You can make it public later, only from $forge.';
+  }
+
+  @override
+  String get pbCreate => 'Create';
+
+  @override
+  String get pbPrivate => 'PRIVATE';
+
+  @override
+  String get pbPublic => 'PUBLIC';
+
+  @override
+  String pbDefaultBranch(String branch) {
+    return 'Default branch: $branch';
+  }
+
+  @override
+  String get pbPush => 'Publish (push)';
+
+  @override
+  String get pbPull => 'Fetch (pull, fast-forward)';
+
+  @override
+  String pbPanelTitle(String repo) {
+    return 'Publish to $repo?';
+  }
+
+  @override
+  String pbPanelBranch(String branch) {
+    return 'Branch: $branch';
+  }
+
+  @override
+  String pbPanelCommits(int count) {
+    return 'Commits sent ($count)';
+  }
+
+  @override
+  String pbPanelFiles(int count) {
+    return 'Files involved ($count)';
+  }
+
+  @override
+  String get pbPanelSecretsOk =>
+      'Secret scan over the whole history sent: no secret found.';
+
+  @override
+  String get pbPanelSecretsKo =>
+      'Likely secret in the history sent: publishing blocked.';
+
+  @override
+  String get pbPanelPublicWarning =>
+      'Warning: this repository is PUBLIC. Everything sent will be visible to everyone.';
+
+  @override
+  String get pbPanelNothing => 'Nothing to send: the remote is up to date.';
+
+  @override
+  String get pbPanelNewBranch =>
+      'The branch does not exist on the remote yet: it will be created.';
+
+  @override
+  String get pbPublish => 'Publish';
+
+  @override
+  String pbPushed(int count) {
+    return 'Published: $count commit(s) sent.';
+  }
+
+  @override
+  String get pbChangeRequests => 'Open merge requests';
+
+  @override
+  String get pbNoChangeRequests => 'No open request.';
+
+  @override
+  String pbNewChangeRequest(String head, String base) {
+    return 'New merge request ($head → $base)';
+  }
+
+  @override
+  String get pbTitleField => 'Title';
+
+  @override
+  String get pbBodyField => 'Description (optional)';
+
+  @override
+  String get pbOpen => 'Open';
+
+  @override
+  String get pbIssues => 'Open issues';
+
+  @override
+  String get pbNoIssues => 'No open issue.';
+
+  @override
+  String get pbNewIssue => 'New issue';
+
+  @override
+  String pbCreated(String url) {
+    return 'Created: $url';
+  }
+
+  @override
+  String get pbErrAuth => 'Token rejected (401): check or regenerate it.';
+
+  @override
+  String pbErrForbidden(String message) {
+    return 'Access denied (403): the token lacks this permission ($message).';
+  }
+
+  @override
+  String get pbErrRate => 'Rate limit reached: try again later.';
+
+  @override
+  String get pbErrNotFound =>
+      'Not found (404): repository missing or token without access to it.';
+
+  @override
+  String pbErrValidation(String message) {
+    return 'Rejected: $message';
+  }
+
+  @override
+  String pbErrNetwork(String forge) {
+    return 'No connection to $forge.';
+  }
+
+  @override
+  String get pbErrNoToken => 'No token saved.';
+
+  @override
+  String pbErrUnknown(String message) {
+    return 'Error: $message';
+  }
+
+  @override
+  String get pbScopeMissing =>
+      'This device lacks the \"remote\" scope: pair it with --scopes read,git-write,remote.';
 }

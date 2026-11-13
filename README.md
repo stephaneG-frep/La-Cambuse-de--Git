@@ -2,7 +2,7 @@
 
 Application Flutter **Android** et **Linux** : académie Git / GitHub / GitLab / Docker / DevOps de zéro à expert, atelier d'opérations réelles sur projets et capitaine automatique supervisé.
 
-> État actuel : **fin de phase 5** (Académie Git hors ligne, professeur IA facultatif, compagnon Linux sécurisé, Atelier Git local). Voir [docs/ACCEPTANCE_MATRIX.md](docs/ACCEPTANCE_MATRIX.md) pour l'état réel de chaque fonctionnalité. Le Capitaine affiche honnêtement la phase où il sera livré. Le bac à sable de l'Académie est un **simulateur pédagogique** clairement signalé : il n'exécute aucune commande réelle.
+> État actuel : **fin de phase 6** (Académie, professeur IA facultatif, compagnon Linux sécurisé, Atelier Git local, publication GitHub/GitLab). Voir [docs/ACCEPTANCE_MATRIX.md](docs/ACCEPTANCE_MATRIX.md) pour l'état réel de chaque fonctionnalité. Le Capitaine affiche honnêtement la phase où il sera livré. Le bac à sable de l'Académie est un **simulateur pédagogique** clairement signalé : il n'exécute aucune commande réelle.
 
 ## Documents de référence
 
@@ -15,6 +15,7 @@ Application Flutter **Android** et **Linux** : académie Git / GitHub / GitLab /
 - [docs/PHASE3_BILAN.md](docs/PHASE3_BILAN.md) — bilan de la phase 3
 - [docs/PHASE4_BILAN.md](docs/PHASE4_BILAN.md) — bilan de la phase 4
 - [docs/PHASE5_BILAN.md](docs/PHASE5_BILAN.md) — bilan de la phase 5
+- [docs/PHASE6_BILAN.md](docs/PHASE6_BILAN.md) — bilan de la phase 6
 - [companion/README.md](companion/README.md) — compagnon Linux (installation, sécurité)
 - [CHANGELOG.md](CHANGELOG.md)
 

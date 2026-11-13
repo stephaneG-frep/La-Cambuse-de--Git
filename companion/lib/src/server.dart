@@ -20,7 +20,11 @@ class CompanionConfig {
     this.port = defaultLoopbackPort,
     this.lan = false,
     this.lanPort = defaultLanPort,
+    this.remoteHosts = const {'github.com', 'gitlab.com'},
   });
+
+  /// Hôtes autorisés pour push/pull (HTTPS).
+  final Set<String> remoteHosts;
 
   final Directory dataDir;
   final List<String> roots;
@@ -42,7 +46,9 @@ class CompanionServer {
   CompanionServer(this.config, {DateTime Function()? clock, OpRunner? runner})
       : store = DeviceStore(config.dataDir, clock: clock),
         audit = AuditLog(config.dataDir, clock: clock),
-        runner = runner ?? OpRunner(RootGuard(config.roots), backups: BackupManager(config.dataDir, clock: clock));
+        runner = runner ??
+            OpRunner(RootGuard(config.roots),
+                backups: BackupManager(config.dataDir, clock: clock), allowedRemoteHosts: config.remoteHosts);
 
   final CompanionConfig config;
   final DeviceStore store;

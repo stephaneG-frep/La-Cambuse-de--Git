@@ -1741,6 +1741,318 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Branche : {branch}'**
   String wsBranchLabel(String branch);
+
+  /// No description provided for @fgTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'GitHub et GitLab'**
+  String get fgTitle;
+
+  /// No description provided for @fgSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Jetons à portée minimale, rangés dans le coffre du système'**
+  String get fgSubtitle;
+
+  /// No description provided for @fgTokenHelp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Créez un jeton « fine-grained » limité à vos dépôts de test, avec seulement Contents, Pull requests et Issues en lecture-écriture. Ne le partagez jamais.'**
+  String get fgTokenHelp;
+
+  /// No description provided for @fgGitlabUrl.
+  ///
+  /// In fr, this message translates to:
+  /// **'URL de l\'instance GitLab'**
+  String get fgGitlabUrl;
+
+  /// No description provided for @fgToken.
+  ///
+  /// In fr, this message translates to:
+  /// **'Jeton {forge}'**
+  String fgToken(String forge);
+
+  /// No description provided for @fgTest.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tester'**
+  String get fgTest;
+
+  /// No description provided for @fgConnectedAs.
+  ///
+  /// In fr, this message translates to:
+  /// **'Connecté à {forge} en tant que {user}.'**
+  String fgConnectedAs(String forge, String user);
+
+  /// No description provided for @wsTabPublish.
+  ///
+  /// In fr, this message translates to:
+  /// **'Publication'**
+  String get wsTabPublish;
+
+  /// No description provided for @pbNoToken.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun jeton {forge} : ajoutez-le dans Paramètres → GitHub et GitLab.'**
+  String pbNoToken(String forge);
+
+  /// No description provided for @pbOpenForges.
+  ///
+  /// In fr, this message translates to:
+  /// **'Configurer les jetons'**
+  String get pbOpenForges;
+
+  /// No description provided for @pbNoRemote.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ce projet n\'a pas encore de dépôt distant.'**
+  String get pbNoRemote;
+
+  /// No description provided for @pbRepoName.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dépôt distant (propriétaire/nom)'**
+  String get pbRepoName;
+
+  /// No description provided for @pbLink.
+  ///
+  /// In fr, this message translates to:
+  /// **'Associer comme origin'**
+  String get pbLink;
+
+  /// No description provided for @pbCreatePrivate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Créer un dépôt privé'**
+  String get pbCreatePrivate;
+
+  /// No description provided for @pbCreateConfirmTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Créer un dépôt privé ?'**
+  String get pbCreateConfirmTitle;
+
+  /// No description provided for @pbCreateConfirmBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le dépôt « {name} » sera créé sur {forge}, en PRIVÉ. Vous pourrez le rendre public plus tard, uniquement depuis {forge}.'**
+  String pbCreateConfirmBody(String name, String forge);
+
+  /// No description provided for @pbCreate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Créer'**
+  String get pbCreate;
+
+  /// No description provided for @pbPrivate.
+  ///
+  /// In fr, this message translates to:
+  /// **'PRIVÉ'**
+  String get pbPrivate;
+
+  /// No description provided for @pbPublic.
+  ///
+  /// In fr, this message translates to:
+  /// **'PUBLIC'**
+  String get pbPublic;
+
+  /// No description provided for @pbDefaultBranch.
+  ///
+  /// In fr, this message translates to:
+  /// **'Branche par défaut : {branch}'**
+  String pbDefaultBranch(String branch);
+
+  /// No description provided for @pbPush.
+  ///
+  /// In fr, this message translates to:
+  /// **'Publier (push)'**
+  String get pbPush;
+
+  /// No description provided for @pbPull.
+  ///
+  /// In fr, this message translates to:
+  /// **'Récupérer (pull, avance rapide)'**
+  String get pbPull;
+
+  /// No description provided for @pbPanelTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Publier sur {repo} ?'**
+  String pbPanelTitle(String repo);
+
+  /// No description provided for @pbPanelBranch.
+  ///
+  /// In fr, this message translates to:
+  /// **'Branche : {branch}'**
+  String pbPanelBranch(String branch);
+
+  /// No description provided for @pbPanelCommits.
+  ///
+  /// In fr, this message translates to:
+  /// **'Commits envoyés ({count})'**
+  String pbPanelCommits(int count);
+
+  /// No description provided for @pbPanelFiles.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fichiers concernés ({count})'**
+  String pbPanelFiles(int count);
+
+  /// No description provided for @pbPanelSecretsOk.
+  ///
+  /// In fr, this message translates to:
+  /// **'Analyse des secrets sur tout l\'historique envoyé : aucun secret détecté.'**
+  String get pbPanelSecretsOk;
+
+  /// No description provided for @pbPanelSecretsKo.
+  ///
+  /// In fr, this message translates to:
+  /// **'Secret probable dans l\'historique envoyé : publication bloquée.'**
+  String get pbPanelSecretsKo;
+
+  /// No description provided for @pbPanelPublicWarning.
+  ///
+  /// In fr, this message translates to:
+  /// **'Attention : ce dépôt est PUBLIC. Tout ce qui est envoyé sera visible par tous.'**
+  String get pbPanelPublicWarning;
+
+  /// No description provided for @pbPanelNothing.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rien à envoyer : le dépôt distant est à jour.'**
+  String get pbPanelNothing;
+
+  /// No description provided for @pbPanelNewBranch.
+  ///
+  /// In fr, this message translates to:
+  /// **'La branche n\'existe pas encore sur le dépôt distant : elle sera créée.'**
+  String get pbPanelNewBranch;
+
+  /// No description provided for @pbPublish.
+  ///
+  /// In fr, this message translates to:
+  /// **'Publier'**
+  String get pbPublish;
+
+  /// No description provided for @pbPushed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Publié : {count} commit(s) envoyé(s).'**
+  String pbPushed(int count);
+
+  /// No description provided for @pbChangeRequests.
+  ///
+  /// In fr, this message translates to:
+  /// **'Demandes de fusion ouvertes'**
+  String get pbChangeRequests;
+
+  /// No description provided for @pbNoChangeRequests.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune demande ouverte.'**
+  String get pbNoChangeRequests;
+
+  /// No description provided for @pbNewChangeRequest.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouvelle demande de fusion ({head} → {base})'**
+  String pbNewChangeRequest(String head, String base);
+
+  /// No description provided for @pbTitleField.
+  ///
+  /// In fr, this message translates to:
+  /// **'Titre'**
+  String get pbTitleField;
+
+  /// No description provided for @pbBodyField.
+  ///
+  /// In fr, this message translates to:
+  /// **'Description (facultatif)'**
+  String get pbBodyField;
+
+  /// No description provided for @pbOpen.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ouvrir'**
+  String get pbOpen;
+
+  /// No description provided for @pbIssues.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tickets ouverts'**
+  String get pbIssues;
+
+  /// No description provided for @pbNoIssues.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun ticket ouvert.'**
+  String get pbNoIssues;
+
+  /// No description provided for @pbNewIssue.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouveau ticket'**
+  String get pbNewIssue;
+
+  /// No description provided for @pbCreated.
+  ///
+  /// In fr, this message translates to:
+  /// **'Créé : {url}'**
+  String pbCreated(String url);
+
+  /// No description provided for @pbErrAuth.
+  ///
+  /// In fr, this message translates to:
+  /// **'Jeton refusé (401) : vérifiez-le ou régénérez-le.'**
+  String get pbErrAuth;
+
+  /// No description provided for @pbErrForbidden.
+  ///
+  /// In fr, this message translates to:
+  /// **'Accès refusé (403) : le jeton n\'a pas cette permission ({message}).'**
+  String pbErrForbidden(String message);
+
+  /// No description provided for @pbErrRate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Limite de requêtes atteinte : réessayez plus tard.'**
+  String get pbErrRate;
+
+  /// No description provided for @pbErrNotFound.
+  ///
+  /// In fr, this message translates to:
+  /// **'Introuvable (404) : dépôt inexistant ou jeton sans accès à ce dépôt.'**
+  String get pbErrNotFound;
+
+  /// No description provided for @pbErrValidation.
+  ///
+  /// In fr, this message translates to:
+  /// **'Refusé : {message}'**
+  String pbErrValidation(String message);
+
+  /// No description provided for @pbErrNetwork.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pas de connexion à {forge}.'**
+  String pbErrNetwork(String forge);
+
+  /// No description provided for @pbErrNoToken.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun jeton enregistré.'**
+  String get pbErrNoToken;
+
+  /// No description provided for @pbErrUnknown.
+  ///
+  /// In fr, this message translates to:
+  /// **'Erreur : {message}'**
+  String pbErrUnknown(String message);
+
+  /// No description provided for @pbScopeMissing.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cet appareil n\'a pas la portée « remote » : appairez-le avec --scopes read,git-write,remote.'**
+  String get pbScopeMissing;
 }
 
 class _AppLocalizationsDelegate

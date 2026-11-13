@@ -2,7 +2,16 @@
 
 Format inspiré de « Keep a Changelog ». Versions non publiées.
 
-## [Non publié] — Phase 5 : Atelier Git local (2026-11-13)
+## [Non publié] — Phase 6 : GitHub et GitLab (2026-11-13)
+
+### Ajouté
+- Compagnon : remotes (HTTPS, sans identifiants), analyse de ce qui serait envoyé, push sans force et pull en avance rapide (portée `remote`), jeton transmis par l'environnement et masqué.
+- Clients GitHub et GitLab (dépôt, création privée, PR/MR, tickets) ; écran des jetons ; onglet Publication avec panneau de publication.
+
+### Corrigé
+- Comptage des commits d'une branche nouvelle ; liste PR/tickets après création ; confirmation invisible après défilement.
+
+## Phase 5 : Atelier Git local (2026-11-13)
 
 ### Ajouté
 - Compagnon : audit non destructif, branches, restore avec sauvegarde automatique, mise à jour du .gitignore, sauvegardes et restauration dans un nouveau dossier ; blocage des secrets à l'ajout et au commit.
