@@ -22,7 +22,8 @@ build/companion/cambuse-companion devices | revoke ID | audit
 | Écoute | 127.0.0.1 par défaut ; réseau local seulement en TLS (`--lan`) |
 | Appairage | code à 6 chiffres généré sur l'hôte (jeton administrateur local), 2 min, usage unique, 5 essais max |
 | Jetons | accès 15 min (mémoire), rafraîchissement avec rotation, stockés hachés (SHA-256), révocables |
-| Portées | `read` (par défaut), `git-write`, `remote` (push/pull) et `docker` (inspection, ≈ root) accordées explicitement sur l'hôte |
+| Portées | `read` (par défaut), `git-write`, `remote` (push/pull), `docker` (inspection, ≈ root) et `build` (analyse, tests, builds Flutter : exécute du code du projet) accordées explicitement sur l'hôte |
+| Builds | `flutter.analyze/test/build.apk.debug/build.linux` (portée `build`, approbation, 25 min max, environnement minimal) ; `ci.scaffold` n'écrase jamais ; `artifacts.list` : tailles, SHA-256, signature APK (apksigner), ABI exécutables |
 | Docker | lecture seule : `docker.info/images/containers/logs` (journaux masqués) ; aucune opération run/stop/rm/pull/exec/prune ; `docker.scaffold` n'écrase jamais |
 | Réseau | push sans `--force`, pull `--ff-only`, HTTPS vers hôtes autorisés (`--remote-host`), jeton transmis par opération via l'environnement, helpers d'identifiants désactivés, secrets de l'historique envoyé bloquants |
 | Opérations | liste blanche typée : lecture `system.info`, `project.list/detect/audit`, `git.status/log/diff/branches`, `backup.list` ; écriture `project.backup`, `git.init/add/commit/branch.create/switch/restore`, `gitignore.update`, `backup.restore` ; aucun shell |

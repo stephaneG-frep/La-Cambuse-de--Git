@@ -1,7 +1,18 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+}
+
+// Signature release : uniquement avec la clé du projet décrite dans
+// android/key.properties (jamais versionné). Sans elle, toute release est
+// refusée : on ne signe JAMAIS une release avec la clé debug.
+val keystorePropertiesFile = rootProject.file("key.properties")
+val keystoreProperties = Properties().apply {
+    if (keystorePropertiesFile.exists()) load(FileInputStream(keystorePropertiesFile))
 }
 
 android {
@@ -29,11 +40,20 @@ android {
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+        if (keystorePropertiesFile.exists()) {
+            create("release") {
+                keyAlias = keystoreProperties["keyAlias"] as String
+                keyPassword = keystoreProperties["keyPassword"] as String
+                storeFile = file(keystoreProperties["storeFile"] as String)
+                storePassword = keystoreProperties["storePassword"] as String
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = if (keystorePropertiesFile.exists()) signingConfigs.getByName("release") else null
         }
     }
 }
@@ -46,4 +66,19 @@ kotlin {
 
 flutter {
     source = "../.."
+}
+
+// Refus explicite d'une release non signée par la clé du projet.
+gradle.taskGraph.whenReady {
+    val releaseTask = allTasks.any { t ->
+        t.project.name == "app" && t.name.contains("Release") &&
+            (t.name.startsWith("assemble") || t.name.startsWith("bundle") || t.name.startsWith("package"))
+    }
+    if (releaseTask && !keystorePropertiesFile.exists()) {
+        throw GradleException(
+            "Release refusée : android/key.properties est absent. Créez votre keystore de production " +
+                "(keytool -genkey) et décrivez-le dans android/key.properties (jamais dans Git). " +
+                "Pour tester, utilisez : flutter build apk --debug"
+        )
+    }
 }

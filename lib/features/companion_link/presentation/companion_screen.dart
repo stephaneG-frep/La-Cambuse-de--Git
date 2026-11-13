@@ -114,7 +114,7 @@ class _PairFormState extends ConsumerState<_PairForm> {
                 padding: const EdgeInsets.all(CambuseSpacing.sm),
                 color: p.night,
                 child: SelectableText(
-                  'cambuse-companion serve --root ~/Projets\ncambuse-companion pair --scopes read,git-write,remote,docker',
+                  'cambuse-companion serve --root ~/Projets\ncambuse-companion pair --scopes read,git-write,remote,docker,build',
                   style: TextStyle(fontFamily: 'monospace', color: p.turquoise),
                 ),
               ),
@@ -487,7 +487,8 @@ Future<bool?> showApprovalDialog(BuildContext context, OpStatus st) {
               child: SelectableText(line, style: const TextStyle(fontFamily: 'monospace')),
             ),
           const SizedBox(height: CambuseSpacing.sm),
-          Text(l.compApproveWarning, style: TextStyle(color: p.alert)),
+          Text(OpType.fromCode(st.type)?.scope == Scope.build ? l.compApproveWarningBuild : l.compApproveWarning,
+              style: TextStyle(color: p.alert)),
         ]),
       ),
       actions: [

@@ -8,6 +8,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/page_header.dart';
 import '../../companion_link/data/companion_client.dart';
 import '../../companion_link/presentation/companion_screen.dart';
+import '../../builds/presentation/builds_tab.dart';
 import '../../docker/presentation/docker_tab.dart';
 import '../../forge/presentation/publish_tab.dart';
 import '../domain/git_parsing.dart';
@@ -39,7 +40,7 @@ class WorkshopProjectScreen extends StatelessWidget {
     final p = CambuseTheme.of(context);
     final wide = MediaQuery.sizeOf(context).width >= CambuseBreakpoints.rail;
     return DefaultTabController(
-      length: 6,
+      length: 7,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -60,6 +61,7 @@ class WorkshopProjectScreen extends StatelessWidget {
               Tab(text: l.wsTabBackups),
               Tab(text: l.wsTabPublish),
               Tab(text: l.wsTabDocker),
+              Tab(text: l.wsTabBuilds),
             ],
           ),
           Expanded(
@@ -70,6 +72,7 @@ class WorkshopProjectScreen extends StatelessWidget {
               _BackupsTab(path: path),
               PublishTab(path: path),
               DockerTab(path: path),
+              BuildsTab(path: path),
             ]),
           ),
         ],

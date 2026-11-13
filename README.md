@@ -2,7 +2,7 @@
 
 Application Flutter **Android** et **Linux** : académie Git / GitHub / GitLab / Docker / DevOps de zéro à expert, atelier d'opérations réelles sur projets et capitaine automatique supervisé.
 
-> État actuel : **fin de phase 7** (Académie Git/Docker/Compose, professeur IA facultatif, compagnon Linux sécurisé, Atelier, publication GitHub/GitLab, inspection Docker). Voir [docs/ACCEPTANCE_MATRIX.md](docs/ACCEPTANCE_MATRIX.md) pour l'état réel de chaque fonctionnalité. Le Capitaine affiche honnêtement la phase où il sera livré. Le bac à sable de l'Académie est un **simulateur pédagogique** clairement signalé : il n'exécute aucune commande réelle.
+> État actuel : **fin de phase 8** (Académie Git/Docker/Compose, professeur IA facultatif, compagnon Linux sécurisé, Atelier, publication GitHub/GitLab, inspection Docker, CI générée, builds approuvés, cale des artefacts, paquet `.deb`). Voir [docs/ACCEPTANCE_MATRIX.md](docs/ACCEPTANCE_MATRIX.md) pour l'état réel de chaque fonctionnalité. Le Capitaine affiche honnêtement la phase où il sera livré. Le bac à sable de l'Académie est un **simulateur pédagogique** clairement signalé : il n'exécute aucune commande réelle.
 
 ## Documents de référence
 
@@ -17,6 +17,7 @@ Application Flutter **Android** et **Linux** : académie Git / GitHub / GitLab /
 - [docs/PHASE5_BILAN.md](docs/PHASE5_BILAN.md) — bilan de la phase 5
 - [docs/PHASE6_BILAN.md](docs/PHASE6_BILAN.md) — bilan de la phase 6
 - [docs/PHASE7_BILAN.md](docs/PHASE7_BILAN.md) — bilan de la phase 7
+- [docs/PHASE8_BILAN.md](docs/PHASE8_BILAN.md) — bilan de la phase 8
 - [companion/README.md](companion/README.md) — compagnon Linux (installation, sécurité)
 - [CHANGELOG.md](CHANGELOG.md)
 
@@ -42,9 +43,27 @@ flutter build apk --debug --target-platform android-arm64      # APK de TEST
 (cd companion && dart test)                                    # tests du compagnon
 (cd packages/cambuse_protocol && dart test)                    # tests du protocole et des analyseurs
 dart compile exe companion/bin/cambuse_companion.dart -o build/companion/cambuse-companion
+tool/package_release.sh [--with-tests] [--skip-build]          # dist/ : APK de test, .deb, sources, SBOM, SHA256SUMS, rapport
 ```
 
-L'APK produit ainsi est signé avec la **clé debug** : il sert aux tests et **n'est pas distribuable**. Une release signée nécessitera votre propre keystore (`android/key.properties`, jamais versionné) — prévu en phase 8.
+L'APK produit ainsi est signé avec la **clé debug** : il sert aux tests et **n'est pas distribuable**. `tool/package_release.sh` le nomme explicitement `…-DEBUG-non-distribuable.apk`.
+
+### Release Android signée
+
+Une release exige **votre** keystore, jamais versionné. Créez `android/key.properties` (ignoré par Git) :
+
+```properties
+storeFile=/chemin/absolu/vers/upload-keystore.jks
+storePassword=…
+keyAlias=upload
+keyPassword=…
+```
+
+Sans ce fichier, `flutter build apk --release` est **refusé par Gradle** (aucune signature debug silencieuse).
+
+### Paquet .deb
+
+`tool/package_release.sh` construit `dist/la-cambuse_<version>_amd64.deb` (application dans `/opt/la-cambuse`, compagnon `cambuse-companion`, raccourcis `/usr/bin`, entrée de menu), avec dépendances calculées par `dpkg-shlibdeps`. Le script **n'installe rien** ; pour installer : `sudo apt install ./dist/la-cambuse_1.0.0_amd64.deb`.
 
 ## Données et confidentialité
 

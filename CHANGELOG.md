@@ -2,7 +2,20 @@
 
 Format inspiré de « Keep a Changelog ». Versions non publiées.
 
-## [Non publié] — Phase 7 : Docker et Compose (2026-11-13)
+## [Non publié] — Phase 8 : CI/CD, APK de test, .deb (2026-11-13)
+
+### Ajouté
+- Modèles de CI (Flutter, Node, Python × GitHub Actions, GitLab CI) : actions épinglées par empreinte, permissions minimales, analyse des secrets, artefacts avec SHA-256.
+- Compagnon : portée `build`, `ci.scaffold` (sans écrasement), `flutter.analyze/test/build.apk.debug/build.linux` approuvés, `artifacts.list` (signature APK vérifiée, ABI exécutables).
+- Atelier : onglet Builds et « Cale des artefacts ».
+- `tool/package_release.sh` : APK DEBUG nommé explicitement, `.deb` (application + compagnon), ZIP des sources, SBOM CycloneDX, `SHA256SUMS`, `BUILD_REPORT.md`.
+- Signature release Android depuis `android/key.properties`, refus explicite en son absence ; CI du projet avec job de livraison.
+
+### Corrigé
+- Panneau d'approbation : formulation spécifique aux opérations de build ; résultat signalé par SnackBar.
+- ABI : seules celles qui embarquent le moteur Flutter sont annoncées.
+
+## Phase 7 : Docker et Compose (2026-11-13)
 
 ### Ajouté
 - Analyseurs Dockerfile et Compose partagés, modèles Dockerfile sûrs, masquage des secrets des journaux.

@@ -4,6 +4,7 @@
 /// formats JSON : l'application et le compagnon l'importent tous les deux.
 library;
 
+export 'ci_templates.dart';
 export 'docker_lint.dart';
 export 'docker_templates.dart';
 export 'secret_scan.dart';
@@ -25,7 +26,10 @@ enum Scope {
 
   /// Inspection du démon Docker de l'hôte (lecture seule). Accordée à part :
   /// l'accès au socket Docker équivaut à des droits root.
-  docker('docker');
+  docker('docker'),
+
+  /// Analyse, tests et builds : exécutent du code du projet. Accordée à part.
+  build('build');
 
   const Scope(this.code);
   final String code;
@@ -50,6 +54,7 @@ enum OpType {
   dockerImages('docker.images', Scope.docker, mutating: false),
   dockerContainers('docker.containers', Scope.docker, mutating: false),
   dockerLogs('docker.logs', Scope.docker, mutating: false),
+  artifactsList('artifacts.list', Scope.read, mutating: false),
   projectBackup('project.backup', Scope.gitWrite, mutating: false),
   projectDetect('project.detect', Scope.read, mutating: false),
   gitStatus('git.status', Scope.read, mutating: false),
@@ -66,7 +71,12 @@ enum OpType {
   gitRemoteAdd('git.remote.add', Scope.gitWrite, mutating: true),
   gitPush('git.push', Scope.remote, mutating: true),
   gitPull('git.pull', Scope.remote, mutating: true),
-  dockerScaffold('docker.scaffold', Scope.gitWrite, mutating: true);
+  dockerScaffold('docker.scaffold', Scope.gitWrite, mutating: true),
+  ciScaffold('ci.scaffold', Scope.gitWrite, mutating: true),
+  flutterAnalyze('flutter.analyze', Scope.build, mutating: true),
+  flutterTest('flutter.test', Scope.build, mutating: true),
+  flutterBuildApkDebug('flutter.build.apk.debug', Scope.build, mutating: true),
+  flutterBuildLinux('flutter.build.linux', Scope.build, mutating: true);
 
   const OpType(this.code, this.scope, {required this.mutating});
 

@@ -8,6 +8,7 @@ import 'package:cambuse_protocol/cambuse_protocol.dart';
 import 'backups.dart';
 import 'paths.dart';
 import 'project_audit.dart';
+import 'artifacts.dart';
 import 'store.dart';
 
 class OpValidationError implements Exception {
@@ -28,8 +29,14 @@ class PreparedOp {
     this.before,
     this.env = const {},
     this.secrets = const [],
+    this.program,
+    this.programArgs,
     this.timeout = const Duration(seconds: 30),
   });
+
+  /// Programme autre que git (flutter…), lancé sans shell avec [programArgs].
+  final String? program;
+  final List<String>? programArgs;
 
   /// Variables d'environnement propres à l'opération (authentification).
   final Map<String, String> env;
@@ -109,7 +116,14 @@ class OpRunner {
     this.allowedRemoteHosts = const {'github.com', 'gitlab.com'},
     this.allowFileRemotes = false,
     this.dockerExecutable = 'docker',
+    this.flutterExecutable = 'flutter',
+    this.buildTimeout = const Duration(minutes: 25),
   });
+
+  final String flutterExecutable;
+
+  /// Délai maximal d'une analyse, de tests ou d'un build.
+  final Duration buildTimeout;
 
   /// Exécutable Docker (remplaçable dans les tests).
   final String dockerExecutable;
@@ -444,6 +458,69 @@ class OpRunner {
       case OpType.dockerContainers:
       case OpType.dockerLogs:
         throw StateError('inatteignable');
+      case OpType.ciScaffold:
+        final kind = '${p['kind'] ?? ''}';
+        final provider = '${p['provider'] ?? ''}';
+        if (!ciTemplateKinds.contains(kind) || !ciProviders.contains(provider)) {
+          throw OpValidationError(ErrorCodes.invalidRequest,
+              'Modèle de CI inconnu (types : ${ciTemplateKinds.join(', ')} ; fournisseurs : ${ciProviders.join(', ')}).');
+        }
+        final name = ciFileName(provider);
+        RootGuard.resolveInProject(root, name);
+        if (FileSystemEntity.typeSync('$root/$name', followLinks: false) != FileSystemEntityType.notFound) {
+          throw OpValidationError(ErrorCodes.conflict, '« $name » existe déjà : il ne sera pas écrasé.');
+        }
+        final version = kind == 'flutter' ? _flutterVersion() : null;
+        final content = ciTemplate(kind, provider, flutterVersion: version ?? '3.27.1')!;
+        return PreparedOp(
+          type: type,
+          root: root,
+          plan: [
+            'Créer $name (modèle $kind, ${provider == 'github' ? 'GitHub Actions' : 'GitLab CI'}${version == null ? '' : ', Flutter $version'})',
+            '${content.split('\n').length} lignes ; actions épinglées, permissions minimales, analyse des secrets.',
+            'Aucun fichier existant n\'est modifié. Crée un fichier : approbation requise.',
+          ],
+          internal: () async {
+            final f = File('$root/$name');
+            if (f.existsSync()) throw OpValidationError(ErrorCodes.conflict, '« $name » est apparu entre-temps.');
+            f.parent.createSync(recursive: true);
+            final tmp = File('${f.path}.cambuse-tmp')..writeAsStringSync(content, flush: true);
+            tmp.renameSync(f.path);
+            return {'created': [name]};
+          },
+        );
+      case OpType.flutterAnalyze:
+      case OpType.flutterTest:
+      case OpType.flutterBuildApkDebug:
+      case OpType.flutterBuildLinux:
+        final pub = File('$root/pubspec.yaml');
+        if (!pub.existsSync() || !RegExp(r'^\s*flutter\s*:', multiLine: true).hasMatch(pub.readAsStringSync())) {
+          throw OpValidationError(ErrorCodes.invalidRequest, 'Ce dossier n\'est pas un projet Flutter (pubspec.yaml).');
+        }
+        final args = switch (type) {
+          OpType.flutterAnalyze => ['analyze'],
+          OpType.flutterTest => ['test', '--reporter', 'expanded'],
+          OpType.flutterBuildApkDebug => ['build', 'apk', '--debug', '--target-platform', 'android-arm64'],
+          _ => ['build', 'linux', '--release'],
+        };
+        return PreparedOp(
+          type: type,
+          root: root,
+          program: flutterExecutable,
+          programArgs: args,
+          env: _buildEnv,
+          timeout: buildTimeout,
+          plan: [
+            'Dossier : $root',
+            'Commande exacte : flutter ${args.join(' ')}',
+            'Exécute du code du projet (scripts Gradle, plugins, tests) : approbation requise.',
+            if (type == OpType.flutterBuildApkDebug) 'Produit un APK DEBUG : pour les tests uniquement, jamais pour la distribution.',
+            'Délai maximal : ${buildTimeout.inMinutes} min.',
+          ],
+        );
+      case OpType.artifactsList:
+        return PreparedOp(type: type, root: root, plan: ['Lister les artefacts de $root (tailles, SHA-256, signature)'],
+            timeout: const Duration(minutes: 2), internal: () => listArtifacts(root));
       case OpType.systemInfo:
         throw StateError('inatteignable');
     }
@@ -496,6 +573,30 @@ class OpRunner {
   }
 
 
+
+
+  // -------------------------------------------------------------- Builds
+
+  /// Environnement des builds : le strict nécessaire à Flutter, Gradle et au SDK.
+  Map<String, String> get _buildEnv {
+    final env = Platform.environment;
+    return {
+      for (final e in env.entries)
+        if (const {'PATH', 'HOME', 'USER', 'LANG', 'JAVA_HOME', 'ANDROID_HOME', 'ANDROID_SDK_ROOT', 'PUB_CACHE', 'FLUTTER_ROOT', 'TMPDIR'}.contains(e.key) ||
+            e.key.startsWith('XDG_') || e.key.startsWith('SNAP'))
+          e.key: e.value,
+    };
+  }
+
+  String? _flutterVersion() {
+    try {
+      final r = Process.runSync(flutterExecutable, ['--version', '--machine'], environment: _buildEnv);
+      final v = (jsonDecode('${r.stdout}') as Map)['frameworkVersion'];
+      return v is String && RegExp(r'^\d+\.\d+\.\d+$').hasMatch(v) ? v : null;
+    } catch (_) {
+      return null;
+    }
+  }
 
   // ------------------------------------------------------------- Docker
 
@@ -860,13 +961,16 @@ class OpRunner {
         rec.state = OpState.succeeded;
         return;
       }
-      final proc = await Process.start(
-        gitExecutable,
-        [...hardenedGitConfig, ...p.gitArgs!],
-        workingDirectory: p.root,
-        includeParentEnvironment: false,
-        environment: {..._gitEnv, ...p.env},
-      );
+      final proc = p.program != null
+          ? await Process.start(p.program!, p.programArgs ?? const [],
+              workingDirectory: p.root, includeParentEnvironment: false, environment: p.env)
+          : await Process.start(
+              gitExecutable,
+              [...hardenedGitConfig, ...p.gitArgs!],
+              workingDirectory: p.root,
+              includeParentEnvironment: false,
+              environment: {..._gitEnv, ...p.env},
+            );
       rec.process = proc;
       final out = _collect(proc.stdout);
       final err = _collect(proc.stderr);

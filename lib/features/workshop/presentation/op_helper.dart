@@ -18,7 +18,8 @@ class OpOutcome {
 /// d'approbation (commande exacte) et n'exécute qu'après « Autoriser ».
 /// Chaque étape est consignée au journal de bord. Les erreurs
 /// ([CompanionException]) remontent à l'appelant.
-Future<OpOutcome> runCompanionOp(BuildContext context, WidgetRef ref, OpRequest req) async {
+Future<OpOutcome> runCompanionOp(BuildContext context, WidgetRef ref, OpRequest req,
+    {Duration max = const Duration(minutes: 6)}) async {
   final client = ref.read(companionClientProvider);
   final log = ref.read(logbookRepositoryProvider);
   final where = req.root ?? '';
@@ -34,7 +35,7 @@ Future<OpOutcome> runCompanionOp(BuildContext context, WidgetRef ref, OpRequest 
     await client.approve(st.id);
     await log.record(category: 'atelier', action: 'Opération autorisée', details: '${req.type} — $where', outcome: AuditOutcome.info);
   }
-  st = await client.waitFor(st.id, max: const Duration(minutes: 6));
+  st = await client.waitFor(st.id, max: max);
   final type = OpType.fromCode(req.type);
   if (type != null && (type.mutating || type == OpType.projectBackup)) {
     await log.record(

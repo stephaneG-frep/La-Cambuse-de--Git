@@ -1,6 +1,7 @@
 /// Compagnon Linux de La Cambuse de Git.
 library;
 
+export 'src/artifacts.dart';
 export 'src/audit.dart';
 export 'src/backups.dart';
 export 'src/project_audit.dart';

@@ -20,7 +20,7 @@ Future<void> main(List<String> argv) async {
     ..addMultiOption('remote-host', defaultsTo: ['github.com', 'gitlab.com'],
         help: 'Hôte HTTPS autorisé pour push/pull (répétable, ex. GitLab auto-hébergé).'));
   parser.addCommand('pair', ArgParser()
-    ..addOption('scopes', defaultsTo: 'read', help: 'Portées : read, git-write, remote, docker (séparées par des virgules).'));
+    ..addOption('scopes', defaultsTo: 'read', help: 'Portées : read, git-write, remote, docker, build (séparées par des virgules).'));
   parser.addCommand('devices');
   parser.addCommand('revoke');
   parser.addCommand('audit', ArgParser()..addOption('limit', abbr: 'n', defaultsTo: '30'));

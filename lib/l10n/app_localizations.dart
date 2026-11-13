@@ -2215,6 +2215,174 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Salle des machines Docker'**
   String get dkOpenRoom;
+
+  /// No description provided for @wsTabBuilds.
+  ///
+  /// In fr, this message translates to:
+  /// **'Builds'**
+  String get wsTabBuilds;
+
+  /// No description provided for @bdIntro.
+  ///
+  /// In fr, this message translates to:
+  /// **'Intégration continue, analyse, tests et builds exécutés sur le PC par le compagnon, chacun après votre approbation.'**
+  String get bdIntro;
+
+  /// No description provided for @bdScopeMissing.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cet appareil n\'a pas la portée « build » : appairez-le avec --scopes …,build (un build exécute du code du projet).'**
+  String get bdScopeMissing;
+
+  /// No description provided for @bdCiTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Intégration continue'**
+  String get bdCiTitle;
+
+  /// No description provided for @bdCiIntro.
+  ///
+  /// In fr, this message translates to:
+  /// **'Génère un pipeline prêt à relire : actions épinglées, permissions minimales, analyse des secrets. Aucun fichier existant n\'est écrasé.'**
+  String get bdCiIntro;
+
+  /// No description provided for @bdCiKind.
+  ///
+  /// In fr, this message translates to:
+  /// **'Type de projet'**
+  String get bdCiKind;
+
+  /// No description provided for @bdCiProvider.
+  ///
+  /// In fr, this message translates to:
+  /// **'Plateforme'**
+  String get bdCiProvider;
+
+  /// No description provided for @bdCiGenerate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Générer le pipeline'**
+  String get bdCiGenerate;
+
+  /// No description provided for @bdRunTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Analyse, tests et builds (Flutter)'**
+  String get bdRunTitle;
+
+  /// No description provided for @bdAnalyze.
+  ///
+  /// In fr, this message translates to:
+  /// **'flutter analyze'**
+  String get bdAnalyze;
+
+  /// No description provided for @bdTest.
+  ///
+  /// In fr, this message translates to:
+  /// **'flutter test'**
+  String get bdTest;
+
+  /// No description provided for @bdApkDebug.
+  ///
+  /// In fr, this message translates to:
+  /// **'APK de test (debug)'**
+  String get bdApkDebug;
+
+  /// No description provided for @bdLinux.
+  ///
+  /// In fr, this message translates to:
+  /// **'Build Linux (release)'**
+  String get bdLinux;
+
+  /// No description provided for @bdApkDebugNote.
+  ///
+  /// In fr, this message translates to:
+  /// **'Un APK debug sert aux tests : il n\'est jamais distribuable. Une release exige votre propre clé de signature.'**
+  String get bdApkDebugNote;
+
+  /// No description provided for @bdRunning.
+  ///
+  /// In fr, this message translates to:
+  /// **'En cours sur le PC… un build peut durer plusieurs minutes.'**
+  String get bdRunning;
+
+  /// No description provided for @bdResult.
+  ///
+  /// In fr, this message translates to:
+  /// **'{op} : code de sortie {code}'**
+  String bdResult(String op, String code);
+
+  /// No description provided for @bdHoldTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cale des artefacts'**
+  String get bdHoldTitle;
+
+  /// No description provided for @bdHoldIntro.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fichiers produits (APK, bundle Linux, paquets de dist/) avec taille, SHA-256 et signature vérifiée.'**
+  String get bdHoldIntro;
+
+  /// No description provided for @bdHoldRefresh.
+  ///
+  /// In fr, this message translates to:
+  /// **'Inspecter la cale'**
+  String get bdHoldRefresh;
+
+  /// No description provided for @bdHoldEmpty.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun artefact : lancez un build.'**
+  String get bdHoldEmpty;
+
+  /// No description provided for @bdSigDebug.
+  ///
+  /// In fr, this message translates to:
+  /// **'DEBUG — non distribuable'**
+  String get bdSigDebug;
+
+  /// No description provided for @bdSigRelease.
+  ///
+  /// In fr, this message translates to:
+  /// **'Signé (release)'**
+  String get bdSigRelease;
+
+  /// No description provided for @bdSigInvalid.
+  ///
+  /// In fr, this message translates to:
+  /// **'Signature invalide'**
+  String get bdSigInvalid;
+
+  /// No description provided for @bdSigUnknown.
+  ///
+  /// In fr, this message translates to:
+  /// **'Signature non vérifiée (apksigner introuvable)'**
+  String get bdSigUnknown;
+
+  /// No description provided for @bdAbis.
+  ///
+  /// In fr, this message translates to:
+  /// **'ABI : {abis}'**
+  String bdAbis(String abis);
+
+  /// No description provided for @bdCopySha.
+  ///
+  /// In fr, this message translates to:
+  /// **'Copier le SHA-256'**
+  String get bdCopySha;
+
+  /// No description provided for @bdCopied.
+  ///
+  /// In fr, this message translates to:
+  /// **'SHA-256 copié'**
+  String get bdCopied;
+
+  /// No description provided for @compApproveWarningBuild.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cette opération exécute du code du projet sur le PC (scripts de build, plugins, tests). Rien n\'est fait sans votre accord.'**
+  String get compApproveWarningBuild;
 }
 
 class _AppLocalizationsDelegate

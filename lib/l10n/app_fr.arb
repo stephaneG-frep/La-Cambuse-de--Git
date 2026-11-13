@@ -830,5 +830,50 @@
     }
   },
   "dkNoDockerignore": "Pas de .dockerignore : le contexte de build peut embarquer .git, .env et les dépendances.",
-  "dkOpenRoom": "Salle des machines Docker"
+  "dkOpenRoom": "Salle des machines Docker",
+  "wsTabBuilds": "Builds",
+  "bdIntro": "Intégration continue, analyse, tests et builds exécutés sur le PC par le compagnon, chacun après votre approbation.",
+  "bdScopeMissing": "Cet appareil n'a pas la portée « build » : appairez-le avec --scopes …,build (un build exécute du code du projet).",
+  "bdCiTitle": "Intégration continue",
+  "bdCiIntro": "Génère un pipeline prêt à relire : actions épinglées, permissions minimales, analyse des secrets. Aucun fichier existant n'est écrasé.",
+  "bdCiKind": "Type de projet",
+  "bdCiProvider": "Plateforme",
+  "bdCiGenerate": "Générer le pipeline",
+  "bdRunTitle": "Analyse, tests et builds (Flutter)",
+  "bdAnalyze": "flutter analyze",
+  "bdTest": "flutter test",
+  "bdApkDebug": "APK de test (debug)",
+  "bdLinux": "Build Linux (release)",
+  "bdApkDebugNote": "Un APK debug sert aux tests : il n'est jamais distribuable. Une release exige votre propre clé de signature.",
+  "bdRunning": "En cours sur le PC… un build peut durer plusieurs minutes.",
+  "bdResult": "{op} : code de sortie {code}",
+  "@bdResult": {
+    "placeholders": {
+      "op": {
+        "type": "String"
+      },
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "bdHoldTitle": "Cale des artefacts",
+  "bdHoldIntro": "Fichiers produits (APK, bundle Linux, paquets de dist/) avec taille, SHA-256 et signature vérifiée.",
+  "bdHoldRefresh": "Inspecter la cale",
+  "bdHoldEmpty": "Aucun artefact : lancez un build.",
+  "bdSigDebug": "DEBUG — non distribuable",
+  "bdSigRelease": "Signé (release)",
+  "bdSigInvalid": "Signature invalide",
+  "bdSigUnknown": "Signature non vérifiée (apksigner introuvable)",
+  "bdAbis": "ABI : {abis}",
+  "@bdAbis": {
+    "placeholders": {
+      "abis": {
+        "type": "String"
+      }
+    }
+  },
+  "bdCopySha": "Copier le SHA-256",
+  "bdCopied": "SHA-256 copié",
+  "compApproveWarningBuild": "Cette opération exécute du code du projet sur le PC (scripts de build, plugins, tests). Rien n'est fait sans votre accord."
 }

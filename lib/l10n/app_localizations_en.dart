@@ -1257,4 +1257,99 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dkOpenRoom => 'Docker engine room';
+
+  @override
+  String get wsTabBuilds => 'Builds';
+
+  @override
+  String get bdIntro =>
+      'Continuous integration, analysis, tests and builds run on the PC by the companion, each after your approval.';
+
+  @override
+  String get bdScopeMissing =>
+      'This device lacks the \"build\" scope: pair it with --scopes …,build (a build runs project code).';
+
+  @override
+  String get bdCiTitle => 'Continuous integration';
+
+  @override
+  String get bdCiIntro =>
+      'Generates a pipeline to review: pinned actions, minimal permissions, secret scanning. No existing file is overwritten.';
+
+  @override
+  String get bdCiKind => 'Project type';
+
+  @override
+  String get bdCiProvider => 'Platform';
+
+  @override
+  String get bdCiGenerate => 'Generate the pipeline';
+
+  @override
+  String get bdRunTitle => 'Analysis, tests and builds (Flutter)';
+
+  @override
+  String get bdAnalyze => 'flutter analyze';
+
+  @override
+  String get bdTest => 'flutter test';
+
+  @override
+  String get bdApkDebug => 'Test APK (debug)';
+
+  @override
+  String get bdLinux => 'Linux build (release)';
+
+  @override
+  String get bdApkDebugNote =>
+      'A debug APK is for testing: it is never distributable. A release requires your own signing key.';
+
+  @override
+  String get bdRunning =>
+      'Running on the PC… a build can take several minutes.';
+
+  @override
+  String bdResult(String op, String code) {
+    return '$op: exit code $code';
+  }
+
+  @override
+  String get bdHoldTitle => 'Artifact hold';
+
+  @override
+  String get bdHoldIntro =>
+      'Produced files (APK, Linux bundle, dist/ packages) with size, SHA-256 and verified signature.';
+
+  @override
+  String get bdHoldRefresh => 'Inspect the hold';
+
+  @override
+  String get bdHoldEmpty => 'No artifacts: run a build.';
+
+  @override
+  String get bdSigDebug => 'DEBUG — not distributable';
+
+  @override
+  String get bdSigRelease => 'Signed (release)';
+
+  @override
+  String get bdSigInvalid => 'Invalid signature';
+
+  @override
+  String get bdSigUnknown => 'Signature not verified (apksigner not found)';
+
+  @override
+  String bdAbis(String abis) {
+    return 'ABI: $abis';
+  }
+
+  @override
+  String get bdCopySha => 'Copy SHA-256';
+
+  @override
+  String get bdCopied => 'SHA-256 copied';
+
+  @override
+  String get compApproveWarningBuild =>
+      'This operation runs project code on the PC (build scripts, plugins, tests). Nothing happens without your consent.';
 }
