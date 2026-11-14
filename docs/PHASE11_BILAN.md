@@ -73,7 +73,7 @@ Date : 2026-11-14. Toutes les commandes listées ont réellement été exécuté
 | `cd packages/cambuse_protocol && dart test` | `+39: All tests passed!` |
 | `flutter analyze --fatal-infos` | `No issues found!` |
 | `tool/package_release.sh --with-tests` | 4 artefacts, sommes vérifiées, tests intégrés au rapport |
-| CI GitHub `43637187905` | secrets ✓, analyse et tests ✓, livraison ✓ |
+| CI GitHub `43637187905`, puis `43639902180` (dernier commit, tout l'historique) | secrets ✓, analyse et tests ✓, livraison ✓ |
 
 ## 6. Essais réels
 - **Honor** :
@@ -81,7 +81,7 @@ Date : 2026-11-14. Toutes les commandes listées ont réellement été exécuté
   - écran « Guide de bord » chargé depuis l'asset embarqué ;
   - mesures de démarrage et de mémoire (téléphone revenu à l'accueil après chaque série, et application vérifiée au premier plan avant toute action).
 - **Linux** : l'application release est lancée avec un dossier de données temporaire, pour ne pas toucher à vos données. La fenêtre de l'application seule a été capturée (pas le bureau). Le Pont s'affiche, sans écran blanc.
-- **Paquet `.deb`** : voir le rapport final, section « Installation ».
+- **Paquet `.deb` installé** par vous avec `sudo apt install` : `dpkg --verify` propre ; l'application installée ouvre sa fenêtre en 226 ms ; le compagnon installé répond HTTP 200. Détails dans le rapport final, §6.
 
 ## 7. Limites
 - Livraison avec un **APK debug** seulement, par votre choix : aucune signature release.

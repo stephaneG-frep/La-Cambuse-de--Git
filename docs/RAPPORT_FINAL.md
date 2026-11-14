@@ -53,7 +53,7 @@ Tous les écrans listés existent et fonctionnent :
 
 | Critère | État | Preuve |
 |---|---|---|
-| APK debug installé sur appareil, `.deb` sur Linux, démarrage sans écran blanc | voir §6 | APK installé et démarré sur Honor MTN-NX1M (phases 1 à 11) ; application Linux release démarrée en 228 ms |
+| APK debug installé sur appareil, `.deb` sur Linux, démarrage sans écran blanc | ✅ | APK installé et démarré sur Honor MTN-NX1M ; `.deb` installé sur Ubuntu 22.04, application installée démarrée en 226 ms (§6) |
 | Profil local, un module Git complet, progression conservée | ✅ | Phase 2, base relue après redémarrage sur le Honor |
 | Chat IA avec fournisseur ; contenu consultable sans fournisseur | ✅ | Phase 3, claude-opus-5-5 en réel |
 | Import d'un projet Flutter, audit, diff et plan sans mutation non consentie | ✅ | Phases 5 et 10 |
@@ -84,7 +84,7 @@ Tous les écrans listés existent et fonctionnent :
 | Compagnon (`dart test`) | **58** réussis : sécurité de l'API, confinement, appairage, audit, opérations réelles sur dépôts de test |
 | Protocole (`dart test`) | **39** réussis : analyseurs, détection de secrets, modèles de CI |
 | Analyse statique | aucun problème sur les trois projets |
-| CI GitHub | exécution `43637187905` : secrets ✓, analyse et tests ✓, livraison ✓ |
+| CI GitHub | dernière exécution `43639902180` (commit `b028770`, analyse des secrets sur tout l'historique) : secrets ✓, analyse et tests ✓, livraison ✓ |
 
 Les essais réels, documentés phase par phase, ont porté sur le Honor MTN-NX1M (Android, arm64) et sur un PC Ubuntu 22.04 (x86_64) :
 - installation, apprentissage et IA réelle ;
@@ -101,7 +101,14 @@ Les essais réels, documentés phase par phase, ont porté sur le Honor MTN-NX1M
 
 ## 6. Installation du paquet `.deb`
 
-*(Complété après l'installation sur ce PC, voir la fin de ce document.)*
+Installation réelle sur ce PC (Ubuntu 22.04.5, x86_64), par l'utilisateur, avec `sudo apt install ./dist/la-cambuse_1.0.0_amd64.deb` :
+
+- `dpkg -l` : `ii la-cambuse 1.0.0 amd64` ; `dpkg --verify la-cambuse` : aucun fichier modifié.
+- `/usr/bin/la-cambuse` et `/usr/bin/cambuse-companion` sont présents, ainsi que l'entrée de menu `/usr/share/applications/la-cambuse.desktop`.
+- L'application installée (`/opt/la-cambuse/la_cambuse`, vérifié via `/proc/<pid>/exe`) ouvre sa fenêtre en **226 ms** et affiche le Pont, **sans écran blanc**. L'essai a été fait avec un dossier de données temporaire, sans toucher aux données de l'utilisateur.
+- Le compagnon installé démarre (`Compagnon prêt sur http://127.0.0.1:47820/v1`) et l'API répond **HTTP 200** sur `/v1/health`. Il a été arrêté après l'essai.
+- Remarque de `desktop-file-validate` : l'entrée déclare deux catégories principales (`Development;Education;`), donc l'application peut apparaître deux fois dans certains menus. C'est un détail cosmétique, laissé tel quel dans le paquet testé.
+- Désinstallation : `sudo apt remove la-cambuse`.
 
 ## 7. Limites connues
 
@@ -113,6 +120,7 @@ Les essais réels, documentés phase par phase, ont porté sur le Honor MTN-NX1M
 - **Contenu des modules avancés** (phase 9) : rédigé par l'IA, vérifié par tests et labos réalisables, **non relu par un expert humain**.
 - Les labos sont statiques : aucun conteneur, cluster ni script n'est exécuté.
 - Guide de bord et cours en français uniquement ; interface en français et en anglais.
+- Entrée de menu avec deux catégories principales (avertissement cosmétique de `desktop-file-validate`).
 - Pas d'illustrations du personnage Capitaine Commit, et pas de panneaux redimensionnables sur Linux (prévus par DESIGN.md).
 - Capitaine : mission CI et restauration du point de contrôle non rejouées en réel depuis le Capitaine ; aucun push réel par une mission.
 - Un échec isolé de la suite du compagnon a été observé une fois en phase 8, sans être reproduit depuis.

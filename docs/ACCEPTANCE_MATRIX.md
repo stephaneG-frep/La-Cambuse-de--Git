@@ -31,7 +31,7 @@ Dernière mise à jour : 2026-11-14 (fin de phase 11)
 
 | Critère | État |
 |---|---|
-| APK debug installé sur appareil + .deb sur Linux, démarrage sans écran blanc | 🟨 APK installé et démarré sur Honor MTN-NX1M ; `.deb` construit et vérifié (extraction, ldd), **pas encore installé** (sudo, accord requis) |
+| APK debug installé sur appareil + .deb sur Linux, démarrage sans écran blanc | ✅ APK installé et démarré sur Honor MTN-NX1M ; `.deb` installé sur Ubuntu 22.04 (dpkg --verify propre), application installée démarrée en 226 ms, compagnon installé répondant HTTP 200 |
 | Profil local, 1 module Git complet, progression conservée | ✅ |
 | Chat IA avec fournisseur ; contenu consultable sans fournisseur | ✅ (claude-opus-5-5, essai réel) |
 | Import projet Flutter Linux, audit, diff, plan sans mutation non consentie | ✅ (via compagnon ; essai réel depuis le Honor) |
