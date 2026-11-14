@@ -9,7 +9,15 @@ title = "La Cambuse de Git"
 useDefault = true
 
 [allowlist]
-description = "Jetons factices des tests automatisés"
+description = "Jetons factices des tests et exemples pédagogiques des labos"
+# Dossiers de tests uniquement.
 paths = [
   '''(^|/)test/''',
+]
+# Valeurs d'exemple des labos de l'Académie (secrets volontairement écrits en
+# dur pour apprendre à les retirer) : seules ces valeurs précises sont admises.
+regexTarget = "match"
+regexes = [
+  '''exempleNonValide''',
+  '''motdepasse-2024''',
 ]
