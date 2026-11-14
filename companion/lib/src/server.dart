@@ -9,6 +9,7 @@ import 'backups.dart';
 import 'ops.dart';
 import 'paths.dart';
 import 'store.dart';
+import 'sync_vault.dart';
 import 'tls.dart';
 
 const companionVersion = '0.1.0';
@@ -46,6 +47,7 @@ class CompanionServer {
   CompanionServer(this.config, {DateTime Function()? clock, OpRunner? runner})
       : store = DeviceStore(config.dataDir, clock: clock),
         audit = AuditLog(config.dataDir, clock: clock),
+        vault = SyncVault(config.dataDir),
         runner = runner ??
             OpRunner(RootGuard(config.roots),
                 backups: BackupManager(config.dataDir, clock: clock), allowedRemoteHosts: config.remoteHosts);
@@ -53,6 +55,7 @@ class CompanionServer {
   final CompanionConfig config;
   final DeviceStore store;
   final AuditLog audit;
+  final SyncVault vault;
   final OpRunner runner;
   late final String adminToken;
   HttpServer? _loopback;
@@ -60,6 +63,9 @@ class CompanionServer {
   String? tlsFingerprint;
 
   static const maxBody = 64 * 1024;
+
+  /// Une progression complète (centaines de cartes de révision) dépasse 64 Ko.
+  static const maxSyncBody = 2 * 1024 * 1024;
 
   int get port => _loopback!.port;
   int? get lanPort => _lan?.port;
@@ -130,11 +136,11 @@ class CompanionServer {
     }
   }
 
-  Future<Map<String, dynamic>> _body(HttpRequest req) async {
+  Future<Map<String, dynamic>> _body(HttpRequest req, {int max = maxBody}) async {
     final chunks = <int>[];
     await for (final c in req) {
       chunks.addAll(c);
-      if (chunks.length > maxBody) throw _ApiError(413, ErrorCodes.tooLarge, 'Requête trop volumineuse.');
+      if (chunks.length > max) throw _ApiError(413, ErrorCodes.tooLarge, 'Requête trop volumineuse.');
     }
     if (chunks.isEmpty) return {};
     try {
@@ -235,6 +241,25 @@ class CompanionServer {
     if (m == 'GET' && path == 'audit') {
       final n = int.tryParse(req.uri.queryParameters['limit'] ?? '') ?? 50;
       return (200, audit.tail(1000).where((e) => e['device'] == dev.id).toList().reversed.take(n.clamp(1, 200)).toList());
+    }
+    if (m == 'POST' && path == 'sync') {
+      if (!dev.scopes.contains(Scope.sync)) {
+        audit.record('sync.forbidden', deviceId: dev.id);
+        throw _ApiError(403, ErrorCodes.forbiddenScope,
+            'Cet appareil n\'a pas la portée « sync » (à accorder sur l\'hôte lors de l\'appairage).');
+      }
+      final ProgressSnapshot incoming;
+      try {
+        incoming = ProgressSnapshot.fromJson(((await _body(req, max: maxSyncBody))['snapshot'] as Map?)?.cast<String, dynamic>() ?? const {});
+      } on FormatException catch (e) {
+        throw _ApiError(400, ErrorCodes.invalidRequest, 'Progression invalide : ${e.message}');
+      }
+      final merged = vault.merge(incoming);
+      audit.record('sync', deviceId: dev.id, details: {
+        'recues': {'lecons': incoming.lessons.length, 'revisions': incoming.reviews.length, 'projets': incoming.projects.length},
+        'total': {'lecons': merged.lessons.length, 'revisions': merged.reviews.length, 'projets': merged.projects.length},
+      });
+      return (200, {'snapshot': merged.toJson()});
     }
     if (m == 'POST' && path == 'ops') {
       final opReq = OpRequest.fromJson(await _body(req));

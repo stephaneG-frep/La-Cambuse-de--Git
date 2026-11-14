@@ -1022,5 +1022,33 @@
   "cpAiReview": "Examiner le plan",
   "helpTitle": "Guide de bord",
   "helpSubtitle": "Mode d'emploi hors ligne : Académie, compagnon, Atelier, Capitaine, sécurité, dépannage",
-  "helpFrenchOnly": "Guide rédigé en français."
+  "helpFrenchOnly": "Guide rédigé en français.",
+  "syncTitle": "Synchronisation de la progression",
+  "syncIntro": "Partage votre progression (leçons, révisions, projets) entre vos appareils via le compagnon. Rien d'autre n'est envoyé : ni conversations IA, ni journal, ni secrets. Rien n'est jamais perdu : la fusion garde le plus avancé.",
+  "syncNeedsCompanion": "Appairez d'abord un compagnon (avec la portée « sync »).",
+  "syncButton": "Synchroniser maintenant",
+  "syncUpToDate": "Déjà à jour : rien de nouveau sur les autres appareils.",
+  "syncDone": "Synchronisé : {lessons} leçon(s), {reviews} carte(s) de révision, {projects} projet(s) mis à jour.",
+  "@syncDone": {
+    "placeholders": {
+      "lessons": {
+        "type": "int"
+      },
+      "reviews": {
+        "type": "int"
+      },
+      "projects": {
+        "type": "int"
+      }
+    }
+  },
+  "syncScopeMissing": "Cet appareil n'a pas la portée « sync » : appairez-le avec --scopes …,sync.",
+  "syncLast": "Dernière synchronisation : {date}",
+  "@syncLast": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  }
 }

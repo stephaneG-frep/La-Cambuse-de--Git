@@ -9,6 +9,7 @@ export 'docker_lint.dart';
 export 'docker_templates.dart';
 export 'infra_lint.dart';
 export 'secret_scan.dart';
+export 'sync.dart';
 
 const apiVersion = 1;
 const defaultLoopbackPort = 47820;
@@ -30,7 +31,11 @@ enum Scope {
   docker('docker'),
 
   /// Analyse, tests et builds : exécutent du code du projet. Accordée à part.
-  build('build');
+  build('build'),
+
+  /// Synchronisation de la progression d'apprentissage entre appareils (aucun
+  /// accès aux projets). Accordée à part.
+  sync('sync');
 
   const Scope(this.code);
   final String code;

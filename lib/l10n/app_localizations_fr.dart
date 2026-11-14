@@ -1622,4 +1622,36 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get helpFrenchOnly => 'Guide rédigé en français.';
+
+  @override
+  String get syncTitle => 'Synchronisation de la progression';
+
+  @override
+  String get syncIntro =>
+      'Partage votre progression (leçons, révisions, projets) entre vos appareils via le compagnon. Rien d\'autre n\'est envoyé : ni conversations IA, ni journal, ni secrets. Rien n\'est jamais perdu : la fusion garde le plus avancé.';
+
+  @override
+  String get syncNeedsCompanion =>
+      'Appairez d\'abord un compagnon (avec la portée « sync »).';
+
+  @override
+  String get syncButton => 'Synchroniser maintenant';
+
+  @override
+  String get syncUpToDate =>
+      'Déjà à jour : rien de nouveau sur les autres appareils.';
+
+  @override
+  String syncDone(int lessons, int reviews, int projects) {
+    return 'Synchronisé : $lessons leçon(s), $reviews carte(s) de révision, $projects projet(s) mis à jour.';
+  }
+
+  @override
+  String get syncScopeMissing =>
+      'Cet appareil n\'a pas la portée « sync » : appairez-le avec --scopes …,sync.';
+
+  @override
+  String syncLast(String date) {
+    return 'Dernière synchronisation : $date';
+  }
 }

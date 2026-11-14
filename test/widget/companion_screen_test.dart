@@ -75,6 +75,7 @@ class ScriptedClient extends CompanionClient {
 /// empêche pumpAndSettle de se stabiliser pendant une opération).
 Future<void> tapPump(WidgetTester tester, Finder f) async {
   await tester.ensureVisible(f.first);
+  await tester.pump(); // mise en page après défilement, avant de toucher
   await tester.tap(f.first);
   for (var i = 0; i < 10; i++) {
     await tester.pump(const Duration(milliseconds: 50));

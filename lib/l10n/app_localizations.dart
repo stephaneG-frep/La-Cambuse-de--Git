@@ -2863,6 +2863,54 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Guide rédigé en français.'**
   String get helpFrenchOnly;
+
+  /// No description provided for @syncTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Synchronisation de la progression'**
+  String get syncTitle;
+
+  /// No description provided for @syncIntro.
+  ///
+  /// In fr, this message translates to:
+  /// **'Partage votre progression (leçons, révisions, projets) entre vos appareils via le compagnon. Rien d\'autre n\'est envoyé : ni conversations IA, ni journal, ni secrets. Rien n\'est jamais perdu : la fusion garde le plus avancé.'**
+  String get syncIntro;
+
+  /// No description provided for @syncNeedsCompanion.
+  ///
+  /// In fr, this message translates to:
+  /// **'Appairez d\'abord un compagnon (avec la portée « sync »).'**
+  String get syncNeedsCompanion;
+
+  /// No description provided for @syncButton.
+  ///
+  /// In fr, this message translates to:
+  /// **'Synchroniser maintenant'**
+  String get syncButton;
+
+  /// No description provided for @syncUpToDate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Déjà à jour : rien de nouveau sur les autres appareils.'**
+  String get syncUpToDate;
+
+  /// No description provided for @syncDone.
+  ///
+  /// In fr, this message translates to:
+  /// **'Synchronisé : {lessons} leçon(s), {reviews} carte(s) de révision, {projects} projet(s) mis à jour.'**
+  String syncDone(int lessons, int reviews, int projects);
+
+  /// No description provided for @syncScopeMissing.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cet appareil n\'a pas la portée « sync » : appairez-le avec --scopes …,sync.'**
+  String get syncScopeMissing;
+
+  /// No description provided for @syncLast.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dernière synchronisation : {date}'**
+  String syncLast(String date);
 }
 
 class _AppLocalizationsDelegate

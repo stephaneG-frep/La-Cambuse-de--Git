@@ -11,6 +11,7 @@ import '../../ai/domain/ai_models.dart';
 import '../../ai/presentation/ai_providers.dart';
 import '../../profile/data/profile_repository.dart';
 import '../domain/app_settings.dart';
+import '../../sync/presentation/sync_card.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -81,6 +82,7 @@ class _SettingsBody extends ConsumerWidget {
                 ),
               ),
             ),
+            const Padding(padding: EdgeInsets.only(bottom: CambuseSpacing.md), child: SyncCard()),
             Padding(
               padding: const EdgeInsets.only(bottom: CambuseSpacing.md),
               child: Card(

@@ -460,5 +460,13 @@
   "cpAiReview": "Review the plan",
   "helpTitle": "Ship's guide",
   "helpSubtitle": "Offline manual: Academy, companion, Workshop, Captain, security, troubleshooting",
-  "helpFrenchOnly": "This guide is written in French."
+  "helpFrenchOnly": "This guide is written in French.",
+  "syncTitle": "Progress synchronisation",
+  "syncIntro": "Shares your progress (lessons, reviews, projects) between your devices through the companion. Nothing else is sent: no AI conversations, no logbook, no secrets. Nothing is ever lost: the merge keeps the most advanced.",
+  "syncNeedsCompanion": "Pair a companion first (with the \"sync\" scope).",
+  "syncButton": "Synchronise now",
+  "syncUpToDate": "Already up to date: nothing new on other devices.",
+  "syncDone": "Synchronised: {lessons} lesson(s), {reviews} review card(s), {projects} project(s) updated.",
+  "syncScopeMissing": "This device lacks the \"sync\" scope: pair it with --scopes …,sync.",
+  "syncLast": "Last synchronisation: {date}"
 }

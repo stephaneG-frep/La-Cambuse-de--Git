@@ -215,6 +215,10 @@ class CompanionClient {
   Future<OpStatus> cancel(String id) async =>
       OpStatus.fromJson(await _authed('POST', '/v1/ops/$id/cancel') as Map<String, dynamic>);
 
+  /// Envoie la progression locale ; le compagnon renvoie la fusion de tous les appareils.
+  Future<ProgressSnapshot> sync(ProgressSnapshot local) async => ProgressSnapshot.fromJson(
+      ((await _authed('POST', '/v1/sync', body: {'snapshot': local.toJson()}) as Map)['snapshot'] as Map).cast<String, dynamic>());
+
   Future<List<Map<String, dynamic>>> audit({int limit = 50}) async =>
       ((await _authed('GET', '/v1/audit?limit=$limit')) as List).cast<Map<String, dynamic>>();
 

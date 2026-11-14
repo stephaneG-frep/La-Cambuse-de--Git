@@ -58,7 +58,7 @@ void main() {
     await tester.sendKeyEvent(LogicalKeyboardKey.comma);
     await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
     await tester.pumpAndSettle();
-    expect(find.text('Contraste renforcé'), findsOneWidget);
+    expect(find.text('Compagnon Linux'), findsOneWidget, reason: 'écran des paramètres ouvert');
     await teardown(tester, db);
   });
 

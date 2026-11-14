@@ -1618,4 +1618,36 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get helpFrenchOnly => 'This guide is written in French.';
+
+  @override
+  String get syncTitle => 'Progress synchronisation';
+
+  @override
+  String get syncIntro =>
+      'Shares your progress (lessons, reviews, projects) between your devices through the companion. Nothing else is sent: no AI conversations, no logbook, no secrets. Nothing is ever lost: the merge keeps the most advanced.';
+
+  @override
+  String get syncNeedsCompanion =>
+      'Pair a companion first (with the \"sync\" scope).';
+
+  @override
+  String get syncButton => 'Synchronise now';
+
+  @override
+  String get syncUpToDate =>
+      'Already up to date: nothing new on other devices.';
+
+  @override
+  String syncDone(int lessons, int reviews, int projects) {
+    return 'Synchronised: $lessons lesson(s), $reviews review card(s), $projects project(s) updated.';
+  }
+
+  @override
+  String get syncScopeMissing =>
+      'This device lacks the \"sync\" scope: pair it with --scopes …,sync.';
+
+  @override
+  String syncLast(String date) {
+    return 'Last synchronisation: $date';
+  }
 }
