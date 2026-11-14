@@ -31,24 +31,34 @@ DIST="$ROOT/dist"
 rm -rf "$DIST"
 mkdir -p "$DIST"
 log() { printf '▶ %s\n' "$*"; }
+# Exécute une étape dont la sortie va dans un journal ; en cas d'échec, affiche
+# la fin du journal (sinon la cause reste invisible, en CI notamment).
+step() {
+  local logfile="$1"; shift
+  if ! "$@" > "$logfile" 2>&1; then
+    echo "ÉCHEC : $* — fin de $logfile :" >&2
+    tail -40 "$logfile" >&2
+    exit 1
+  fi
+}
 
 if [ "$WITH_TESTS" = 1 ]; then
   log "Tests (application, compagnon, protocole)"
-  flutter analyze --fatal-infos > "$DIST/.analyze.log" 2>&1
-  flutter test > "$DIST/.test-app.log" 2>&1
-  (cd companion && dart test > "$DIST/.test-companion.log" 2>&1)
-  (cd packages/cambuse_protocol && dart test > "$DIST/.test-protocol.log" 2>&1)
+  step "$DIST/.analyze.log" flutter analyze --fatal-infos
+  step "$DIST/.test-app.log" flutter test
+  (cd companion && step "$DIST/.test-companion.log" dart test)
+  (cd packages/cambuse_protocol && step "$DIST/.test-protocol.log" dart test)
 fi
 
 if [ "$SKIP_BUILD" = 0 ]; then
   log "Build Linux (release)"
-  flutter build linux --release > "$DIST/.build-linux.log" 2>&1
+  step "$DIST/.build-linux.log" flutter build linux --release
   log "Build APK de test (debug, arm64-v8a)"
-  flutter build apk --debug --target-platform android-arm64 > "$DIST/.build-apk.log" 2>&1
+  step "$DIST/.build-apk.log" flutter build apk --debug --target-platform android-arm64
   log "Build du compagnon (exécutable natif)"
   rm -f build/companion/cambuse-companion
   mkdir -p build/companion
-  dart compile exe companion/bin/cambuse_companion.dart -o build/companion/cambuse-companion > "$DIST/.build-companion.log" 2>&1
+  step "$DIST/.build-companion.log" dart compile exe companion/bin/cambuse_companion.dart -o build/companion/cambuse-companion
 fi
 
 BUNDLE="$ROOT/build/linux/x64/release/bundle"

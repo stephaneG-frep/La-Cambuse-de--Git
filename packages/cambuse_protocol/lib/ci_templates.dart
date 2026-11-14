@@ -10,6 +10,7 @@ abstract final class PinnedActions {
   static const flutter = 'subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0';
   static const setupNode = 'actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0';
   static const setupPython = 'actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0';
+  static const setupJava = 'actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0';
   static const gitleaks = 'gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3.0.0';
 }
 
@@ -84,6 +85,11 @@ String? ciTemplate(String kind, String provider, {String flutterVersion = '3.27.
       - uses: ${PinnedActions.checkout}
         with:
           persist-credentials: false
+      # Le plugin Android Gradle récent exige Java 17 (Java 11 par défaut sur le runner).
+      - uses: ${PinnedActions.setupJava}
+        with:
+          distribution: temurin
+          java-version: '17'
       - uses: ${PinnedActions.flutter}
         with:
           flutter-version: $flutterVersion

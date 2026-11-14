@@ -7,7 +7,7 @@ Ce guide est aussi disponible hors ligne dans l'application : Paramètres → Gu
 - Au premier lancement, choisissez un nom de profil : il reste sur votre appareil, aucun compte en ligne n'est créé.
 - Le **Pont** résume votre progression et donne accès aux trois espaces : Académie, Atelier et Capitaine.
 - Le **Journal** garde la trace de ce qui s'est passé : leçons, opérations, décisions, erreurs. Aucun secret n'y est écrit.
-- Paramètres : taille du texte, contraste élevé, réduction des animations et langue.
+- Paramètres : taille du texte, contraste renforcé, réduction des animations et langue.
 
 ## Académie
 
