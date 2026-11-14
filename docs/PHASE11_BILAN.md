@@ -7,7 +7,7 @@ Date : 2026-11-14. Toutes les commandes listées ont réellement été exécuté
 ### Sécurité
 - **Historique Git entier analysé** : 389 versions de fichiers texte, avec le détecteur du projet.
   - **Aucun vrai secret.**
-  - Les valeurs détectées sont des jetons factices de tests (`ghp_TESTTOKEN000…`, `AKIAABCDEFGHIJKLMNOP`, `sk-ant-test-000…`) et des exemples pédagogiques des labos (`ghp_exempleNonValide1234`, `motdepasse-2024`).
+  - Les valeurs détectées sont des jetons factices de tests (`ghp_TESTTOKEN000…`, `AKIA…` (clé AWS factice), `sk-ant-test-000…`) et des exemples pédagogiques des labos (`ghp_exempleNonValide1234`, `motdepasse-2024`).
 - **gitleaks en CI** (règles par défaut) sur tout l'historique : vert. L'exception est limitée aux dossiers `test/` et aux deux valeurs d'exemple précises, dans `.gitleaks.toml`.
 - **Défaut corrigé : faux positifs bloquants.** La règle « mot de passe en clair » signalait du code ordinaire (`accessToken: _issueAccess(id)`, `keyPassword = keystoreProperties[…]`, `secretDetected = 'secret_detected'`). L'Atelier et le Capitaine auraient donc **bloqué des commits légitimes**. La règle tient désormais compte du type de fichier :
   - dans le code, elle exige une valeur littérale entre guillemets ;

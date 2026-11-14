@@ -1,7 +1,7 @@
 # Configuration gitleaks de La Cambuse de Git.
 # Règles par défaut, plus une exception explicite et auditable : les dossiers
 # de tests contiennent des jetons FACTICES construits exprès pour éprouver la
-# détection et le masquage des secrets (ex. ghp_TESTTOKEN000…, AKIAABCDEFGHIJKLMNOP).
+# détection et le masquage des secrets (ex. ghp_TESTTOKEN000…, AKIA…).
 # Aucun autre chemin n'est exempté. Audit de l'historique : docs/RAPPORT_FINAL.md.
 title = "La Cambuse de Git"
 
@@ -20,4 +20,6 @@ regexTarget = "match"
 regexes = [
   '''exempleNonValide''',
   '''motdepasse-2024''',
+  # Clé AWS factice des tests, citée dans un bilan de phase (commit bf78f51).
+  '''AKIAABCDEFGHIJKLMNOP''',
 ]
