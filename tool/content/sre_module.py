@@ -2,8 +2,8 @@
 """Module « Observabilité, sécurité et SRE » : python3 tool/content/sre_module.py"""
 from common import *
 
-CO = "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2"
-LEAKS = "gitleaks/gitleaks-action@83373cf2f8c4db6e24b41c1a9b086bb9619e9cd3 # v2.3.7"
+CO = "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1"
+LEAKS = "gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3.0.0"
 
 EXPR_5XX = "sum(rate(http_requests_total{code=~\"5..\"}[5m])) / sum(rate(http_requests_total[5m])) > 0.05"
 
@@ -175,7 +175,7 @@ S.append(lesson("ci-securisee", "Sécuriser la CI elle-même", 20,
   lab("workflow", "Ce workflow d'analyse de secrets a lui-même des failles : actions mobiles et droits totaux. Corrigez-le.",
       "name: Secrets\non:\n  pull_request:\npermissions: write-all\njobs:\n  secrets:\n    runs-on: ubuntu-24.04\n    timeout-minutes: 10\n    steps:\n      - uses: actions/checkout@v4\n        with:\n          fetch-depth: 0\n          persist-credentials: false\n      - uses: gitleaks/gitleaks-action@v2\n",
       [no("GH001", "Actions épinglées par empreinte"), no("GH003", "Plus de write-all"), valid()],
-      "permissions: contents: read ; checkout@11bd71901bbe5b1630ceea73d27597364c9af683 ; gitleaks-action@83373cf2f8c4db6e24b41c1a9b086bb9619e9cd3.",
+      "permissions: contents: read ; checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 ; gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e.",
       f"name: Secrets\non:\n  pull_request:\npermissions:\n  contents: read\njobs:\n  secrets:\n    runs-on: ubuntu-24.04\n    timeout-minutes: 10\n    steps:\n      - uses: {CO}\n        with:\n          fetch-depth: 0\n          persist-credentials: false\n      - uses: {LEAKS}\n")))
 
 S.append(lesson("vulnerabilites", "Vulnérabilités et correctifs", 18,

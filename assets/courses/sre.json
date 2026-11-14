@@ -842,7 +842,7 @@
     },
     {
      "type": "code",
-     "body": "secrets:\n  runs-on: ubuntu-24.04\n  timeout-minutes: 10\n  steps:\n    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2\n      with:\n        fetch-depth: 0\n        persist-credentials: false\n    - uses: gitleaks/gitleaks-action@83373cf2f8c4db6e24b41c1a9b086bb9619e9cd3 # v2.3.7",
+     "body": "secrets:\n  runs-on: ubuntu-24.04\n  timeout-minutes: 10\n  steps:\n    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1\n      with:\n        fetch-depth: 0\n        persist-credentials: false\n    - uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3.0.0",
      "caption": "Job d'analyse de secrets épinglé"
     },
     {
@@ -932,8 +932,8 @@
       "label": "Fichier valide"
      }
     ],
-    "hint": "permissions: contents: read ; checkout@11bd71901bbe5b1630ceea73d27597364c9af683 ; gitleaks-action@83373cf2f8c4db6e24b41c1a9b086bb9619e9cd3.",
-    "solution": "name: Secrets\non:\n  pull_request:\npermissions:\n  contents: read\njobs:\n  secrets:\n    runs-on: ubuntu-24.04\n    timeout-minutes: 10\n    steps:\n      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2\n        with:\n          fetch-depth: 0\n          persist-credentials: false\n      - uses: gitleaks/gitleaks-action@83373cf2f8c4db6e24b41c1a9b086bb9619e9cd3 # v2.3.7\n"
+    "hint": "permissions: contents: read ; checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 ; gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e.",
+    "solution": "name: Secrets\non:\n  pull_request:\npermissions:\n  contents: read\njobs:\n  secrets:\n    runs-on: ubuntu-24.04\n    timeout-minutes: 10\n    steps:\n      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1\n        with:\n          fetch-depth: 0\n          persist-credentials: false\n      - uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3.0.0\n"
    }
   },
   {

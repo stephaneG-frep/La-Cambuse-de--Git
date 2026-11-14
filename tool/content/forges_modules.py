@@ -2,8 +2,8 @@
 """Modules « GitHub » et « GitLab » : python3 tool/content/forges_modules.py"""
 from common import *
 
-CO = "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2"
-NODE = "actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0"
+CO = "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1"
+NODE = "actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0"
 
 # ====================================================================== GITHUB
 G = []
@@ -117,17 +117,17 @@ G.append(lesson("actions-epinglees", "Actions tierces : épingler et réduire", 
   ["Comprendre le risque d'une étiquette mobile", "Épingler une action par empreinte de commit"],
   [t("uses: une-org/une-action@v3 suit une étiquette que l'auteur (ou un attaquant qui a volé son compte) peut déplacer vers "
      "un autre code. Votre workflow exécuterait alors ce nouveau code avec vos secrets."),
-   code("- uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0", "Épinglage par empreinte, version en commentaire"),
+   code("- uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0", "Épinglage par empreinte, version en commentaire"),
    t("L'empreinte (40 caractères) désigne un contenu immuable. Dependabot sait mettre à jour ces empreintes et le commentaire."),
    tip("Moins d'actions tierces = moins de risques : une ligne run: de trois commandes vaut souvent mieux qu'une action obscure.")],
   [single("gh-8-1", "Pourquoi @v3 est-il risqué ?", ["L'étiquette peut être déplacée vers un autre code", "v3 est obsolète", "Les étiquettes sont interdites", "C'est plus lent"], 0, "Seule l'empreinte de commit est immuable."),
-   single("gh-8-2", "Quelle référence est immuable ?", ["@11bd71901bbe5b1630ceea73d27597364c9af683", "@v4", "@main", "@latest"], 0, "Une empreinte de 40 caractères."),
+   single("gh-8-2", "Quelle référence est immuable ?", ["@3d3c42e5aac5ba805825da76410c181273ba90b1", "@v4", "@main", "@latest"], 0, "Une empreinte de 40 caractères."),
    single("gh-8-3", "Qui peut tenir les empreintes à jour ?", ["Dependabot", "Personne", "GitHub Pages", "Le README"], 0, "Il propose des PR avec la nouvelle empreinte."),
    single("gh-8-4", "Une alternative à une action tierce simple ?", ["Quelques lignes run: lisibles", "Ignorer la CI", "Désactiver les permissions", "Copier un jeton"], 0, "Moins de dépendances, moins de surface d'attaque.")],
   lab("workflow", "Ces actions suivent des étiquettes mobiles. Épinglez-les par empreinte de commit.",
       "name: CI\non:\n  push:\npermissions:\n  contents: read\njobs:\n  build:\n    runs-on: ubuntu-24.04\n    timeout-minutes: 10\n    steps:\n      - uses: actions/checkout@v4\n        with:\n          persist-credentials: false\n      - uses: actions/setup-node@v4\n      - run: npm ci\n",
       [no("GH001", "Toutes les actions épinglées par empreinte"), valid()],
-      "checkout : 11bd71901bbe5b1630ceea73d27597364c9af683 (v4.2.2) ; setup-node : 39370e3970a6d050c480ffad4ff0ed4d3fdee5af (v4.1.0).",
+      "checkout : 3d3c42e5aac5ba805825da76410c181273ba90b1 (v7.0.1) ; setup-node : 949feb2413d6458794dcd2491c4babbbce0c15c1 (v7.1.0).",
       f"name: CI\non:\n  push:\npermissions:\n  contents: read\njobs:\n  build:\n    runs-on: ubuntu-24.04\n    timeout-minutes: 10\n    steps:\n      - uses: {CO}\n        with:\n          persist-credentials: false\n      - uses: {NODE}\n      - run: npm ci\n")))
 
 G.append(lesson("secrets-injection", "Secrets et injections dans les workflows", 22,

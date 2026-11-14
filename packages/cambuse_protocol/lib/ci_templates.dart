@@ -3,14 +3,14 @@
 /// secrets, artefacts avec sommes SHA-256. Aucun secret n'y figure.
 library;
 
-/// Actions GitHub épinglées (empreintes résolues le 2026-11-13).
+/// Actions GitHub épinglées (empreintes résolues le 2026-11-14 ; Node 24).
 abstract final class PinnedActions {
-  static const checkout = 'actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2';
-  static const uploadArtifact = 'actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3';
-  static const flutter = 'subosito/flutter-action@44ac965b96f18d999802d4b807e3256d5a3f9fa1 # v2.16.0';
-  static const setupNode = 'actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0';
-  static const setupPython = 'actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0';
-  static const gitleaks = 'gitleaks/gitleaks-action@83373cf2f8c4db6e24b41c1a9b086bb9619e9cd3 # v2.3.7';
+  static const checkout = 'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1';
+  static const uploadArtifact = 'actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2';
+  static const flutter = 'subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0';
+  static const setupNode = 'actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0';
+  static const setupPython = 'actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0';
+  static const gitleaks = 'gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3.0.0';
 }
 
 const ciTemplateKinds = ['flutter', 'node', 'python'];

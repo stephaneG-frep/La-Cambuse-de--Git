@@ -516,7 +516,7 @@
    "lab": {
     "kind": "workflow",
     "intro": "Ce workflow de release donne tous les droits au jeton. Accordez l'écriture au seul job qui publie.",
-    "starter": "name: Release\non:\n  push:\n    tags: ['v*']\npermissions: write-all\njobs:\n  publier:\n    runs-on: ubuntu-24.04\n    timeout-minutes: 15\n    steps:\n      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2\n        with:\n          persist-credentials: false\n      - run: gh release create \"$GITHUB_REF_NAME\" dist/* --draft\n        env:\n          GH_TOKEN: ${{ github.token }}\n",
+    "starter": "name: Release\non:\n  push:\n    tags: ['v*']\npermissions: write-all\njobs:\n  publier:\n    runs-on: ubuntu-24.04\n    timeout-minutes: 15\n    steps:\n      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1\n        with:\n          persist-credentials: false\n      - run: gh release create \"$GITHUB_REF_NAME\" dist/* --draft\n        env:\n          GH_TOKEN: ${{ github.token }}\n",
     "goals": [
      {
       "type": "noRule",
@@ -534,7 +534,7 @@
      }
     ],
     "hint": "En tête : permissions: contents: read ; dans le job publier : permissions: contents: write.",
-    "solution": "name: Release\non:\n  push:\n    tags: ['v*']\npermissions:\n  contents: read\njobs:\n  publier:\n    runs-on: ubuntu-24.04\n    timeout-minutes: 15\n    permissions:\n      contents: write\n    steps:\n      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2\n        with:\n          persist-credentials: false\n      - run: gh release create \"$GITHUB_REF_NAME\" dist/* --draft\n        env:\n          GH_TOKEN: ${{ github.token }}\n"
+    "solution": "name: Release\non:\n  push:\n    tags: ['v*']\npermissions:\n  contents: read\njobs:\n  publier:\n    runs-on: ubuntu-24.04\n    timeout-minutes: 15\n    permissions:\n      contents: write\n    steps:\n      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1\n        with:\n          persist-credentials: false\n      - run: gh release create \"$GITHUB_REF_NAME\" dist/* --draft\n        env:\n          GH_TOKEN: ${{ github.token }}\n"
    }
   },
   {
@@ -623,7 +623,7 @@
    "lab": {
     "kind": "workflow",
     "intro": "Ce workflow laisse au jeton les droits par défaut et n'a aucune limite de durée. Corrigez-le.",
-    "starter": "name: CI\non:\n  pull_request:\njobs:\n  test:\n    runs-on: ubuntu-24.04\n    steps:\n      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2\n        with:\n          persist-credentials: false\n      - run: npm ci && npm test\n",
+    "starter": "name: CI\non:\n  pull_request:\njobs:\n  test:\n    runs-on: ubuntu-24.04\n    steps:\n      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1\n        with:\n          persist-credentials: false\n      - run: npm ci && npm test\n",
     "goals": [
      {
       "type": "noRule",
@@ -641,7 +641,7 @@
      }
     ],
     "hint": "Ajoutez « permissions: contents: read » au niveau du workflow et « timeout-minutes: 10 » au job.",
-    "solution": "name: CI\non:\n  pull_request:\npermissions:\n  contents: read\njobs:\n  test:\n    runs-on: ubuntu-24.04\n    timeout-minutes: 10\n    steps:\n      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2\n        with:\n          persist-credentials: false\n      - run: npm ci && npm test\n"
+    "solution": "name: CI\non:\n  pull_request:\npermissions:\n  contents: read\njobs:\n  test:\n    runs-on: ubuntu-24.04\n    timeout-minutes: 10\n    steps:\n      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1\n        with:\n          persist-credentials: false\n      - run: npm ci && npm test\n"
    }
   },
   {
@@ -659,7 +659,7 @@
     },
     {
      "type": "code",
-     "body": "- uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0",
+     "body": "- uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0",
      "caption": "Épinglage par empreinte, version en commentaire"
     },
     {
@@ -692,7 +692,7 @@
      "type": "single",
      "prompt": "Quelle référence est immuable ?",
      "choices": [
-      "@11bd71901bbe5b1630ceea73d27597364c9af683",
+      "@3d3c42e5aac5ba805825da76410c181273ba90b1",
       "@v4",
       "@main",
       "@latest"
@@ -748,8 +748,8 @@
       "label": "Fichier valide"
      }
     ],
-    "hint": "checkout : 11bd71901bbe5b1630ceea73d27597364c9af683 (v4.2.2) ; setup-node : 39370e3970a6d050c480ffad4ff0ed4d3fdee5af (v4.1.0).",
-    "solution": "name: CI\non:\n  push:\npermissions:\n  contents: read\njobs:\n  build:\n    runs-on: ubuntu-24.04\n    timeout-minutes: 10\n    steps:\n      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2\n        with:\n          persist-credentials: false\n      - uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0\n      - run: npm ci\n"
+    "hint": "checkout : 3d3c42e5aac5ba805825da76410c181273ba90b1 (v7.0.1) ; setup-node : 949feb2413d6458794dcd2491c4babbbce0c15c1 (v7.1.0).",
+    "solution": "name: CI\non:\n  push:\npermissions:\n  contents: read\njobs:\n  build:\n    runs-on: ubuntu-24.04\n    timeout-minutes: 10\n    steps:\n      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1\n        with:\n          persist-credentials: false\n      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0\n      - run: npm ci\n"
    }
   },
   {
@@ -957,7 +957,7 @@
    "lab": {
     "kind": "workflow",
     "intro": "Ce workflow construit le code des PR externes avec les secrets du dépôt. Rendez-le sûr.",
-    "starter": "name: Tests PR\non:\n  pull_request_target:\npermissions:\n  contents: read\njobs:\n  test:\n    runs-on: ubuntu-24.04\n    timeout-minutes: 15\n    steps:\n      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2\n        with:\n          ref: ${{ github.event.pull_request.head.sha }}\n          persist-credentials: false\n      - run: npm ci && npm test\n",
+    "starter": "name: Tests PR\non:\n  pull_request_target:\npermissions:\n  contents: read\njobs:\n  test:\n    runs-on: ubuntu-24.04\n    timeout-minutes: 15\n    steps:\n      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1\n        with:\n          ref: ${{ github.event.pull_request.head.sha }}\n          persist-credentials: false\n      - run: npm ci && npm test\n",
     "goals": [
      {
       "type": "noRule",
@@ -971,7 +971,7 @@
      }
     ],
     "hint": "Remplacez le déclencheur par pull_request et retirez le ref : checkout prendra le code de la PR sans secrets.",
-    "solution": "name: Tests PR\non:\n  pull_request:\npermissions:\n  contents: read\njobs:\n  test:\n    runs-on: ubuntu-24.04\n    timeout-minutes: 15\n    steps:\n      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2\n        with:\n          persist-credentials: false\n      - run: npm ci && npm test\n"
+    "solution": "name: Tests PR\non:\n  pull_request:\npermissions:\n  contents: read\njobs:\n  test:\n    runs-on: ubuntu-24.04\n    timeout-minutes: 15\n    steps:\n      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1\n        with:\n          persist-credentials: false\n      - run: npm ci && npm test\n"
    }
   }
  ],
@@ -1005,7 +1005,7 @@
     }
    ],
    "hint": "Reprenez les labos : déclencheur pull_request, permissions en lecture, empreintes, env: pour les données tierces, aucun secret affiché, timeout.",
-   "solution": "name: CI\non:\n  pull_request:\n  push:\n    branches: [main]\npermissions:\n  contents: read\njobs:\n  test:\n    runs-on: ubuntu-24.04\n    timeout-minutes: 15\n    steps:\n      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2\n        with:\n          persist-credentials: false\n      - uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0\n      - env:\n          BRANCHE: ${{ github.head_ref }}\n        run: echo \"Branche $BRANCHE\"\n      - run: npm ci && npm test\n"
+   "solution": "name: CI\non:\n  pull_request:\n  push:\n    branches: [main]\npermissions:\n  contents: read\njobs:\n  test:\n    runs-on: ubuntu-24.04\n    timeout-minutes: 15\n    steps:\n      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1\n        with:\n          persist-credentials: false\n      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0\n      - env:\n          BRANCHE: ${{ github.head_ref }}\n        run: echo \"Branche $BRANCHE\"\n      - run: npm ci && npm test\n"
   },
   "rubric": [
    {
