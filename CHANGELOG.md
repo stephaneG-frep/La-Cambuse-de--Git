@@ -2,7 +2,23 @@
 
 Format inspiré de « Keep a Changelog ». Versions non publiées.
 
-## [Non publié] — Phase 10 : Capitaine automatique (2026-11-14)
+## [1.0.0] — Phase 11 : stabilisation et livraison (2026-11-14)
+
+### Ajouté
+- Guide de bord hors ligne (Paramètres → Guide de bord), guide développeur, politique de sécurité.
+- Tests d'accessibilité (cibles, libellés, contraste) et texte à 200 % sur les écrans principaux.
+- CI : lancement manuel, configuration gitleaks auditable, Java 17 pour le build Android.
+
+### Corrigé
+- Détection de secrets : faux positifs qui auraient bloqué des commits de code ordinaire.
+- CI du dépôt (en échec depuis la phase 4) : dépendances avant l'analyse, jetons factices des tests, Java 17.
+- Modèle de CI Flutter généré : Java 17 manquant pour le build de l'APK.
+- Guide : cibles d'appui long trop petites sur bureau.
+
+### Modifié
+- Actions GitHub mises à jour (Node 24) dans la CI, les modèles et les labos ; dépendances transitives (dont sqlite3 3.9.1).
+
+## Phase 10 : Capitaine automatique (2026-11-14)
 
 ### Ajouté
 - Moteur de missions supervisées : étapes typées (opérations du compagnon), validation stricte des plans, point de contrôle automatique, relecture, approbation, consentement spécifique pour les actions externes, limites, pause, arrêt d'urgence, reprise après interruption, journal horodaté, rapport de fin, guide de retour arrière.
