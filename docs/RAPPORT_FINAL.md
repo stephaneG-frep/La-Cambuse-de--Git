@@ -110,13 +110,24 @@ Installation réelle sur ce PC (Ubuntu 22.04.5, x86_64), par l'utilisateur, avec
 - Remarque de `desktop-file-validate` : l'entrée déclare deux catégories principales (`Development;Education;`), donc l'application peut apparaître deux fois dans certains menus. C'est un détail cosmétique, laissé tel quel dans le paquet testé.
 - Désinstallation : `sudo apt remove la-cambuse`.
 
+## 6 bis. Compléments livrés après la version 1.0.0
+
+- **Compagnon en réseau local (TLS) essayé depuis le téléphone** :
+  - appairage sans câble sur le Wi-Fi (`https://192.168.1.73:47821`, empreinte épinglée), enregistré `"via":"lan"` dans l'audit ;
+  - une empreinte fausse d'un caractère est **refusée** (« Certificat TLS refusé ») ;
+  - une opération réelle (`git status`) passe par le réseau local ;
+  - le port est refermé après l'essai.
+- **Synchronisation explicite de la progression** (SPEC §10) :
+  - nouvelle portée `sync` ; route `POST /v1/sync` du compagnon ; coffre `sync.json` en 0600 ;
+  - fusion commutative, associative et idempotente, vérifiée sur 200 tirages aléatoires ;
+  - essai réel dans les deux sens. Le Honor envoie 4 leçons ; l'**application Linux réelle** (test d'intégration `integration_test/sync_linux_test.dart`, vrai compagnon, base temporaire) les reçoit et ajoute sa leçon Git terminée ; le Honor récupère alors cette leçon, et son Pont affiche « Git — 1/14 leçons ».
+
 ## 7. Limites connues
 
 - **APK debug uniquement** : aucune release signée, par choix. La procédure de signature est documentée (`android/key.properties`, avec refus explicite sans ce fichier).
 - **GitLab** : client testé sur serveur simulé, pas sur un vrai GitLab.
-- **Compagnon en réseau local (TLS)** : testé automatiquement, **jamais essayé depuis le téléphone**. Les essais réels sont passés par `adb reverse`.
+- **Synchronisation** : explicite, sur bouton, via un compagnon commun ; pas de synchronisation automatique ni par Internet. Le test d'intégration Linux demande un compagnon lancé : il n'est pas exécuté dans la CI.
 - **Moteur IA local (Ollama)** : couvert par le fournisseur « compatible OpenAI », testé sur serveur simulé seulement.
-- **Synchronisation entre appareils** (SPEC §10, « si activée ») : **non implémentée**. Toutes les données restent locales à chaque appareil.
 - **Contenu des modules avancés** (phase 9) : rédigé par l'IA, vérifié par tests et labos réalisables, **non relu par un expert humain**.
 - Les labos sont statiques : aucun conteneur, cluster ni script n'est exécuté.
 - Guide de bord et cours en français uniquement ; interface en français et en anglais.

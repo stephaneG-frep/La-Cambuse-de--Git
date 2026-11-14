@@ -15,7 +15,7 @@ Ne la décrivez pas dans un ticket public. Utilisez le signalement privé de Git
   - dossiers autorisés confinés (liens symboliques résolus, `..` refusé) ;
   - Git durci : hooks désactivés, `fsmonitor` désactivé ;
   - journal d'audit JSONL.
-- **Portées** accordées séparément : `read`, `git-write`, `remote`, `docker` (équivaut à root), `build` (exécute du code du projet).
+- **Portées** accordées séparément : `read`, `git-write`, `remote`, `docker` (équivaut à root), `build` (exécute du code du projet), `sync` (progression d'apprentissage uniquement ; jamais de conversations IA, de journal ni de secrets).
 - **Mutations** : approbation explicite, avec la commande exacte affichée. Pas de `push --force`. Sauvegarde avant toute opération qui écrase.
 - **Secrets** :
   - clés et jetons rangés dans le coffre du système (Keystore Android, libsecret Linux) ;

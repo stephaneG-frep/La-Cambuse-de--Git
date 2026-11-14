@@ -33,7 +33,7 @@ Le téléphone ne lance jamais de commande sur votre PC par lui-même. Il passe 
 
 ```
 cambuse-companion serve --root ~/Projets
-cambuse-companion pair --scopes read,git-write,remote,docker,build
+cambuse-companion pair --scopes read,git-write,remote,docker,build,sync
 ```
 
 - `serve` n'autorise que les dossiers indiqués par `--root` et n'écoute que sur la machine (127.0.0.1). Avec `--lan`, il écoute aussi sur le réseau local, en TLS uniquement.
@@ -43,9 +43,26 @@ cambuse-companion pair --scopes read,git-write,remote,docker,build
   - `git-write` : modifications locales ;
   - `remote` : push et pull ;
   - `docker` : inspection Docker, ce qui équivaut à des droits root ;
-  - `build` : analyse, tests et builds, qui exécutent du code du projet.
+  - `build` : analyse, tests et builds, qui exécutent du code du projet ;
+  - `sync` : synchronisation de la progression entre vos appareils.
+- **Sans câble, sur votre Wi-Fi** :
+  1. lancez `cambuse-companion serve --lan --root ~/Projets` ; il affiche le port (47821) et l'**empreinte du certificat** ;
+  2. si besoin, autorisez ce port dans le pare-feu, uniquement pour votre réseau local ;
+  3. dans l'application, saisissez l'adresse `https://<adresse-du-PC>:47821`, l'empreinte et le code d'appairage.
+
+  Une empreinte qui ne correspond pas est refusée.
 - Téléphone relié en USB pour le développement : `adb reverse tcp:47820 tcp:47820`, puis l'adresse `http://127.0.0.1:47820`.
 - Pour révoquer un appareil : `cambuse-companion revoke <identifiant>`.
+
+## Synchroniser plusieurs appareils
+
+- Paramètres → **Synchronisation de la progression** → « Synchroniser maintenant ». Chaque appareil doit être appairé au même compagnon, avec la portée `sync`.
+- Seule la progression circule : leçons, cartes de révision et projets. Les conversations IA, le journal et les secrets ne sont jamais envoyés.
+- Rien n'est perdu, et l'ordre des synchronisations n'a pas d'importance :
+  - une leçon terminée sur un appareil l'est partout ;
+  - le meilleur score est gardé ;
+  - pour une révision, c'est la carte la plus révisée qui l'emporte.
+- La synchronisation est **explicite** : elle n'a lieu que lorsque vous appuyez sur le bouton.
 
 ## Atelier
 

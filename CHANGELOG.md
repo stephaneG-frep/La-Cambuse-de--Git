@@ -2,6 +2,15 @@
 
 Format inspiré de « Keep a Changelog ». Versions non publiées.
 
+## [Non publié] — compléments après 1.0.0 (2026-11-14)
+
+### Ajouté
+- Synchronisation explicite de la progression entre appareils via le compagnon (portée `sync`, fusion sans perte).
+- Test d'intégration sur la cible Linux (`integration_test/sync_linux_test.dart`).
+
+### Vérifié
+- Compagnon en réseau local (TLS) depuis le téléphone : appairage sans câble, refus d'une empreinte fausse.
+
 ## [1.0.0] — Phase 11 : stabilisation et livraison (2026-11-14)
 
 ### Ajouté
