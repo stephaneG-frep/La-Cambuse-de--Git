@@ -8,6 +8,8 @@ on:
   push:
     branches: [main]
   pull_request:
+  # Lancement manuel : gitleaks analyse alors tout l'historique.
+  workflow_dispatch:
 
 permissions:
   contents: read
