@@ -2,7 +2,18 @@
 
 Format inspiré de « Keep a Changelog ». Versions non publiées.
 
-## [Non publié] — Phase 9 : Académie avancée (2026-11-13)
+## [Non publié] — Phase 10 : Capitaine automatique (2026-11-14)
+
+### Ajouté
+- Moteur de missions supervisées : étapes typées (opérations du compagnon), validation stricte des plans, point de contrôle automatique, relecture, approbation, consentement spécifique pour les actions externes, limites, pause, arrêt d'urgence, reprise après interruption, journal horodaté, rapport de fin, guide de retour arrière.
+- Missions : mettre un projet sous Git, contrôle qualité Flutter, mise en place de la CI, publication.
+- Plan proposé par le professeur IA (facultatif), traité comme non fiable et validé avant affichage.
+- Écrans : accueil du Capitaine, Table de navigation, exécution ; base de données v4.
+
+### Corrigé
+- Barre latérale de navigation qui débordait en paysage sur téléphone.
+
+## Phase 9 : Académie avancée (2026-11-13)
 
 ### Ajouté
 - Modules Terminal Linux, GitHub, GitLab, DevOps et CI/CD, Réseaux/serveurs/cloud, Kubernetes, Terraform/OpenTofu/Ansible, Observabilité/sécurité/SRE : 79 leçons, 316 questions, 48 labos, 8 projets avec grille.

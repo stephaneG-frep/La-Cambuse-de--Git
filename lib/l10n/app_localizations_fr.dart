@@ -1354,4 +1354,262 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get compApproveWarningBuild =>
       'Cette opération exécute du code du projet sur le PC (scripts de build, plugins, tests). Rien n\'est fait sans votre accord.';
+
+  @override
+  String get cpTitle => 'Le Capitaine automatique';
+
+  @override
+  String get cpSubtitle =>
+      'Des missions exécutées étape par étape sous votre supervision : plan affiché, point de contrôle, chaque modification approuvée, pause et arrêt d\'urgence à tout moment.';
+
+  @override
+  String get cpNeedsCompanion =>
+      'Le Capitaine agit sur vos projets via le compagnon Linux : appairez-le d\'abord.';
+
+  @override
+  String get cpDecisionWaiting => 'Une décision vous attend';
+
+  @override
+  String get cpMissions => 'Missions';
+
+  @override
+  String get cpAiTitle => 'Proposer une mission avec le professeur IA';
+
+  @override
+  String get cpAiDesc =>
+      'Facultatif : l\'IA propose un plan, validé strictement puis soumis à votre approbation.';
+
+  @override
+  String get cpHistory => 'Journal des missions';
+
+  @override
+  String get cpHistoryEmpty => 'Aucune mission pour l\'instant.';
+
+  @override
+  String get cpPlanTitle => 'Table de navigation';
+
+  @override
+  String get cpPlanMissing => 'Mission introuvable.';
+
+  @override
+  String get cpPlanFromAi =>
+      'Plan proposé par le professeur IA : relisez chaque étape. Il a été validé (opérations autorisées, aucun secret) mais pas jugé à votre place.';
+
+  @override
+  String cpLimits(int steps, int mutations, int minutes) {
+    return 'Limites : $steps étapes, $mutations modifications, $minutes min au total ; chaque opération a son propre délai.';
+  }
+
+  @override
+  String get cpCostAi =>
+      'Coût IA : celui de la proposition (affiché à l\'étape précédente) ; l\'exécution n\'appelle pas l\'IA.';
+
+  @override
+  String get cpCostNone =>
+      'Coût IA : aucun (mission prédéfinie, fonctionne sans fournisseur).';
+
+  @override
+  String get cpPlanInvalid => 'Plan refusé par la validation :';
+
+  @override
+  String get cpApproveNote =>
+      'Approuver le plan lance la mission. Chaque modification restera soumise à l\'approbation du compagnon, et toute action externe à un consentement spécifique.';
+
+  @override
+  String get cpChooseProject => 'Choisissez un projet';
+
+  @override
+  String get cpApproveLaunch => 'Approuver le plan et lancer';
+
+  @override
+  String get cpTokenAtRuntime =>
+      'token : lu dans le coffre au moment de l\'exécution (jamais affiché ni enregistré)';
+
+  @override
+  String cpComputed(String param, String source) {
+    return '$param : calculé à l\'exécution ($source)';
+  }
+
+  @override
+  String get cpMarkReview => 'Relecture humaine';
+
+  @override
+  String get cpMarkConsent => 'Consentement spécifique';
+
+  @override
+  String get cpMarkApproval => 'Approbation du compagnon';
+
+  @override
+  String cpMarkWhen(String condition) {
+    return 'Si $condition';
+  }
+
+  @override
+  String cpMarkRequires(String condition) {
+    return 'Arrêt sauf si $condition';
+  }
+
+  @override
+  String get cpProject => 'Projet';
+
+  @override
+  String get cpRiskRead => 'Lecture seule';
+
+  @override
+  String get cpRiskCheckpoint => 'Point de contrôle';
+
+  @override
+  String get cpRiskModify => 'Modifie le projet';
+
+  @override
+  String get cpRiskExecute => 'Exécute du code';
+
+  @override
+  String get cpRiskExternal => 'Action externe';
+
+  @override
+  String get cpStepTodo => 'À faire';
+
+  @override
+  String get cpStepRunning => 'En cours';
+
+  @override
+  String get cpStepDone => 'Réussie';
+
+  @override
+  String get cpStepSkipped => 'Ignorée';
+
+  @override
+  String get cpStepFailed => 'Échouée';
+
+  @override
+  String get cpStepRefused => 'Refusée';
+
+  @override
+  String get cpStepCancelled => 'Annulée';
+
+  @override
+  String get cpStepUnknown => 'État inconnu';
+
+  @override
+  String get cpRunReady => 'Prête';
+
+  @override
+  String get cpRunRunning => 'En cours';
+
+  @override
+  String get cpRunPaused => 'En pause';
+
+  @override
+  String get cpRunDone => 'Terminée';
+
+  @override
+  String get cpRunFailed => 'Échouée';
+
+  @override
+  String get cpRunStopped => 'Arrêtée';
+
+  @override
+  String get cpRunInterrupted => 'Interrompue (reprise possible)';
+
+  @override
+  String get cpRunTitle => 'Mission';
+
+  @override
+  String get cpProgress => 'Avancement de la mission';
+
+  @override
+  String get cpPause => 'Pause';
+
+  @override
+  String get cpPauseRequested => 'Pause demandée (fin de l\'étape en cours)';
+
+  @override
+  String get cpResume => 'Reprendre';
+
+  @override
+  String get cpEmergencyStop => 'Arrêt d\'urgence';
+
+  @override
+  String get cpSteps => 'Étapes';
+
+  @override
+  String get cpRollback => 'Retour arrière';
+
+  @override
+  String get cpRollbackNone => 'Aucune modification à défaire.';
+
+  @override
+  String get cpRestoreCheckpoint => 'Restaurer dans un nouveau dossier';
+
+  @override
+  String cpRestored(String path) {
+    return 'Restauré dans $path';
+  }
+
+  @override
+  String get cpCopyReport => 'Copier le rapport';
+
+  @override
+  String get cpReportCopied => 'Rapport copié';
+
+  @override
+  String get cpReport => 'Rapport de mission';
+
+  @override
+  String get cpJournal => 'Journal horodaté';
+
+  @override
+  String get cpDecApproval => 'Le compagnon demande votre accord';
+
+  @override
+  String get cpDecReview => 'Relisez avant de continuer';
+
+  @override
+  String get cpDecConsent => 'Action externe : consentement spécifique';
+
+  @override
+  String get cpDecContinue => 'Continuer';
+
+  @override
+  String get cpDecPublish => 'Publier';
+
+  @override
+  String get cpDecConsentWarn =>
+      'Cette action sort de votre machine et ne peut pas être annulée automatiquement.';
+
+  @override
+  String get cpDecUnderstood =>
+      'Je comprends que cette publication est visible par d\'autres et non annulable automatiquement.';
+
+  @override
+  String get cpAiIntro =>
+      'Décrivez votre objectif. Le professeur IA propose un plan composé uniquement d\'opérations autorisées ; il est validé strictement (aucun shell, aucun secret, chemins confinés) et rien ne s\'exécute sans votre approbation.';
+
+  @override
+  String get cpAiGoal => 'Objectif';
+
+  @override
+  String get cpAiGoalHint =>
+      'Ex. : créer une branche de travail et commiter mes changements';
+
+  @override
+  String get cpAiAsk => 'Demander un plan';
+
+  @override
+  String cpAiUsage(int input, int output, String cost) {
+    return 'Jetons : $input en entrée, $output en sortie — coût estimé $cost';
+  }
+
+  @override
+  String get cpAiRejected =>
+      'Plan refusé par la validation (rien ne sera exécuté) :';
+
+  @override
+  String cpAiAccepted(String title, int count) {
+    return 'Plan valide : « $title », $count étapes.';
+  }
+
+  @override
+  String get cpAiReview => 'Examiner le plan';
 }

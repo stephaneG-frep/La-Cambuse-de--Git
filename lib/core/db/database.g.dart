@@ -3227,6 +3227,956 @@ class AiMessagesCompanion extends UpdateCompanion<AiMessageRow> {
   }
 }
 
+class $CaptainRunsTable extends CaptainRuns
+    with TableInfo<$CaptainRunsTable, CaptainRunRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CaptainRunsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _missionIdMeta = const VerificationMeta(
+    'missionId',
+  );
+  @override
+  late final GeneratedColumn<String> missionId = GeneratedColumn<String>(
+    'mission_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  @override
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+    'title',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _projectPathMeta = const VerificationMeta(
+    'projectPath',
+  );
+  @override
+  late final GeneratedColumn<String> projectPath = GeneratedColumn<String>(
+    'project_path',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _stateMeta = const VerificationMeta('state');
+  @override
+  late final GeneratedColumn<String> state = GeneratedColumn<String>(
+    'state',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _snapshotJsonMeta = const VerificationMeta(
+    'snapshotJson',
+  );
+  @override
+  late final GeneratedColumn<String> snapshotJson = GeneratedColumn<String>(
+    'snapshot_json',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _reportMdMeta = const VerificationMeta(
+    'reportMd',
+  );
+  @override
+  late final GeneratedColumn<String> reportMd = GeneratedColumn<String>(
+    'report_md',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    missionId,
+    title,
+    projectPath,
+    state,
+    snapshotJson,
+    reportMd,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'captain_runs';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CaptainRunRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('mission_id')) {
+      context.handle(
+        _missionIdMeta,
+        missionId.isAcceptableOrUnknown(data['mission_id']!, _missionIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_missionIdMeta);
+    }
+    if (data.containsKey('title')) {
+      context.handle(
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_titleMeta);
+    }
+    if (data.containsKey('project_path')) {
+      context.handle(
+        _projectPathMeta,
+        projectPath.isAcceptableOrUnknown(
+          data['project_path']!,
+          _projectPathMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_projectPathMeta);
+    }
+    if (data.containsKey('state')) {
+      context.handle(
+        _stateMeta,
+        state.isAcceptableOrUnknown(data['state']!, _stateMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_stateMeta);
+    }
+    if (data.containsKey('snapshot_json')) {
+      context.handle(
+        _snapshotJsonMeta,
+        snapshotJson.isAcceptableOrUnknown(
+          data['snapshot_json']!,
+          _snapshotJsonMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_snapshotJsonMeta);
+    }
+    if (data.containsKey('report_md')) {
+      context.handle(
+        _reportMdMeta,
+        reportMd.isAcceptableOrUnknown(data['report_md']!, _reportMdMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  CaptainRunRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CaptainRunRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      missionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}mission_id'],
+      )!,
+      title: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      )!,
+      projectPath: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}project_path'],
+      )!,
+      state: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}state'],
+      )!,
+      snapshotJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}snapshot_json'],
+      )!,
+      reportMd: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}report_md'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $CaptainRunsTable createAlias(String alias) {
+    return $CaptainRunsTable(attachedDatabase, alias);
+  }
+}
+
+class CaptainRunRow extends DataClass implements Insertable<CaptainRunRow> {
+  final String id;
+  final String missionId;
+  final String title;
+  final String projectPath;
+  final String state;
+  final String snapshotJson;
+  final String? reportMd;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const CaptainRunRow({
+    required this.id,
+    required this.missionId,
+    required this.title,
+    required this.projectPath,
+    required this.state,
+    required this.snapshotJson,
+    this.reportMd,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['mission_id'] = Variable<String>(missionId);
+    map['title'] = Variable<String>(title);
+    map['project_path'] = Variable<String>(projectPath);
+    map['state'] = Variable<String>(state);
+    map['snapshot_json'] = Variable<String>(snapshotJson);
+    if (!nullToAbsent || reportMd != null) {
+      map['report_md'] = Variable<String>(reportMd);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  CaptainRunsCompanion toCompanion(bool nullToAbsent) {
+    return CaptainRunsCompanion(
+      id: Value(id),
+      missionId: Value(missionId),
+      title: Value(title),
+      projectPath: Value(projectPath),
+      state: Value(state),
+      snapshotJson: Value(snapshotJson),
+      reportMd: reportMd == null && nullToAbsent
+          ? const Value.absent()
+          : Value(reportMd),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory CaptainRunRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CaptainRunRow(
+      id: serializer.fromJson<String>(json['id']),
+      missionId: serializer.fromJson<String>(json['missionId']),
+      title: serializer.fromJson<String>(json['title']),
+      projectPath: serializer.fromJson<String>(json['projectPath']),
+      state: serializer.fromJson<String>(json['state']),
+      snapshotJson: serializer.fromJson<String>(json['snapshotJson']),
+      reportMd: serializer.fromJson<String?>(json['reportMd']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'missionId': serializer.toJson<String>(missionId),
+      'title': serializer.toJson<String>(title),
+      'projectPath': serializer.toJson<String>(projectPath),
+      'state': serializer.toJson<String>(state),
+      'snapshotJson': serializer.toJson<String>(snapshotJson),
+      'reportMd': serializer.toJson<String?>(reportMd),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  CaptainRunRow copyWith({
+    String? id,
+    String? missionId,
+    String? title,
+    String? projectPath,
+    String? state,
+    String? snapshotJson,
+    Value<String?> reportMd = const Value.absent(),
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => CaptainRunRow(
+    id: id ?? this.id,
+    missionId: missionId ?? this.missionId,
+    title: title ?? this.title,
+    projectPath: projectPath ?? this.projectPath,
+    state: state ?? this.state,
+    snapshotJson: snapshotJson ?? this.snapshotJson,
+    reportMd: reportMd.present ? reportMd.value : this.reportMd,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  CaptainRunRow copyWithCompanion(CaptainRunsCompanion data) {
+    return CaptainRunRow(
+      id: data.id.present ? data.id.value : this.id,
+      missionId: data.missionId.present ? data.missionId.value : this.missionId,
+      title: data.title.present ? data.title.value : this.title,
+      projectPath: data.projectPath.present
+          ? data.projectPath.value
+          : this.projectPath,
+      state: data.state.present ? data.state.value : this.state,
+      snapshotJson: data.snapshotJson.present
+          ? data.snapshotJson.value
+          : this.snapshotJson,
+      reportMd: data.reportMd.present ? data.reportMd.value : this.reportMd,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CaptainRunRow(')
+          ..write('id: $id, ')
+          ..write('missionId: $missionId, ')
+          ..write('title: $title, ')
+          ..write('projectPath: $projectPath, ')
+          ..write('state: $state, ')
+          ..write('snapshotJson: $snapshotJson, ')
+          ..write('reportMd: $reportMd, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    missionId,
+    title,
+    projectPath,
+    state,
+    snapshotJson,
+    reportMd,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CaptainRunRow &&
+          other.id == this.id &&
+          other.missionId == this.missionId &&
+          other.title == this.title &&
+          other.projectPath == this.projectPath &&
+          other.state == this.state &&
+          other.snapshotJson == this.snapshotJson &&
+          other.reportMd == this.reportMd &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class CaptainRunsCompanion extends UpdateCompanion<CaptainRunRow> {
+  final Value<String> id;
+  final Value<String> missionId;
+  final Value<String> title;
+  final Value<String> projectPath;
+  final Value<String> state;
+  final Value<String> snapshotJson;
+  final Value<String?> reportMd;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const CaptainRunsCompanion({
+    this.id = const Value.absent(),
+    this.missionId = const Value.absent(),
+    this.title = const Value.absent(),
+    this.projectPath = const Value.absent(),
+    this.state = const Value.absent(),
+    this.snapshotJson = const Value.absent(),
+    this.reportMd = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CaptainRunsCompanion.insert({
+    required String id,
+    required String missionId,
+    required String title,
+    required String projectPath,
+    required String state,
+    required String snapshotJson,
+    this.reportMd = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       missionId = Value(missionId),
+       title = Value(title),
+       projectPath = Value(projectPath),
+       state = Value(state),
+       snapshotJson = Value(snapshotJson),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<CaptainRunRow> custom({
+    Expression<String>? id,
+    Expression<String>? missionId,
+    Expression<String>? title,
+    Expression<String>? projectPath,
+    Expression<String>? state,
+    Expression<String>? snapshotJson,
+    Expression<String>? reportMd,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (missionId != null) 'mission_id': missionId,
+      if (title != null) 'title': title,
+      if (projectPath != null) 'project_path': projectPath,
+      if (state != null) 'state': state,
+      if (snapshotJson != null) 'snapshot_json': snapshotJson,
+      if (reportMd != null) 'report_md': reportMd,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CaptainRunsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? missionId,
+    Value<String>? title,
+    Value<String>? projectPath,
+    Value<String>? state,
+    Value<String>? snapshotJson,
+    Value<String?>? reportMd,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return CaptainRunsCompanion(
+      id: id ?? this.id,
+      missionId: missionId ?? this.missionId,
+      title: title ?? this.title,
+      projectPath: projectPath ?? this.projectPath,
+      state: state ?? this.state,
+      snapshotJson: snapshotJson ?? this.snapshotJson,
+      reportMd: reportMd ?? this.reportMd,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (missionId.present) {
+      map['mission_id'] = Variable<String>(missionId.value);
+    }
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
+    }
+    if (projectPath.present) {
+      map['project_path'] = Variable<String>(projectPath.value);
+    }
+    if (state.present) {
+      map['state'] = Variable<String>(state.value);
+    }
+    if (snapshotJson.present) {
+      map['snapshot_json'] = Variable<String>(snapshotJson.value);
+    }
+    if (reportMd.present) {
+      map['report_md'] = Variable<String>(reportMd.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CaptainRunsCompanion(')
+          ..write('id: $id, ')
+          ..write('missionId: $missionId, ')
+          ..write('title: $title, ')
+          ..write('projectPath: $projectPath, ')
+          ..write('state: $state, ')
+          ..write('snapshotJson: $snapshotJson, ')
+          ..write('reportMd: $reportMd, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $CaptainEventsTable extends CaptainEvents
+    with TableInfo<$CaptainEventsTable, CaptainEventRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CaptainEventsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _runIdMeta = const VerificationMeta('runId');
+  @override
+  late final GeneratedColumn<String> runId = GeneratedColumn<String>(
+    'run_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES captain_runs (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _atMeta = const VerificationMeta('at');
+  @override
+  late final GeneratedColumn<DateTime> at = GeneratedColumn<DateTime>(
+    'at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _kindMeta = const VerificationMeta('kind');
+  @override
+  late final GeneratedColumn<String> kind = GeneratedColumn<String>(
+    'kind',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _messageMeta = const VerificationMeta(
+    'message',
+  );
+  @override
+  late final GeneratedColumn<String> message = GeneratedColumn<String>(
+    'message',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _stepMeta = const VerificationMeta('step');
+  @override
+  late final GeneratedColumn<int> step = GeneratedColumn<int>(
+    'step',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, runId, at, kind, message, step];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'captain_events';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CaptainEventRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('run_id')) {
+      context.handle(
+        _runIdMeta,
+        runId.isAcceptableOrUnknown(data['run_id']!, _runIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_runIdMeta);
+    }
+    if (data.containsKey('at')) {
+      context.handle(_atMeta, at.isAcceptableOrUnknown(data['at']!, _atMeta));
+    } else if (isInserting) {
+      context.missing(_atMeta);
+    }
+    if (data.containsKey('kind')) {
+      context.handle(
+        _kindMeta,
+        kind.isAcceptableOrUnknown(data['kind']!, _kindMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_kindMeta);
+    }
+    if (data.containsKey('message')) {
+      context.handle(
+        _messageMeta,
+        message.isAcceptableOrUnknown(data['message']!, _messageMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_messageMeta);
+    }
+    if (data.containsKey('step')) {
+      context.handle(
+        _stepMeta,
+        step.isAcceptableOrUnknown(data['step']!, _stepMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  CaptainEventRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CaptainEventRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      runId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}run_id'],
+      )!,
+      at: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}at'],
+      )!,
+      kind: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}kind'],
+      )!,
+      message: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}message'],
+      )!,
+      step: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}step'],
+      ),
+    );
+  }
+
+  @override
+  $CaptainEventsTable createAlias(String alias) {
+    return $CaptainEventsTable(attachedDatabase, alias);
+  }
+}
+
+class CaptainEventRow extends DataClass implements Insertable<CaptainEventRow> {
+  final int id;
+  final String runId;
+  final DateTime at;
+  final String kind;
+  final String message;
+  final int? step;
+  const CaptainEventRow({
+    required this.id,
+    required this.runId,
+    required this.at,
+    required this.kind,
+    required this.message,
+    this.step,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['run_id'] = Variable<String>(runId);
+    map['at'] = Variable<DateTime>(at);
+    map['kind'] = Variable<String>(kind);
+    map['message'] = Variable<String>(message);
+    if (!nullToAbsent || step != null) {
+      map['step'] = Variable<int>(step);
+    }
+    return map;
+  }
+
+  CaptainEventsCompanion toCompanion(bool nullToAbsent) {
+    return CaptainEventsCompanion(
+      id: Value(id),
+      runId: Value(runId),
+      at: Value(at),
+      kind: Value(kind),
+      message: Value(message),
+      step: step == null && nullToAbsent ? const Value.absent() : Value(step),
+    );
+  }
+
+  factory CaptainEventRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CaptainEventRow(
+      id: serializer.fromJson<int>(json['id']),
+      runId: serializer.fromJson<String>(json['runId']),
+      at: serializer.fromJson<DateTime>(json['at']),
+      kind: serializer.fromJson<String>(json['kind']),
+      message: serializer.fromJson<String>(json['message']),
+      step: serializer.fromJson<int?>(json['step']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'runId': serializer.toJson<String>(runId),
+      'at': serializer.toJson<DateTime>(at),
+      'kind': serializer.toJson<String>(kind),
+      'message': serializer.toJson<String>(message),
+      'step': serializer.toJson<int?>(step),
+    };
+  }
+
+  CaptainEventRow copyWith({
+    int? id,
+    String? runId,
+    DateTime? at,
+    String? kind,
+    String? message,
+    Value<int?> step = const Value.absent(),
+  }) => CaptainEventRow(
+    id: id ?? this.id,
+    runId: runId ?? this.runId,
+    at: at ?? this.at,
+    kind: kind ?? this.kind,
+    message: message ?? this.message,
+    step: step.present ? step.value : this.step,
+  );
+  CaptainEventRow copyWithCompanion(CaptainEventsCompanion data) {
+    return CaptainEventRow(
+      id: data.id.present ? data.id.value : this.id,
+      runId: data.runId.present ? data.runId.value : this.runId,
+      at: data.at.present ? data.at.value : this.at,
+      kind: data.kind.present ? data.kind.value : this.kind,
+      message: data.message.present ? data.message.value : this.message,
+      step: data.step.present ? data.step.value : this.step,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CaptainEventRow(')
+          ..write('id: $id, ')
+          ..write('runId: $runId, ')
+          ..write('at: $at, ')
+          ..write('kind: $kind, ')
+          ..write('message: $message, ')
+          ..write('step: $step')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, runId, at, kind, message, step);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CaptainEventRow &&
+          other.id == this.id &&
+          other.runId == this.runId &&
+          other.at == this.at &&
+          other.kind == this.kind &&
+          other.message == this.message &&
+          other.step == this.step);
+}
+
+class CaptainEventsCompanion extends UpdateCompanion<CaptainEventRow> {
+  final Value<int> id;
+  final Value<String> runId;
+  final Value<DateTime> at;
+  final Value<String> kind;
+  final Value<String> message;
+  final Value<int?> step;
+  const CaptainEventsCompanion({
+    this.id = const Value.absent(),
+    this.runId = const Value.absent(),
+    this.at = const Value.absent(),
+    this.kind = const Value.absent(),
+    this.message = const Value.absent(),
+    this.step = const Value.absent(),
+  });
+  CaptainEventsCompanion.insert({
+    this.id = const Value.absent(),
+    required String runId,
+    required DateTime at,
+    required String kind,
+    required String message,
+    this.step = const Value.absent(),
+  }) : runId = Value(runId),
+       at = Value(at),
+       kind = Value(kind),
+       message = Value(message);
+  static Insertable<CaptainEventRow> custom({
+    Expression<int>? id,
+    Expression<String>? runId,
+    Expression<DateTime>? at,
+    Expression<String>? kind,
+    Expression<String>? message,
+    Expression<int>? step,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (runId != null) 'run_id': runId,
+      if (at != null) 'at': at,
+      if (kind != null) 'kind': kind,
+      if (message != null) 'message': message,
+      if (step != null) 'step': step,
+    });
+  }
+
+  CaptainEventsCompanion copyWith({
+    Value<int>? id,
+    Value<String>? runId,
+    Value<DateTime>? at,
+    Value<String>? kind,
+    Value<String>? message,
+    Value<int?>? step,
+  }) {
+    return CaptainEventsCompanion(
+      id: id ?? this.id,
+      runId: runId ?? this.runId,
+      at: at ?? this.at,
+      kind: kind ?? this.kind,
+      message: message ?? this.message,
+      step: step ?? this.step,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (runId.present) {
+      map['run_id'] = Variable<String>(runId.value);
+    }
+    if (at.present) {
+      map['at'] = Variable<DateTime>(at.value);
+    }
+    if (kind.present) {
+      map['kind'] = Variable<String>(kind.value);
+    }
+    if (message.present) {
+      map['message'] = Variable<String>(message.value);
+    }
+    if (step.present) {
+      map['step'] = Variable<int>(step.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CaptainEventsCompanion(')
+          ..write('id: $id, ')
+          ..write('runId: $runId, ')
+          ..write('at: $at, ')
+          ..write('kind: $kind, ')
+          ..write('message: $message, ')
+          ..write('step: $step')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -3244,6 +4194,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     this,
   );
   late final $AiMessagesTable aiMessages = $AiMessagesTable(this);
+  late final $CaptainRunsTable captainRuns = $CaptainRunsTable(this);
+  late final $CaptainEventsTable captainEvents = $CaptainEventsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -3257,6 +4209,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     projectProgress,
     aiConversations,
     aiMessages,
+    captainRuns,
+    captainEvents,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -3266,6 +4220,13 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         limitUpdateKind: UpdateKind.delete,
       ),
       result: [TableUpdate('ai_messages', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'captain_runs',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('captain_events', kind: UpdateKind.delete)],
     ),
   ]);
 }
@@ -5276,6 +6237,723 @@ typedef $$AiMessagesTableProcessedTableManager =
       AiMessageRow,
       PrefetchHooks Function({bool conversationId})
     >;
+typedef $$CaptainRunsTableCreateCompanionBuilder =
+    CaptainRunsCompanion Function({
+      required String id,
+      required String missionId,
+      required String title,
+      required String projectPath,
+      required String state,
+      required String snapshotJson,
+      Value<String?> reportMd,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+      Value<int> rowid,
+    });
+typedef $$CaptainRunsTableUpdateCompanionBuilder =
+    CaptainRunsCompanion Function({
+      Value<String> id,
+      Value<String> missionId,
+      Value<String> title,
+      Value<String> projectPath,
+      Value<String> state,
+      Value<String> snapshotJson,
+      Value<String?> reportMd,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
+
+final class $$CaptainRunsTableReferences
+    extends BaseReferences<_$AppDatabase, $CaptainRunsTable, CaptainRunRow> {
+  $$CaptainRunsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<$CaptainEventsTable, List<CaptainEventRow>>
+  _captainEventsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.captainEvents,
+    aliasName: 'captain_runs__id__captain_events__run_id',
+  );
+
+  $$CaptainEventsTableProcessedTableManager get captainEventsRefs {
+    final manager = $$CaptainEventsTableTableManager(
+      $_db,
+      $_db.captainEvents,
+    ).filter((f) => f.runId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_captainEventsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$CaptainRunsTableFilterComposer
+    extends Composer<_$AppDatabase, $CaptainRunsTable> {
+  $$CaptainRunsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get missionId => $composableBuilder(
+    column: $table.missionId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get projectPath => $composableBuilder(
+    column: $table.projectPath,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get state => $composableBuilder(
+    column: $table.state,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get snapshotJson => $composableBuilder(
+    column: $table.snapshotJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get reportMd => $composableBuilder(
+    column: $table.reportMd,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  Expression<bool> captainEventsRefs(
+    Expression<bool> Function($$CaptainEventsTableFilterComposer f) f,
+  ) {
+    final $$CaptainEventsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.captainEvents,
+      getReferencedColumn: (t) => t.runId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CaptainEventsTableFilterComposer(
+            $db: $db,
+            $table: $db.captainEvents,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$CaptainRunsTableOrderingComposer
+    extends Composer<_$AppDatabase, $CaptainRunsTable> {
+  $$CaptainRunsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get missionId => $composableBuilder(
+    column: $table.missionId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get projectPath => $composableBuilder(
+    column: $table.projectPath,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get state => $composableBuilder(
+    column: $table.state,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get snapshotJson => $composableBuilder(
+    column: $table.snapshotJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get reportMd => $composableBuilder(
+    column: $table.reportMd,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$CaptainRunsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CaptainRunsTable> {
+  $$CaptainRunsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get missionId =>
+      $composableBuilder(column: $table.missionId, builder: (column) => column);
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<String> get projectPath => $composableBuilder(
+    column: $table.projectPath,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get state =>
+      $composableBuilder(column: $table.state, builder: (column) => column);
+
+  GeneratedColumn<String> get snapshotJson => $composableBuilder(
+    column: $table.snapshotJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get reportMd =>
+      $composableBuilder(column: $table.reportMd, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  Expression<T> captainEventsRefs<T extends Object>(
+    Expression<T> Function($$CaptainEventsTableAnnotationComposer a) f,
+  ) {
+    final $$CaptainEventsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.captainEvents,
+      getReferencedColumn: (t) => t.runId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CaptainEventsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.captainEvents,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$CaptainRunsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $CaptainRunsTable,
+          CaptainRunRow,
+          $$CaptainRunsTableFilterComposer,
+          $$CaptainRunsTableOrderingComposer,
+          $$CaptainRunsTableAnnotationComposer,
+          $$CaptainRunsTableCreateCompanionBuilder,
+          $$CaptainRunsTableUpdateCompanionBuilder,
+          (CaptainRunRow, $$CaptainRunsTableReferences),
+          CaptainRunRow,
+          PrefetchHooks Function({bool captainEventsRefs})
+        > {
+  $$CaptainRunsTableTableManager(_$AppDatabase db, $CaptainRunsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CaptainRunsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CaptainRunsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CaptainRunsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> missionId = const Value.absent(),
+                Value<String> title = const Value.absent(),
+                Value<String> projectPath = const Value.absent(),
+                Value<String> state = const Value.absent(),
+                Value<String> snapshotJson = const Value.absent(),
+                Value<String?> reportMd = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CaptainRunsCompanion(
+                id: id,
+                missionId: missionId,
+                title: title,
+                projectPath: projectPath,
+                state: state,
+                snapshotJson: snapshotJson,
+                reportMd: reportMd,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String missionId,
+                required String title,
+                required String projectPath,
+                required String state,
+                required String snapshotJson,
+                Value<String?> reportMd = const Value.absent(),
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => CaptainRunsCompanion.insert(
+                id: id,
+                missionId: missionId,
+                title: title,
+                projectPath: projectPath,
+                state: state,
+                snapshotJson: snapshotJson,
+                reportMd: reportMd,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$CaptainRunsTable, CaptainRunRow>(table),
+                  $$CaptainRunsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({captainEventsRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [
+                if (captainEventsRefs) db.captainEvents,
+              ],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (captainEventsRefs)
+                    await $_getPrefetchedDataByColumns<
+                      CaptainRunRow,
+                      $CaptainRunsTable,
+                      CaptainEventRow,
+                      $CaptainEventsTable
+                    >(
+                      currentTable: table,
+                      referencedTable: $$CaptainRunsTableReferences
+                          ._captainEventsRefsTable(db),
+                      managerFromTypedResult: (p0) =>
+                          $$CaptainRunsTableReferences(
+                            db,
+                            table,
+                            p0,
+                          ).captainEventsRefs,
+                      currentColumn: 'id',
+                      referencedColumn: 'run_id',
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$CaptainRunsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $CaptainRunsTable,
+      CaptainRunRow,
+      $$CaptainRunsTableFilterComposer,
+      $$CaptainRunsTableOrderingComposer,
+      $$CaptainRunsTableAnnotationComposer,
+      $$CaptainRunsTableCreateCompanionBuilder,
+      $$CaptainRunsTableUpdateCompanionBuilder,
+      (CaptainRunRow, $$CaptainRunsTableReferences),
+      CaptainRunRow,
+      PrefetchHooks Function({bool captainEventsRefs})
+    >;
+typedef $$CaptainEventsTableCreateCompanionBuilder =
+    CaptainEventsCompanion Function({
+      Value<int> id,
+      required String runId,
+      required DateTime at,
+      required String kind,
+      required String message,
+      Value<int?> step,
+    });
+typedef $$CaptainEventsTableUpdateCompanionBuilder =
+    CaptainEventsCompanion Function({
+      Value<int> id,
+      Value<String> runId,
+      Value<DateTime> at,
+      Value<String> kind,
+      Value<String> message,
+      Value<int?> step,
+    });
+
+final class $$CaptainEventsTableReferences
+    extends
+        BaseReferences<_$AppDatabase, $CaptainEventsTable, CaptainEventRow> {
+  $$CaptainEventsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $CaptainRunsTable _runIdTable(_$AppDatabase db) =>
+      db.captainRuns.createAlias('captain_events__run_id__captain_runs__id');
+
+  $$CaptainRunsTableProcessedTableManager get runId {
+    final $_column = $_itemColumn<String>('run_id')!;
+
+    final manager = $$CaptainRunsTableTableManager(
+      $_db,
+      $_db.captainRuns,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_runIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$CaptainEventsTableFilterComposer
+    extends Composer<_$AppDatabase, $CaptainEventsTable> {
+  $$CaptainEventsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get at => $composableBuilder(
+    column: $table.at,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get message => $composableBuilder(
+    column: $table.message,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get step => $composableBuilder(
+    column: $table.step,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$CaptainRunsTableFilterComposer get runId {
+    final $$CaptainRunsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.runId,
+      referencedTable: $db.captainRuns,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CaptainRunsTableFilterComposer(
+            $db: $db,
+            $table: $db.captainRuns,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CaptainEventsTableOrderingComposer
+    extends Composer<_$AppDatabase, $CaptainEventsTable> {
+  $$CaptainEventsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get at => $composableBuilder(
+    column: $table.at,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get message => $composableBuilder(
+    column: $table.message,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get step => $composableBuilder(
+    column: $table.step,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$CaptainRunsTableOrderingComposer get runId {
+    final $$CaptainRunsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.runId,
+      referencedTable: $db.captainRuns,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CaptainRunsTableOrderingComposer(
+            $db: $db,
+            $table: $db.captainRuns,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CaptainEventsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CaptainEventsTable> {
+  $$CaptainEventsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get at =>
+      $composableBuilder(column: $table.at, builder: (column) => column);
+
+  GeneratedColumn<String> get kind =>
+      $composableBuilder(column: $table.kind, builder: (column) => column);
+
+  GeneratedColumn<String> get message =>
+      $composableBuilder(column: $table.message, builder: (column) => column);
+
+  GeneratedColumn<int> get step =>
+      $composableBuilder(column: $table.step, builder: (column) => column);
+
+  $$CaptainRunsTableAnnotationComposer get runId {
+    final $$CaptainRunsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.runId,
+      referencedTable: $db.captainRuns,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CaptainRunsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.captainRuns,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CaptainEventsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $CaptainEventsTable,
+          CaptainEventRow,
+          $$CaptainEventsTableFilterComposer,
+          $$CaptainEventsTableOrderingComposer,
+          $$CaptainEventsTableAnnotationComposer,
+          $$CaptainEventsTableCreateCompanionBuilder,
+          $$CaptainEventsTableUpdateCompanionBuilder,
+          (CaptainEventRow, $$CaptainEventsTableReferences),
+          CaptainEventRow,
+          PrefetchHooks Function({bool runId})
+        > {
+  $$CaptainEventsTableTableManager(_$AppDatabase db, $CaptainEventsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CaptainEventsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CaptainEventsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CaptainEventsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> runId = const Value.absent(),
+                Value<DateTime> at = const Value.absent(),
+                Value<String> kind = const Value.absent(),
+                Value<String> message = const Value.absent(),
+                Value<int?> step = const Value.absent(),
+              }) => CaptainEventsCompanion(
+                id: id,
+                runId: runId,
+                at: at,
+                kind: kind,
+                message: message,
+                step: step,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String runId,
+                required DateTime at,
+                required String kind,
+                required String message,
+                Value<int?> step = const Value.absent(),
+              }) => CaptainEventsCompanion.insert(
+                id: id,
+                runId: runId,
+                at: at,
+                kind: kind,
+                message: message,
+                step: step,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$CaptainEventsTable, CaptainEventRow>(table),
+                  $$CaptainEventsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({runId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (runId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.runId,
+                        referencedTable: $$CaptainEventsTableReferences
+                            ._runIdTable(db),
+                        referencedColumn: $$CaptainEventsTableReferences
+                            ._runIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$CaptainEventsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $CaptainEventsTable,
+      CaptainEventRow,
+      $$CaptainEventsTableFilterComposer,
+      $$CaptainEventsTableOrderingComposer,
+      $$CaptainEventsTableAnnotationComposer,
+      $$CaptainEventsTableCreateCompanionBuilder,
+      $$CaptainEventsTableUpdateCompanionBuilder,
+      (CaptainEventRow, $$CaptainEventsTableReferences),
+      CaptainEventRow,
+      PrefetchHooks Function({bool runId})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -5296,4 +6974,8 @@ class $AppDatabaseManager {
       $$AiConversationsTableTableManager(_db, _db.aiConversations);
   $$AiMessagesTableTableManager get aiMessages =>
       $$AiMessagesTableTableManager(_db, _db.aiMessages);
+  $$CaptainRunsTableTableManager get captainRuns =>
+      $$CaptainRunsTableTableManager(_db, _db.captainRuns);
+  $$CaptainEventsTableTableManager get captainEvents =>
+      $$CaptainEventsTableTableManager(_db, _db.captainEvents);
 }

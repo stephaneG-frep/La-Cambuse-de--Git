@@ -2383,6 +2383,468 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Cette opération exécute du code du projet sur le PC (scripts de build, plugins, tests). Rien n\'est fait sans votre accord.'**
   String get compApproveWarningBuild;
+
+  /// No description provided for @cpTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le Capitaine automatique'**
+  String get cpTitle;
+
+  /// No description provided for @cpSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Des missions exécutées étape par étape sous votre supervision : plan affiché, point de contrôle, chaque modification approuvée, pause et arrêt d\'urgence à tout moment.'**
+  String get cpSubtitle;
+
+  /// No description provided for @cpNeedsCompanion.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le Capitaine agit sur vos projets via le compagnon Linux : appairez-le d\'abord.'**
+  String get cpNeedsCompanion;
+
+  /// No description provided for @cpDecisionWaiting.
+  ///
+  /// In fr, this message translates to:
+  /// **'Une décision vous attend'**
+  String get cpDecisionWaiting;
+
+  /// No description provided for @cpMissions.
+  ///
+  /// In fr, this message translates to:
+  /// **'Missions'**
+  String get cpMissions;
+
+  /// No description provided for @cpAiTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Proposer une mission avec le professeur IA'**
+  String get cpAiTitle;
+
+  /// No description provided for @cpAiDesc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Facultatif : l\'IA propose un plan, validé strictement puis soumis à votre approbation.'**
+  String get cpAiDesc;
+
+  /// No description provided for @cpHistory.
+  ///
+  /// In fr, this message translates to:
+  /// **'Journal des missions'**
+  String get cpHistory;
+
+  /// No description provided for @cpHistoryEmpty.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune mission pour l\'instant.'**
+  String get cpHistoryEmpty;
+
+  /// No description provided for @cpPlanTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Table de navigation'**
+  String get cpPlanTitle;
+
+  /// No description provided for @cpPlanMissing.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mission introuvable.'**
+  String get cpPlanMissing;
+
+  /// No description provided for @cpPlanFromAi.
+  ///
+  /// In fr, this message translates to:
+  /// **'Plan proposé par le professeur IA : relisez chaque étape. Il a été validé (opérations autorisées, aucun secret) mais pas jugé à votre place.'**
+  String get cpPlanFromAi;
+
+  /// No description provided for @cpLimits.
+  ///
+  /// In fr, this message translates to:
+  /// **'Limites : {steps} étapes, {mutations} modifications, {minutes} min au total ; chaque opération a son propre délai.'**
+  String cpLimits(int steps, int mutations, int minutes);
+
+  /// No description provided for @cpCostAi.
+  ///
+  /// In fr, this message translates to:
+  /// **'Coût IA : celui de la proposition (affiché à l\'étape précédente) ; l\'exécution n\'appelle pas l\'IA.'**
+  String get cpCostAi;
+
+  /// No description provided for @cpCostNone.
+  ///
+  /// In fr, this message translates to:
+  /// **'Coût IA : aucun (mission prédéfinie, fonctionne sans fournisseur).'**
+  String get cpCostNone;
+
+  /// No description provided for @cpPlanInvalid.
+  ///
+  /// In fr, this message translates to:
+  /// **'Plan refusé par la validation :'**
+  String get cpPlanInvalid;
+
+  /// No description provided for @cpApproveNote.
+  ///
+  /// In fr, this message translates to:
+  /// **'Approuver le plan lance la mission. Chaque modification restera soumise à l\'approbation du compagnon, et toute action externe à un consentement spécifique.'**
+  String get cpApproveNote;
+
+  /// No description provided for @cpChooseProject.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisissez un projet'**
+  String get cpChooseProject;
+
+  /// No description provided for @cpApproveLaunch.
+  ///
+  /// In fr, this message translates to:
+  /// **'Approuver le plan et lancer'**
+  String get cpApproveLaunch;
+
+  /// No description provided for @cpTokenAtRuntime.
+  ///
+  /// In fr, this message translates to:
+  /// **'token : lu dans le coffre au moment de l\'exécution (jamais affiché ni enregistré)'**
+  String get cpTokenAtRuntime;
+
+  /// No description provided for @cpComputed.
+  ///
+  /// In fr, this message translates to:
+  /// **'{param} : calculé à l\'exécution ({source})'**
+  String cpComputed(String param, String source);
+
+  /// No description provided for @cpMarkReview.
+  ///
+  /// In fr, this message translates to:
+  /// **'Relecture humaine'**
+  String get cpMarkReview;
+
+  /// No description provided for @cpMarkConsent.
+  ///
+  /// In fr, this message translates to:
+  /// **'Consentement spécifique'**
+  String get cpMarkConsent;
+
+  /// No description provided for @cpMarkApproval.
+  ///
+  /// In fr, this message translates to:
+  /// **'Approbation du compagnon'**
+  String get cpMarkApproval;
+
+  /// No description provided for @cpMarkWhen.
+  ///
+  /// In fr, this message translates to:
+  /// **'Si {condition}'**
+  String cpMarkWhen(String condition);
+
+  /// No description provided for @cpMarkRequires.
+  ///
+  /// In fr, this message translates to:
+  /// **'Arrêt sauf si {condition}'**
+  String cpMarkRequires(String condition);
+
+  /// No description provided for @cpProject.
+  ///
+  /// In fr, this message translates to:
+  /// **'Projet'**
+  String get cpProject;
+
+  /// No description provided for @cpRiskRead.
+  ///
+  /// In fr, this message translates to:
+  /// **'Lecture seule'**
+  String get cpRiskRead;
+
+  /// No description provided for @cpRiskCheckpoint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Point de contrôle'**
+  String get cpRiskCheckpoint;
+
+  /// No description provided for @cpRiskModify.
+  ///
+  /// In fr, this message translates to:
+  /// **'Modifie le projet'**
+  String get cpRiskModify;
+
+  /// No description provided for @cpRiskExecute.
+  ///
+  /// In fr, this message translates to:
+  /// **'Exécute du code'**
+  String get cpRiskExecute;
+
+  /// No description provided for @cpRiskExternal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Action externe'**
+  String get cpRiskExternal;
+
+  /// No description provided for @cpStepTodo.
+  ///
+  /// In fr, this message translates to:
+  /// **'À faire'**
+  String get cpStepTodo;
+
+  /// No description provided for @cpStepRunning.
+  ///
+  /// In fr, this message translates to:
+  /// **'En cours'**
+  String get cpStepRunning;
+
+  /// No description provided for @cpStepDone.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réussie'**
+  String get cpStepDone;
+
+  /// No description provided for @cpStepSkipped.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ignorée'**
+  String get cpStepSkipped;
+
+  /// No description provided for @cpStepFailed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Échouée'**
+  String get cpStepFailed;
+
+  /// No description provided for @cpStepRefused.
+  ///
+  /// In fr, this message translates to:
+  /// **'Refusée'**
+  String get cpStepRefused;
+
+  /// No description provided for @cpStepCancelled.
+  ///
+  /// In fr, this message translates to:
+  /// **'Annulée'**
+  String get cpStepCancelled;
+
+  /// No description provided for @cpStepUnknown.
+  ///
+  /// In fr, this message translates to:
+  /// **'État inconnu'**
+  String get cpStepUnknown;
+
+  /// No description provided for @cpRunReady.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prête'**
+  String get cpRunReady;
+
+  /// No description provided for @cpRunRunning.
+  ///
+  /// In fr, this message translates to:
+  /// **'En cours'**
+  String get cpRunRunning;
+
+  /// No description provided for @cpRunPaused.
+  ///
+  /// In fr, this message translates to:
+  /// **'En pause'**
+  String get cpRunPaused;
+
+  /// No description provided for @cpRunDone.
+  ///
+  /// In fr, this message translates to:
+  /// **'Terminée'**
+  String get cpRunDone;
+
+  /// No description provided for @cpRunFailed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Échouée'**
+  String get cpRunFailed;
+
+  /// No description provided for @cpRunStopped.
+  ///
+  /// In fr, this message translates to:
+  /// **'Arrêtée'**
+  String get cpRunStopped;
+
+  /// No description provided for @cpRunInterrupted.
+  ///
+  /// In fr, this message translates to:
+  /// **'Interrompue (reprise possible)'**
+  String get cpRunInterrupted;
+
+  /// No description provided for @cpRunTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mission'**
+  String get cpRunTitle;
+
+  /// No description provided for @cpProgress.
+  ///
+  /// In fr, this message translates to:
+  /// **'Avancement de la mission'**
+  String get cpProgress;
+
+  /// No description provided for @cpPause.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pause'**
+  String get cpPause;
+
+  /// No description provided for @cpPauseRequested.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pause demandée (fin de l\'étape en cours)'**
+  String get cpPauseRequested;
+
+  /// No description provided for @cpResume.
+  ///
+  /// In fr, this message translates to:
+  /// **'Reprendre'**
+  String get cpResume;
+
+  /// No description provided for @cpEmergencyStop.
+  ///
+  /// In fr, this message translates to:
+  /// **'Arrêt d\'urgence'**
+  String get cpEmergencyStop;
+
+  /// No description provided for @cpSteps.
+  ///
+  /// In fr, this message translates to:
+  /// **'Étapes'**
+  String get cpSteps;
+
+  /// No description provided for @cpRollback.
+  ///
+  /// In fr, this message translates to:
+  /// **'Retour arrière'**
+  String get cpRollback;
+
+  /// No description provided for @cpRollbackNone.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune modification à défaire.'**
+  String get cpRollbackNone;
+
+  /// No description provided for @cpRestoreCheckpoint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Restaurer dans un nouveau dossier'**
+  String get cpRestoreCheckpoint;
+
+  /// No description provided for @cpRestored.
+  ///
+  /// In fr, this message translates to:
+  /// **'Restauré dans {path}'**
+  String cpRestored(String path);
+
+  /// No description provided for @cpCopyReport.
+  ///
+  /// In fr, this message translates to:
+  /// **'Copier le rapport'**
+  String get cpCopyReport;
+
+  /// No description provided for @cpReportCopied.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rapport copié'**
+  String get cpReportCopied;
+
+  /// No description provided for @cpReport.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rapport de mission'**
+  String get cpReport;
+
+  /// No description provided for @cpJournal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Journal horodaté'**
+  String get cpJournal;
+
+  /// No description provided for @cpDecApproval.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le compagnon demande votre accord'**
+  String get cpDecApproval;
+
+  /// No description provided for @cpDecReview.
+  ///
+  /// In fr, this message translates to:
+  /// **'Relisez avant de continuer'**
+  String get cpDecReview;
+
+  /// No description provided for @cpDecConsent.
+  ///
+  /// In fr, this message translates to:
+  /// **'Action externe : consentement spécifique'**
+  String get cpDecConsent;
+
+  /// No description provided for @cpDecContinue.
+  ///
+  /// In fr, this message translates to:
+  /// **'Continuer'**
+  String get cpDecContinue;
+
+  /// No description provided for @cpDecPublish.
+  ///
+  /// In fr, this message translates to:
+  /// **'Publier'**
+  String get cpDecPublish;
+
+  /// No description provided for @cpDecConsentWarn.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cette action sort de votre machine et ne peut pas être annulée automatiquement.'**
+  String get cpDecConsentWarn;
+
+  /// No description provided for @cpDecUnderstood.
+  ///
+  /// In fr, this message translates to:
+  /// **'Je comprends que cette publication est visible par d\'autres et non annulable automatiquement.'**
+  String get cpDecUnderstood;
+
+  /// No description provided for @cpAiIntro.
+  ///
+  /// In fr, this message translates to:
+  /// **'Décrivez votre objectif. Le professeur IA propose un plan composé uniquement d\'opérations autorisées ; il est validé strictement (aucun shell, aucun secret, chemins confinés) et rien ne s\'exécute sans votre approbation.'**
+  String get cpAiIntro;
+
+  /// No description provided for @cpAiGoal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Objectif'**
+  String get cpAiGoal;
+
+  /// No description provided for @cpAiGoalHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ex. : créer une branche de travail et commiter mes changements'**
+  String get cpAiGoalHint;
+
+  /// No description provided for @cpAiAsk.
+  ///
+  /// In fr, this message translates to:
+  /// **'Demander un plan'**
+  String get cpAiAsk;
+
+  /// No description provided for @cpAiUsage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Jetons : {input} en entrée, {output} en sortie — coût estimé {cost}'**
+  String cpAiUsage(int input, int output, String cost);
+
+  /// No description provided for @cpAiRejected.
+  ///
+  /// In fr, this message translates to:
+  /// **'Plan refusé par la validation (rien ne sera exécuté) :'**
+  String get cpAiRejected;
+
+  /// No description provided for @cpAiAccepted.
+  ///
+  /// In fr, this message translates to:
+  /// **'Plan valide : « {title} », {count} étapes.'**
+  String cpAiAccepted(String title, int count);
+
+  /// No description provided for @cpAiReview.
+  ///
+  /// In fr, this message translates to:
+  /// **'Examiner le plan'**
+  String get cpAiReview;
 }
 
 class _AppLocalizationsDelegate

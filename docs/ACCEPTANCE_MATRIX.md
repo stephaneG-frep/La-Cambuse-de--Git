@@ -24,7 +24,7 @@ Dernière mise à jour : 2026-11-12 (fin de phase 7)
 | 7 | Docker et Compose | ✅ | modules Docker + Compose (13 labos), analyseurs, inspection lecture seule, génération ; essai réel Honor — [PHASE7_BILAN.md](PHASE7_BILAN.md) |
 | 8 | CI/CD générée, APK debug, .deb, checksums | ✅ | CI générée et builds approuvés depuis le Honor, cale « DEBUG », `.deb` construit et vérifié sans installation ; CI du dépôt non encore exécutée sur GitHub — [PHASE8_BILAN.md](PHASE8_BILAN.md) |
 | 9 | Académie avancée | ✅ | 8 modules (79 leçons, 316 questions, 48 labos réalisables, 8 projets), 9 analyseurs ; essai réel Honor ; contenu non relu par un expert humain — [PHASE9_BILAN.md](PHASE9_BILAN.md) |
-| 10 | Capitaine automatique | ⬜ | |
+| 10 | Capitaine automatique | ✅ | 4 missions + plan IA validé, point de contrôle, approbations, consentement spécifique, pause, arrêt d'urgence, reprise, rapport, retour arrière ; 20 scénarios de défaillance ; essai réel Honor (mission complète, arrêt pendant un build, publication refusée) — [PHASE10_BILAN.md](PHASE10_BILAN.md) |
 | 11 | Stabilisation et livraison | ⬜ | |
 
 ## Critères MVP (SPEC §12)
@@ -37,4 +37,4 @@ Dernière mise à jour : 2026-11-12 (fin de phase 7)
 | Import projet Flutter Linux, audit, diff, plan sans mutation non consentie | ✅ (via compagnon ; essai réel depuis le Honor) |
 | Git local, dépôt privé de test avec consentement, push, rapport | ✅ (dépôt privé créé via gh avec accord ; push, PR et ticket depuis le Honor) |
 | Pipeline analyse/tests + APK de test, limites de signature affichées | ✅ (pipeline généré, analyse/tests/APK debug réels via le compagnon, « DEBUG — non distribuable » affiché) |
-| Logs, erreurs, artefacts, historique, reprise après échec | 🟨 (journal de bord seulement) |
+| Logs, erreurs, artefacts, historique, reprise après échec | ✅ (journal de bord, cale des artefacts, journal horodaté des missions, reprise d'une mission interrompue après redémarrage) |

@@ -19,9 +19,9 @@ Future<void> runLab(WidgetTester tester, String island, String lessonId, String 
   final lesson = module.lessons.firstWhere((l) => l.id == lessonId);
   final db = await pumpApp(tester, size: desktop);
   await openAcademy(tester);
-  await tester.scrollUntilVisible(find.text(island), 300, scrollable: find.byType(Scrollable).hitTestable().first);
+  await tester.scrollUntilVisible(find.text(island), 300, scrollable: find.byType(Scrollable).hitTestable().last);
   await tapVisible(tester, find.text(island));
-  await tester.scrollUntilVisible(find.text(lesson.title), 300, scrollable: find.byType(Scrollable).hitTestable().first);
+  await tester.scrollUntilVisible(find.text(lesson.title), 300, scrollable: find.byType(Scrollable).hitTestable().last);
   await tapVisible(tester, find.text(lesson.title));
   await tester.tap(find.text('Exercice'));
   await tester.pumpAndSettle();

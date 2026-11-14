@@ -106,6 +106,35 @@ class AiMessages extends Table {
   DateTimeColumn get createdAt => dateTime()();
 }
 
+/// Exécution d'une mission du Capitaine (v4). [snapshotJson] = état complet
+/// (plan, étapes, contexte), sans aucun secret.
+@DataClassName('CaptainRunRow')
+class CaptainRuns extends Table {
+  TextColumn get id => text()();
+  TextColumn get missionId => text()();
+  TextColumn get title => text()();
+  TextColumn get projectPath => text()();
+  TextColumn get state => text()();
+  TextColumn get snapshotJson => text()();
+  TextColumn get reportMd => text().nullable()();
+  DateTimeColumn get createdAt => dateTime()();
+  DateTimeColumn get updatedAt => dateTime()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+/// Journal horodaté d'une mission (v4).
+@DataClassName('CaptainEventRow')
+class CaptainEvents extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get runId => text().references(CaptainRuns, #id, onDelete: KeyAction.cascade)();
+  DateTimeColumn get at => dateTime()();
+  TextColumn get kind => text()();
+  TextColumn get message => text()();
+  IntColumn get step => integer().nullable()();
+}
+
 @DriftDatabase(tables: [
   Profiles,
   AppSettingsTable,
@@ -115,6 +144,8 @@ class AiMessages extends Table {
   ProjectProgress,
   AiConversations,
   AiMessages,
+  CaptainRuns,
+  CaptainEvents,
 ])
 class AppDatabase extends _$AppDatabase {
   AppDatabase(super.executor);
@@ -134,7 +165,7 @@ class AppDatabase extends _$AppDatabase {
   /// Version du schéma. Toute modification doit ajouter une étape de migration
   /// dans [migration] et un test dans `test/core/db/`.
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -151,6 +182,10 @@ class AppDatabase extends _$AppDatabase {
           if (from < 3) {
             await m.createTable(aiConversations);
             await m.createTable(aiMessages);
+          }
+          if (from < 4) {
+            await m.createTable(captainRuns);
+            await m.createTable(captainEvents);
           }
         },
         beforeOpen: (details) async {

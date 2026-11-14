@@ -14,12 +14,12 @@ import '../helpers.dart';
 void main() {
   test('schéma courant : création de toutes les tables', () async {
     final db = memoryDb();
-    expect(db.schemaVersion, 3);
+    expect(db.schemaVersion, 4);
     final tables = await db
         .customSelect("SELECT name FROM sqlite_master WHERE type='table'")
         .map((r) => r.read<String>('name'))
         .get();
-    expect(tables, containsAll(['profiles', 'app_settings', 'audit_entries', 'lesson_progress', 'review_cards', 'project_progress', 'ai_conversations', 'ai_messages']));
+    expect(tables, containsAll(['profiles', 'app_settings', 'audit_entries', 'lesson_progress', 'review_cards', 'project_progress', 'ai_conversations', 'ai_messages', 'captain_runs', 'captain_events']));
     await db.close();
   });
 

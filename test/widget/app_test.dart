@@ -142,4 +142,25 @@ void main() {
       await teardown(tester, db);
     });
   });
+
+  testWidgets('téléphone en paysage : rail sans débordement, toutes les destinations accessibles', (tester) async {
+    // Honor MTN-NX1M en paysage : ~880 × 400 points, moins barres d'état et système.
+    final db = await pumpApp(tester, size: const Size(880, 340));
+    expect(tester.takeException(), isNull, reason: 'aucun débordement de mise en page');
+    for (final label in ['Académie', 'Atelier', 'Capitaine', 'Journal']) {
+      final dest = find.byIcon(switch (label) {
+        'Académie' => Icons.map_outlined,
+        'Atelier' => Icons.construction_outlined,
+        'Capitaine' => Icons.explore_outlined,
+        _ => Icons.menu_book_outlined,
+      });
+      if (dest.evaluate().isNotEmpty) {
+        await tester.ensureVisible(dest.first);
+        await tester.tap(dest.first);
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull, reason: label);
+      }
+    }
+    await teardown(tester, db);
+  });
 }

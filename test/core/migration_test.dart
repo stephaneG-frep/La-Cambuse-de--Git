@@ -34,7 +34,7 @@ void main() {
       expect(await db.select(db.reviewCards).get(), isEmpty);
       expect(await db.select(db.projectProgress).get(), isEmpty);
       final version = await db.customSelect('PRAGMA user_version').getSingle();
-      expect(version.read<int>('user_version'), 3);
+      expect(version.read<int>('user_version'), 4);
       await db.close();
     } finally {
       await dir.delete(recursive: true);
@@ -65,6 +65,37 @@ void main() {
       // Suppression en cascade des messages avec la conversation.
       await (db.delete(db.aiConversations)..where((t) => t.id.equals(id))).go();
       expect(await db.select(db.aiMessages).get(), isEmpty);
+      await db.close();
+    } finally {
+      await dir.delete(recursive: true);
+    }
+  });
+
+  test('migration v3 → v4 : conversations IA conservées, tables du Capitaine créées', () async {
+    driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
+    final dir = await Directory.systemTemp.createTemp('cambuse_mig4_');
+    final file = File('${dir.path}/v3.sqlite');
+    final v3 = File('test/fixtures/schema_v3.sql').readAsStringSync();
+    try {
+      final db = AppDatabase(NativeDatabase(file, setup: (raw) {
+        if (raw.userVersion == 0) {
+          raw.execute(v3);
+          raw.execute("INSERT INTO ai_conversations (title, system_prompt, provider_kind, model, level, created_at, updated_at) "
+              "VALUES ('Branches', 's', 'anthropic', 'claude-opus-5-5', 'debutant', 1762900000, 1762900000)");
+          raw.userVersion = 3;
+        }
+      }));
+      expect((await db.select(db.aiConversations).getSingle()).title, 'Branches');
+      await db.into(db.captainRuns).insert(CaptainRunsCompanion.insert(
+          id: 'r1', missionId: 'depot-local', title: 't', projectPath: '/p', state: 'termine', snapshotJson: '{}',
+          createdAt: DateTime(2026), updatedAt: DateTime(2026)));
+      await db.into(db.captainEvents).insert(
+          CaptainEventsCompanion.insert(runId: 'r1', at: DateTime(2026), kind: 'info', message: 'démarrée'));
+      // Le journal disparaît avec sa mission.
+      await (db.delete(db.captainRuns)..where((t) => t.id.equals('r1'))).go();
+      expect(await db.select(db.captainEvents).get(), isEmpty);
+      final version = await db.customSelect('PRAGMA user_version').getSingle();
+      expect(version.read<int>('user_version'), 4);
       await db.close();
     } finally {
       await dir.delete(recursive: true);

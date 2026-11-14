@@ -1352,4 +1352,260 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get compApproveWarningBuild =>
       'This operation runs project code on the PC (build scripts, plugins, tests). Nothing happens without your consent.';
+
+  @override
+  String get cpTitle => 'The automatic Captain';
+
+  @override
+  String get cpSubtitle =>
+      'Missions run step by step under your supervision: visible plan, checkpoint, every change approved, pause and emergency stop at any time.';
+
+  @override
+  String get cpNeedsCompanion =>
+      'The Captain acts on your projects through the Linux companion: pair it first.';
+
+  @override
+  String get cpDecisionWaiting => 'A decision is waiting for you';
+
+  @override
+  String get cpMissions => 'Missions';
+
+  @override
+  String get cpAiTitle => 'Propose a mission with the AI teacher';
+
+  @override
+  String get cpAiDesc =>
+      'Optional: the AI proposes a plan, strictly validated then submitted for your approval.';
+
+  @override
+  String get cpHistory => 'Mission log';
+
+  @override
+  String get cpHistoryEmpty => 'No mission yet.';
+
+  @override
+  String get cpPlanTitle => 'Chart table';
+
+  @override
+  String get cpPlanMissing => 'Mission not found.';
+
+  @override
+  String get cpPlanFromAi =>
+      'Plan proposed by the AI teacher: review every step. It was validated (allowed operations, no secrets) but not judged on your behalf.';
+
+  @override
+  String cpLimits(int steps, int mutations, int minutes) {
+    return 'Limits: $steps steps, $mutations changes, $minutes min in total; each operation has its own timeout.';
+  }
+
+  @override
+  String get cpCostAi =>
+      'AI cost: that of the proposal (shown on the previous screen); execution does not call the AI.';
+
+  @override
+  String get cpCostNone =>
+      'AI cost: none (predefined mission, works without a provider).';
+
+  @override
+  String get cpPlanInvalid => 'Plan rejected by validation:';
+
+  @override
+  String get cpApproveNote =>
+      'Approving the plan starts the mission. Every change still requires the companion\'s approval, and any external action a specific consent.';
+
+  @override
+  String get cpChooseProject => 'Choose a project';
+
+  @override
+  String get cpApproveLaunch => 'Approve the plan and start';
+
+  @override
+  String get cpTokenAtRuntime =>
+      'token: read from the vault at run time (never shown or stored)';
+
+  @override
+  String cpComputed(String param, String source) {
+    return '$param: computed at run time ($source)';
+  }
+
+  @override
+  String get cpMarkReview => 'Human review';
+
+  @override
+  String get cpMarkConsent => 'Specific consent';
+
+  @override
+  String get cpMarkApproval => 'Companion approval';
+
+  @override
+  String cpMarkWhen(String condition) {
+    return 'If $condition';
+  }
+
+  @override
+  String cpMarkRequires(String condition) {
+    return 'Stop unless $condition';
+  }
+
+  @override
+  String get cpProject => 'Project';
+
+  @override
+  String get cpRiskRead => 'Read only';
+
+  @override
+  String get cpRiskCheckpoint => 'Checkpoint';
+
+  @override
+  String get cpRiskModify => 'Changes the project';
+
+  @override
+  String get cpRiskExecute => 'Runs code';
+
+  @override
+  String get cpRiskExternal => 'External action';
+
+  @override
+  String get cpStepTodo => 'To do';
+
+  @override
+  String get cpStepRunning => 'Running';
+
+  @override
+  String get cpStepDone => 'Succeeded';
+
+  @override
+  String get cpStepSkipped => 'Skipped';
+
+  @override
+  String get cpStepFailed => 'Failed';
+
+  @override
+  String get cpStepRefused => 'Refused';
+
+  @override
+  String get cpStepCancelled => 'Cancelled';
+
+  @override
+  String get cpStepUnknown => 'Unknown state';
+
+  @override
+  String get cpRunReady => 'Ready';
+
+  @override
+  String get cpRunRunning => 'Running';
+
+  @override
+  String get cpRunPaused => 'Paused';
+
+  @override
+  String get cpRunDone => 'Completed';
+
+  @override
+  String get cpRunFailed => 'Failed';
+
+  @override
+  String get cpRunStopped => 'Stopped';
+
+  @override
+  String get cpRunInterrupted => 'Interrupted (can be resumed)';
+
+  @override
+  String get cpRunTitle => 'Mission';
+
+  @override
+  String get cpProgress => 'Mission progress';
+
+  @override
+  String get cpPause => 'Pause';
+
+  @override
+  String get cpPauseRequested => 'Pause requested (end of current step)';
+
+  @override
+  String get cpResume => 'Resume';
+
+  @override
+  String get cpEmergencyStop => 'Emergency stop';
+
+  @override
+  String get cpSteps => 'Steps';
+
+  @override
+  String get cpRollback => 'Rollback';
+
+  @override
+  String get cpRollbackNone => 'Nothing to undo.';
+
+  @override
+  String get cpRestoreCheckpoint => 'Restore into a new folder';
+
+  @override
+  String cpRestored(String path) {
+    return 'Restored into $path';
+  }
+
+  @override
+  String get cpCopyReport => 'Copy the report';
+
+  @override
+  String get cpReportCopied => 'Report copied';
+
+  @override
+  String get cpReport => 'Mission report';
+
+  @override
+  String get cpJournal => 'Timestamped log';
+
+  @override
+  String get cpDecApproval => 'The companion asks for your approval';
+
+  @override
+  String get cpDecReview => 'Review before continuing';
+
+  @override
+  String get cpDecConsent => 'External action: specific consent';
+
+  @override
+  String get cpDecContinue => 'Continue';
+
+  @override
+  String get cpDecPublish => 'Publish';
+
+  @override
+  String get cpDecConsentWarn =>
+      'This action leaves your machine and cannot be undone automatically.';
+
+  @override
+  String get cpDecUnderstood =>
+      'I understand this publication is visible to others and cannot be undone automatically.';
+
+  @override
+  String get cpAiIntro =>
+      'Describe your goal. The AI teacher proposes a plan made only of allowed operations; it is strictly validated (no shell, no secrets, confined paths) and nothing runs without your approval.';
+
+  @override
+  String get cpAiGoal => 'Goal';
+
+  @override
+  String get cpAiGoalHint => 'E.g.: create a work branch and commit my changes';
+
+  @override
+  String get cpAiAsk => 'Ask for a plan';
+
+  @override
+  String cpAiUsage(int input, int output, String cost) {
+    return 'Tokens: $input in, $output out — estimated cost $cost';
+  }
+
+  @override
+  String get cpAiRejected => 'Plan rejected by validation (nothing will run):';
+
+  @override
+  String cpAiAccepted(String title, int count) {
+    return 'Valid plan: “$title”, $count steps.';
+  }
+
+  @override
+  String get cpAiReview => 'Review the plan';
 }

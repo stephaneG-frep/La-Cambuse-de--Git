@@ -9,7 +9,10 @@ import '../features/academy/presentation/reviews_screen.dart';
 import '../features/academy/presentation/search_screen.dart';
 import '../features/ai/presentation/ai_settings_screen.dart';
 import '../features/ai/presentation/chat_screen.dart';
+import '../features/captain/presentation/ai_plan_screen.dart';
 import '../features/captain/presentation/captain_screen.dart';
+import '../features/captain/presentation/mission_plan_screen.dart';
+import '../features/captain/presentation/run_screen.dart';
 import '../features/companion_link/presentation/companion_screen.dart';
 import '../features/dashboard/presentation/dashboard_screen.dart';
 import '../features/docker/presentation/docker_room_screen.dart';
@@ -98,7 +101,21 @@ GoRouter buildRouter() => GoRouter(
                 ],
               ),
             ]),
-            _branch(Routes.captain, const CaptainScreen()),
+            StatefulShellBranch(routes: [
+              GoRoute(
+                path: Routes.captain,
+                builder: (context, state) => const CaptainScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'plan',
+                    builder: (c, s) => MissionPlanScreen(
+                        missionId: s.uri.queryParameters['mission'] ?? '', projectPath: s.uri.queryParameters['chemin']),
+                  ),
+                  GoRoute(path: 'execution', builder: (c, s) => RunScreen(runId: s.uri.queryParameters['id'] ?? '')),
+                  GoRoute(path: 'ia', builder: (c, s) => const AiPlanScreen()),
+                ],
+              ),
+            ]),
             _branch(Routes.logbook, const LogbookScreen()),
           ],
         ),
