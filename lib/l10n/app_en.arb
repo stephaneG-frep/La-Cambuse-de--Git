@@ -457,5 +457,8 @@
   "cpAiUsage": "Tokens: {input} in, {output} out — estimated cost {cost}",
   "cpAiRejected": "Plan rejected by validation (nothing will run):",
   "cpAiAccepted": "Valid plan: “{title}”, {count} steps.",
-  "cpAiReview": "Review the plan"
+  "cpAiReview": "Review the plan",
+  "helpTitle": "Ship's guide",
+  "helpSubtitle": "Offline manual: Academy, companion, Workshop, Captain, security, troubleshooting",
+  "helpFrenchOnly": "This guide is written in French."
 }

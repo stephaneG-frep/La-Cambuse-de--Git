@@ -97,4 +97,36 @@ void main() {
     const a = 'groups:\n  - name: g\n    rules:\n      - record: x\n        expr: up\n      - alert: A\n        expr: up == 0\n';
     expect(rules('alerts', a), {'PR001', 'PR002', 'PR003', 'PR004'});
   });
+
+  group('détection de secrets selon le type de fichier', () {
+    Set<String> kinds(String path, String line) => scanContent(path, line).map((f) => f.kind).toSet();
+
+    test('du code ordinaire n\'est pas pris pour un secret (pas de commit bloqué à tort)', () {
+      expect(kinds('lib/store.dart', '      accessToken: _issueAccess(deviceId),'), isEmpty);
+      expect(kinds('android/app/build.gradle.kts', '  keyPassword = keystoreProperties["keyPassword"] as String'), isEmpty);
+      expect(kinds('src/app.py', 'password = os.environ["DB_PASSWORD"]'), isEmpty);
+      expect(kinds('src/app.ts', 'const apiKey = readSecret(config);'), isEmpty);
+      expect(kinds('lib/codes.dart', "  static const secretDetected = 'secret_detected';"), isEmpty);
+    });
+
+    test('les vrais secrets restent détectés', () {
+      expect(kinds('src/config.dart', "const password = 'motdepasse-2024';"), {'mot de passe en clair'});
+      expect(kinds('appsettings.json', '"api_key": "abcd1234efgh5678"'), {'mot de passe en clair'});
+      expect(kinds('.env', 'DB_PASSWORD=supersecret1'), {'mot de passe en clair'});
+      expect(kinds('compose.yaml', '      DB_PASSWORD: motdepasse-2024'), {'mot de passe en clair'});
+      expect(kinds('Dockerfile', 'ENV API_KEY=abcd1234efgh'), {'mot de passe en clair'});
+      expect(kinds('deploy.sh', 'export ACCESS_TOKEN=tok_1234567890'), {'mot de passe en clair'});
+      expect(kinds('src/a.dart', "final t = 'ghp_${'a' * 36}';"), {'jeton GitHub'});
+    });
+
+    test('références à des variables ou modèles : pas de secret', () {
+      expect(kinds('compose.yaml', '      DB_PASSWORD: \${DB_PASSWORD}'), isEmpty);
+      expect(kinds('deploy.sh', 'TOKEN=\$1'), isEmpty);
+      expect(kinds('playbook.yml', '    password: "{{ app_password | password_hash(\'sha512\') }}"'), isEmpty);
+    });
+
+    test('le masquage des journaux reste large', () {
+      expect(maskSecrets('password=motdepasse-2024'), contains('[SECRET MASQUÉ]'));
+    });
+  });
 }

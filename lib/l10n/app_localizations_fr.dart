@@ -1612,4 +1612,14 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get cpAiReview => 'Examiner le plan';
+
+  @override
+  String get helpTitle => 'Guide de bord';
+
+  @override
+  String get helpSubtitle =>
+      'Mode d\'emploi hors ligne : Académie, compagnon, Atelier, Capitaine, sécurité, dépannage';
+
+  @override
+  String get helpFrenchOnly => 'Guide rédigé en français.';
 }

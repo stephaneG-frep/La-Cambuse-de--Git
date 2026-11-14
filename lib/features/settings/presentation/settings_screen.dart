@@ -94,6 +94,19 @@ class _SettingsBody extends ConsumerWidget {
                 ),
               ),
             ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: CambuseSpacing.md),
+              child: Card(
+                clipBehavior: Clip.antiAlias,
+                child: ListTile(
+                  leading: Icon(Icons.menu_book_outlined, color: p.copper),
+                  title: Text(l.helpTitle),
+                  subtitle: Text(l.helpSubtitle, style: TextStyle(color: p.textSecondary)),
+                  trailing: Icon(Icons.chevron_right, color: p.turquoise),
+                  onTap: () => context.push('/parametres/guide'),
+                ),
+              ),
+            ),
             Card(
               child: Padding(
                 padding: const EdgeInsets.all(CambuseSpacing.md),

@@ -1608,4 +1608,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get cpAiReview => 'Review the plan';
+
+  @override
+  String get helpTitle => 'Ship\'s guide';
+
+  @override
+  String get helpSubtitle =>
+      'Offline manual: Academy, companion, Workshop, Captain, security, troubleshooting';
+
+  @override
+  String get helpFrenchOnly => 'This guide is written in French.';
 }

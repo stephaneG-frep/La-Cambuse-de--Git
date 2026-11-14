@@ -11,7 +11,9 @@ class SecretFinding {
   Map<String, dynamic> toJson() => {'file': file, 'kind': kind, 'line': ?line};
 }
 
-/// Motifs de contenu. Les valeurs trouvées ne sont jamais renvoyées.
+/// Motifs de contenu. Les valeurs trouvées ne sont jamais renvoyées. Le motif
+/// « mot de passe en clair » est large (masquage des journaux) ; l'analyse de
+/// fichiers ([scanContent]) l'affine selon le type de fichier.
 final secretContentPatterns = <String, RegExp>{
   'jeton GitHub': RegExp(r'\b(gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,})'),
   'jeton GitLab': RegExp(r'\bglpat-[A-Za-z0-9_\-]{20,}'),
@@ -25,6 +27,30 @@ final secretContentPatterns = <String, RegExp>{
     caseSensitive: false,
   ),
 };
+
+const _secretKey = r'(?:password|passwd|secret|api[_-]?key|access[_-]?token)';
+
+/// Valeur littérale entre guillemets : `password = "…"`, `"api_key": "…"`.
+final _quotedSecret = RegExp('$_secretKey' r'''\w*["']?\s*[:=]\s*["']([^\s"'$<{]{8,})["']''', caseSensitive: false);
+
+/// Valeur nue, signalée seulement dans les fichiers de configuration (dans du
+/// code, `password = config.read()` n'est pas un secret).
+final _bareSecret = RegExp('$_secretKey' r'''\w*\s*[:=]\s*([^\s"'$<{#(\[]{8,})''', caseSensitive: false);
+
+final _configFile = RegExp(
+  r'(^|/)(\.env[\w.-]*|Dockerfile[\w.-]*|Containerfile|[^/]+\.(properties|ini|cfg|conf|ya?ml|sh|bash|zsh|tfvars|env|npmrc|pypirc|netrc))$',
+  caseSensitive: false,
+);
+
+/// Identifiant de code (`secret_detected`, `apiKeyMissing`) : pas un secret.
+final _identifier = RegExp(r'^([a-z]+(_[a-z]+)+|[a-z]+([A-Z][a-z]+)+)$');
+
+/// Le motif « mot de passe en clair » tient compte du type de fichier.
+bool _plainPassword(String path, String line) {
+  bool real(RegExpMatch m) => !_identifier.hasMatch(m.group(1)!);
+  if (_quotedSecret.allMatches(line).any(real)) return true;
+  return _configFile.hasMatch(path) && _bareSecret.allMatches(line).any(real);
+}
 
 /// Noms de fichiers typiquement sensibles.
 final secretFilePatterns = <String, RegExp>{
@@ -55,7 +81,8 @@ List<SecretFinding> scanContent(String path, String content, {int maxFindings = 
     final line = lines[i];
     if (line.length > 5000) continue; // lignes minifiées : ignorées
     for (final e in secretContentPatterns.entries) {
-      if (e.value.hasMatch(line)) {
+      final hit = e.key == 'mot de passe en clair' ? _plainPassword(path, line) : e.value.hasMatch(line);
+      if (hit) {
         out.add(SecretFinding(path, e.key, line: i + 1));
         break;
       }

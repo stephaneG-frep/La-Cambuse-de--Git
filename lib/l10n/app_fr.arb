@@ -1019,5 +1019,8 @@
       }
     }
   },
-  "cpAiReview": "Examiner le plan"
+  "cpAiReview": "Examiner le plan",
+  "helpTitle": "Guide de bord",
+  "helpSubtitle": "Mode d'emploi hors ligne : Académie, compagnon, Atelier, Capitaine, sécurité, dépannage",
+  "helpFrenchOnly": "Guide rédigé en français."
 }

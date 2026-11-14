@@ -74,6 +74,10 @@ void main() {
     final db = await pumpApp(tester, size: phone);
     await tester.tap(find.byTooltip('Paramètres'));
     await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(find.text('Contraste renforcé'), 200,
+        scrollable: find.descendant(of: find.byType(SettingsScreen), matching: find.byType(Scrollable)).first);
+    await tester.ensureVisible(find.text('Contraste renforcé'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Contraste renforcé'));
     await tester.pumpAndSettle();
     // Écran plus long que le téléphone : défilement jusqu'au choix de langue.

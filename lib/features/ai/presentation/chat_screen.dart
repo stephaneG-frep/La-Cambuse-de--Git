@@ -396,48 +396,9 @@ class _Bubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = CambuseTheme.of(context);
-    final base = TextStyle(height: 1.4, color: muted ? p.textSecondary : p.text);
-    final children = <Widget>[];
     // Les messages de l'apprenant restent du texte brut ; ceux du professeur
     // sont mis en forme (Markdown simplifié, rien de cliquable).
-    final blocks = user ? [MdParagraph(text)] : parseMarkdownLite(text);
-    for (final b in blocks) {
-      switch (b) {
-        case MdCode(:final code):
-          children.add(Container(
-            width: double.infinity,
-            margin: const EdgeInsets.symmetric(vertical: CambuseSpacing.xs),
-            padding: const EdgeInsets.all(CambuseSpacing.sm),
-            decoration: BoxDecoration(
-              color: p.night,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: p.turquoise.withValues(alpha: 0.5)),
-            ),
-            child: SelectableText(code, style: TextStyle(fontFamily: 'monospace', color: p.turquoise)),
-          ));
-        case MdHeading(:final text):
-          children.add(Padding(
-            padding: const EdgeInsets.only(top: CambuseSpacing.sm, bottom: CambuseSpacing.xs),
-            child: SelectableText.rich(TextSpan(
-                children: inlineSpans(text, base.copyWith(color: p.gold, fontWeight: FontWeight.w700, fontSize: 17), p.turquoise))),
-          ));
-        case MdBullet(:final text, :final marker):
-          children.add(Padding(
-            padding: const EdgeInsets.only(left: CambuseSpacing.sm, bottom: CambuseSpacing.xs),
-            child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              SizedBox(width: 22, child: Text(marker, style: base.copyWith(color: p.copper))),
-              Expanded(child: SelectableText.rich(TextSpan(children: inlineSpans(text, base, p.turquoise)))),
-            ]),
-          ));
-        case MdParagraph(:final text):
-          children.add(Padding(
-            padding: const EdgeInsets.only(bottom: CambuseSpacing.xs),
-            child: user
-                ? SelectableText(text, style: base)
-                : SelectableText.rich(TextSpan(children: inlineSpans(text, base, p.turquoise))),
-          ));
-      }
-    }
+    final content = MarkdownLiteView(text: text, plain: user, muted: muted);
     return Align(
       alignment: user ? Alignment.centerRight : Alignment.centerLeft,
       child: ConstrainedBox(
@@ -462,7 +423,7 @@ class _Bubble extends StatelessWidget {
                 ],
               ]),
             if (!user) const SizedBox(height: CambuseSpacing.xs),
-            ...children,
+            content,
             if (caption != null) ...[
               const SizedBox(height: CambuseSpacing.xs),
               Text(caption!, style: TextStyle(color: p.textSecondary, fontSize: 12)),

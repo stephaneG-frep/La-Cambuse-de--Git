@@ -18,6 +18,7 @@ import '../features/dashboard/presentation/dashboard_screen.dart';
 import '../features/docker/presentation/docker_room_screen.dart';
 import '../features/forge/presentation/forge_settings_screen.dart';
 import '../features/logbook/presentation/logbook_screen.dart';
+import '../features/settings/presentation/help_screen.dart';
 import '../features/settings/presentation/settings_screen.dart';
 import '../features/workshop/presentation/project_screen.dart' as workshop;
 import '../features/workshop/presentation/workshop_screen.dart';
@@ -126,6 +127,7 @@ GoRouter buildRouter() => GoRouter(
             GoRoute(path: 'ia', builder: (c, s) => const AiSettingsScreen()),
             GoRoute(path: 'compagnon', builder: (c, s) => const CompanionScreen()),
             GoRoute(path: 'forges', builder: (c, s) => const ForgeSettingsScreen()),
+            GoRoute(path: 'guide', builder: (c, s) => const HelpScreen()),
           ],
         ),
       ],

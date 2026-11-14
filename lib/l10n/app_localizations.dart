@@ -2845,6 +2845,24 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Examiner le plan'**
   String get cpAiReview;
+
+  /// No description provided for @helpTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Guide de bord'**
+  String get helpTitle;
+
+  /// No description provided for @helpSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mode d\'emploi hors ligne : Académie, compagnon, Atelier, Capitaine, sécurité, dépannage'**
+  String get helpSubtitle;
+
+  /// No description provided for @helpFrenchOnly.
+  ///
+  /// In fr, this message translates to:
+  /// **'Guide rédigé en français.'**
+  String get helpFrenchOnly;
 }
 
 class _AppLocalizationsDelegate

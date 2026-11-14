@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../../app/theme/theme.dart';
+import '../../../app/theme/tokens.dart';
+
 /// Bloc Markdown simplifié.
 sealed class MdBlock {
   const MdBlock();
@@ -104,4 +107,71 @@ List<InlineSpan> inlineSpans(String text, TextStyle base, Color codeColor) {
   }
   if (last < text.length) spans.add(TextSpan(text: text.substring(last)));
   return [TextSpan(style: base, children: spans)];
+}
+
+
+/// Rendu du Markdown simplifié (titres, paragraphes, puces, code). Rien n'est
+/// cliquable : aucun lien n'est ouvert depuis un texte rendu. [plain] affiche
+/// le texte brut (messages de l'apprenant).
+class MarkdownLiteView extends StatelessWidget {
+  const MarkdownLiteView({super.key, required this.text, this.plain = false, this.muted = false, this.selectable = true});
+  final String text;
+  final bool plain;
+  final bool muted;
+
+  /// Texte sélectionnable (chat). Dans un document de lecture, seul le code
+  /// reste sélectionnable (pour copier une commande), avec une cible ≥ 48 dp.
+  final bool selectable;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = CambuseTheme.of(context);
+    final base = TextStyle(height: 1.4, color: muted ? p.textSecondary : p.text);
+    final children = <Widget>[];
+    Widget rich(TextSpan span) => selectable ? SelectableText.rich(span) : Text.rich(span);
+    final blocks = plain ? [MdParagraph(text)] : parseMarkdownLite(text);
+    for (final b in blocks) {
+      switch (b) {
+        case MdCode(:final code):
+          children.add(Container(
+            width: double.infinity,
+            constraints: const BoxConstraints(minHeight: CambuseSpacing.minTouchTarget),
+            margin: const EdgeInsets.symmetric(vertical: CambuseSpacing.xs),
+            padding: const EdgeInsets.all(CambuseSpacing.sm),
+            decoration: BoxDecoration(
+              color: p.night,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: p.turquoise.withValues(alpha: 0.5)),
+            ),
+            child: SelectableText(code, style: TextStyle(fontFamily: 'monospace', color: p.turquoise)),
+          ));
+        case MdHeading(:final text, :final level):
+          children.add(Padding(
+            padding: const EdgeInsets.only(top: CambuseSpacing.sm, bottom: CambuseSpacing.xs),
+            child: Semantics(
+              header: true,
+              child: rich(TextSpan(
+                  children: inlineSpans(
+                      text, base.copyWith(color: p.gold, fontWeight: FontWeight.w700, fontSize: level <= 2 ? 19 : 17), p.turquoise))),
+            ),
+          ));
+        case MdBullet(:final text, :final marker):
+          children.add(Padding(
+            padding: const EdgeInsets.only(left: CambuseSpacing.sm, bottom: CambuseSpacing.xs),
+            child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              SizedBox(width: 22, child: Text(marker, style: base.copyWith(color: p.copper))),
+              Expanded(child: rich(TextSpan(children: inlineSpans(text, base, p.turquoise)))),
+            ]),
+          ));
+        case MdParagraph(:final text):
+          children.add(Padding(
+            padding: const EdgeInsets.only(bottom: CambuseSpacing.xs),
+            child: plain
+                ? (selectable ? SelectableText(text, style: base) : Text(text, style: base))
+                : rich(TextSpan(children: inlineSpans(text, base, p.turquoise))),
+          ));
+      }
+    }
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: children);
+  }
 }
