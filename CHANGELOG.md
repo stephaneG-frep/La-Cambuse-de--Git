@@ -10,6 +10,7 @@ Format inspiré de « Keep a Changelog ». Versions non publiées.
 
 ### Vérifié
 - Compagnon en réseau local (TLS) depuis le téléphone : appairage sans câble, refus d'une empreinte fausse.
+- GitLab réel depuis le téléphone : projet privé, push sans force, merge request et ticket.
 
 ## [1.0.0] — Phase 11 : stabilisation et livraison (2026-11-14)
 

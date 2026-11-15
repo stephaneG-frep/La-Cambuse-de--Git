@@ -122,10 +122,16 @@ Installation réelle sur ce PC (Ubuntu 22.04.5, x86_64), par l'utilisateur, avec
   - fusion commutative, associative et idempotente, vérifiée sur 200 tirages aléatoires ;
   - essai réel dans les deux sens. Le Honor envoie 4 leçons ; l'**application Linux réelle** (test d'intégration `integration_test/sync_linux_test.dart`, vrai compagnon, base temporaire) les reçoit et ajoute sa leçon Git terminée ; le Honor récupère alors cette leçon, et son Pont affiche « Git — 1/14 leçons ».
 
+- **GitLab en réel** (2026-11-15), depuis le Honor, sur gitlab.com, avec un jeton personnel saisi par l'utilisateur dans l'application :
+  - « Connecté à GitLab en tant que stephaneG-frep » ;
+  - projet **privé** `stephaneG-frep/cambuse-depot-test` créé depuis l'onglet Publication (accès anonyme à l'API : HTTP 404) ;
+  - `git remote add` approuvé ; push de `main` puis de la branche `feat/essai`, sans force, chacun approuvé dans le panneau de publication (commits, fichiers, analyse des secrets) ;
+  - **merge request !1** `feat/essai → main` et **ticket #1** créés depuis l'application ;
+  - audit du compagnon : 4 événements liés au push, toutes les opérations terminées en succès.
+
 ## 7. Limites connues
 
 - **APK debug uniquement** : aucune release signée, par choix. La procédure de signature est documentée (`android/key.properties`, avec refus explicite sans ce fichier).
-- **GitLab** : client testé sur serveur simulé, pas sur un vrai GitLab.
 - **Synchronisation** : explicite, sur bouton, via un compagnon commun ; pas de synchronisation automatique ni par Internet. Le test d'intégration Linux demande un compagnon lancé : il n'est pas exécuté dans la CI.
 - **Moteur IA local (Ollama)** : couvert par le fournisseur « compatible OpenAI », testé sur serveur simulé seulement.
 - **Contenu des modules avancés** (phase 9) : rédigé par l'IA, vérifié par tests et labos réalisables, **non relu par un expert humain**.
