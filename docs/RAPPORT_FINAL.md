@@ -84,7 +84,7 @@ Tous les écrans listés existent et fonctionnent :
 | Compagnon (`dart test`) | **58** réussis : sécurité de l'API, confinement, appairage, audit, opérations réelles sur dépôts de test |
 | Protocole (`dart test`) | **39** réussis : analyseurs, détection de secrets, modèles de CI |
 | Analyse statique | aucun problème sur les trois projets |
-| CI GitHub | dernière exécution `43639902180` (commit `b028770`, analyse des secrets sur tout l'historique) : secrets ✓, analyse et tests ✓, livraison ✓ |
+| CI GitHub | dépôt public, dernière exécution `43707347030` (commit `f30d513`) : secrets ✓, analyse et tests ✓, livraison ✓ |
 
 Les essais réels, documentés phase par phase, ont porté sur le Honor MTN-NX1M (Android, arm64) et sur un PC Ubuntu 22.04 (x86_64) :
 - installation, apprentissage et IA réelle ;
@@ -141,4 +141,3 @@ Installation réelle sur ce PC (Ubuntu 22.04.5, x86_64), par l'utilisateur, avec
 - Pas d'illustrations du personnage Capitaine Commit, et pas de panneaux redimensionnables sur Linux (prévus par DESIGN.md).
 - Capitaine : mission CI et restauration du point de contrôle non rejouées en réel depuis le Capitaine ; aucun push réel par une mission.
 - Un échec isolé de la suite du compagnon a été observé une fois en phase 8, sans être reproduit depuis.
-- Le dépôt public `La-Cambuse-de--Git` contient la version de la phase 10, dont la CI échoue. Les corrections sont sur le dépôt privé et en local ; il reste à les pousser si vous le décidez.
